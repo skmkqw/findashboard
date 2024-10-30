@@ -11,4 +11,9 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\z-bank.application\z-bank.application.csproj" />
+      <ProjectReference Include="..\z-bank.contracts\z-bank.contracts.csproj" />
+    </ItemGroup>
+
 </Project>

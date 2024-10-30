@@ -7,4 +7,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\z-bank.application\z-bank.application.csproj" />
+    </ItemGroup>
+
 </Project>
