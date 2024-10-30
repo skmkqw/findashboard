@@ -4,7 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>z_bank.api</RootNamespace>
+        <RootNamespace>ZBank.API</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,8 +12,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\z-bank.application\z-bank.application.csproj" />
-      <ProjectReference Include="..\z-bank.contracts\z-bank.contracts.csproj" />
+      <ProjectReference Include="..\ZBank.Application\ZBank.Application.csproj" />
+      <ProjectReference Include="..\ZBank.Contracts\ZBank.Contracts.csproj" />
     </ItemGroup>
 
 </Project>

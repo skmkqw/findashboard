@@ -2,13 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <RootNamespace>z_bank.application</RootNamespace>
+        <RootNamespace>ZBank.Application</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\z-bank.domain\z-bank.domain.csproj" />
+      <ProjectReference Include="..\ZBank.Domain\ZBank.Domain.csproj" />
     </ItemGroup>
 
 </Project>
