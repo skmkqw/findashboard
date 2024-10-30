@@ -11,4 +11,8 @@
       <ProjectReference Include="..\ZBank.Application\ZBank.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MediatR" Version="12.4.1" />
+    </ItemGroup>
+
 </Project>
