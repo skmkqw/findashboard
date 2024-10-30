@@ -1,7 +1,8 @@
 namespace ZBank.Contracts.Authentication;
 
-public record RegisterRequest(
+public record AuthenticationResponse(
+    string Id, 
     string FirstName,
     string LastName,
     string Email,
-    string Password);
+    string Token);
