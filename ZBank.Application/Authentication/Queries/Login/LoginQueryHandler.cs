@@ -3,6 +3,7 @@ using MediatR;
 using ZBank.Application.Authentication.Common;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Interfaces.Services;
+using ZBank.Application.Common.Interfaces.Services.Authentication;
 
 namespace ZBank.Application.Authentication.Queries.Login;
 
