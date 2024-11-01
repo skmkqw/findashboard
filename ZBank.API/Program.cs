@@ -1,10 +1,12 @@
 using ZBank.API;
+using ZBank.Application;
 using ZBank.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 {
     builder.Services
         .AddPresentation()
+        .AddApplication()
         .AddInfrastructure(builder.Configuration); 
 }
 
