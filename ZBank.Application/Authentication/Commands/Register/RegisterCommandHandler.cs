@@ -4,6 +4,8 @@ using ZBank.Application.Authentication.Common;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Application.Common.Interfaces.Services.Authentication;
+using ZBank.Domain.Common.Errors;
+using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Authentication.Commands.Register;
 
@@ -24,12 +26,16 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
 
     public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        if (await _userRepository.FindByEmailAsync(request.Email) != null)
-        {
-            return Error.Conflict("User.EmailExists", "User with given email already exists");
-        }
+        if (await _userRepository.FindByEmailAsync(request.Email) is not null)
+            return Errors.User.DuplicateEmail;
         
-        var user = new User(Guid.NewGuid(), request.FirstName, request.LastName, request.Email, _passwordHasher.HashPassword(request.Password));
+        string hashedPassword = _passwordHasher.HashPassword(request.Password);    
+    
+        var user = User.Create(
+            request.FirstName,
+            request.LastName,
+            request.Email,
+            hashedPassword);
         
         string token = _jwtTokenGenerator.GenerateJwtToken(user);
         
