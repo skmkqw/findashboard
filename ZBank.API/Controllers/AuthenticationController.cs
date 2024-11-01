@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZBank.Application.Authentication.Commands.Register;
+using ZBank.Application.Authentication.Queries.Login;
 using ZBank.Contracts.Authentication;
 
 namespace ZBank.API.Controllers;
@@ -29,6 +30,19 @@ public class AuthenticationController : ApiController
         var registerUserResult = await _mediator.Send(command);
         
         return registerUserResult.Match(
+            onValue: value => Ok(_mapper.Map<AuthenticationResponse>(value)),
+            onError: errors => Problem(errors)
+        );
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var query = _mapper.Map<LoginQuery>(request);
+        
+        var loginQueryResult = await _mediator.Send(query);
+
+        return loginQueryResult.Match(
             onValue: value => Ok(_mapper.Map<AuthenticationResponse>(value)),
             onError: errors => Problem(errors)
         );
