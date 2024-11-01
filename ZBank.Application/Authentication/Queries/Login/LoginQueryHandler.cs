@@ -4,6 +4,8 @@ using ZBank.Application.Authentication.Common;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Application.Common.Interfaces.Services.Authentication;
+using ZBank.Domain.Common.Errors;
+using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Authentication.Queries.Login;
 
@@ -25,19 +27,13 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<Authenticat
 
     public async Task<ErrorOr<AuthenticationResult>> Handle(LoginQuery request, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.FindByEmailAsync(request.Email);
-        
-        if (user is null)
-        {
-            return Error.NotFound("User.NotFound", "User with given email not found or doesn't exist");
-        }
+        if (await _userRepository.FindByEmailAsync(request.Email) is not User user)
+            return Errors.Authentication.InvalidCredentials;
 
         if (!_passwordHasher.VerifyHashedPassword(user.Password, request.Password))
-        {
-            return Error.Forbidden("User.InvalidCredentials", "Invalid credentials");
-        }
-
-        string token = _tokenGenerator.GenerateJwtToken(user);
+            return Errors.Authentication.InvalidCredentials;
+        
+        var token = _tokenGenerator.GenerateJwtToken(user);
         
         return new AuthenticationResult(user, token);
     }
