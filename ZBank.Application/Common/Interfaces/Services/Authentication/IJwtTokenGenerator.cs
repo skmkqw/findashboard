@@ -1,4 +1,4 @@
-using ZBank.Application.Authentication.Common;
+using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Common.Interfaces.Services.Authentication;
 

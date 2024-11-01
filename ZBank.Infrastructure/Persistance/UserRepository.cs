@@ -1,5 +1,5 @@
-using ZBank.Application.Authentication.Common;
 using ZBank.Application.Common.Interfaces.Persistance;
+using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Infrastructure.Persistance;
 
