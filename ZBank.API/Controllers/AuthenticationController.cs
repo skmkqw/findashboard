@@ -9,7 +9,7 @@ using RegisterRequest = Microsoft.AspNetCore.Identity.Data.RegisterRequest;
 namespace ZBank.API.Controllers;
 
 [AllowAnonymous]
-[Microsoft.AspNetCore.Components.Route("api/auth")]
+[Route("api/auth")]
 public class AuthenticationController : ApiController
 {
     private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ public class AuthenticationController : ApiController
         _mediator = mediator;
     }
 
-    [HttpGet("register")]
+    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         var command = _mapper.Map<RegisterCommand>(request);
