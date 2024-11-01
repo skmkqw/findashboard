@@ -2,7 +2,6 @@ using ErrorOr;
 using MediatR;
 using ZBank.Application.Authentication.Common;
 using ZBank.Application.Common.Interfaces.Persistance;
-using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Application.Common.Interfaces.Services.Authentication;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.UserAggregate;
