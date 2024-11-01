@@ -1,15 +1,24 @@
+using ZBank.API;
+using ZBank.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
-
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
+{
+    builder.Services
+        .AddPresentation()
+        .AddInfrastructure(builder.Configuration); 
+}
 
 var app = builder.Build();
+{
+    app.UseExceptionHandler("/error");
 
-app.UseHttpsRedirection();
+    app.UseAuthentication();
+    
+    app.UseHttpsRedirection();
+    
+    app.UseAuthorization();
 
-app.UseAuthorization();
+    app.MapControllers();
 
-app.MapControllers();
-
-app.Run();
+    app.Run();
+}
