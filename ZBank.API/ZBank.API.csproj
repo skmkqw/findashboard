@@ -16,6 +16,7 @@
     <ItemGroup>
       <ProjectReference Include="..\ZBank.Application\ZBank.Application.csproj" />
       <ProjectReference Include="..\ZBank.Contracts\ZBank.Contracts.csproj" />
+      <ProjectReference Include="..\ZBank.Infrastructure\ZBank.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
