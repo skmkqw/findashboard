@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using ZBank.Application.Authentication.Common;
 using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Application.Common.Interfaces.Services.Authentication;
+using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Infrastructure.Authentication;
 
