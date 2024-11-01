@@ -5,9 +5,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ZBank.Application.Authentication.Common;
 using ZBank.Application.Common.Interfaces.Services;
-using ZBank.Infrastructure.Authentication;
+using ZBank.Application.Common.Interfaces.Services.Authentication;
 
-namespace ZBank.Infrastructure.Services;
+namespace ZBank.Infrastructure.Authentication;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
