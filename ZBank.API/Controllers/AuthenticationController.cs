@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZBank.Application.Authentication.Commands.Register;
 using ZBank.Contracts.Authentication;
-using RegisterRequest = Microsoft.AspNetCore.Identity.Data.RegisterRequest;
 
 namespace ZBank.API.Controllers;
 
