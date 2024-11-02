@@ -15,12 +15,19 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     
     private readonly IPasswordHasher _passwordHasher;
+    
+    private readonly IUnitOfWork _unitOfWork;
 
-    public RegisterCommandHandler(IUserRepository userRepository, IJwtTokenGenerator jwtTokenGenerator, IPasswordHasher passwordHasher)
+    public RegisterCommandHandler(
+        IUserRepository userRepository,
+        IJwtTokenGenerator jwtTokenGenerator,
+        IPasswordHasher passwordHasher,
+        IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
         _passwordHasher = passwordHasher;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -39,6 +46,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
         string token = _jwtTokenGenerator.GenerateJwtToken(user);
         
         _userRepository.Add(user);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         return new AuthenticationResult(user, token);
     }
