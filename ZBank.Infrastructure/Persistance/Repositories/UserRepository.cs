@@ -1,7 +1,7 @@
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.UserAggregate;
 
-namespace ZBank.Infrastructure.Persistance;
+namespace ZBank.Infrastructure.Persistance.Repositories;
 
 public class UserRepository : IUserRepository
 {

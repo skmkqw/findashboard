@@ -10,6 +10,7 @@ using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Application.Common.Interfaces.Services.Authentication;
 using ZBank.Infrastructure.Authentication;
 using ZBank.Infrastructure.Persistance;
+using ZBank.Infrastructure.Persistance.Repositories;
 using ZBank.Infrastructure.Services;
 
 namespace ZBank.Infrastructure;
