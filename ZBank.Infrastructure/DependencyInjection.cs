@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,7 @@ using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Application.Common.Interfaces.Services.Authentication;
 using ZBank.Infrastructure.Authentication;
 using ZBank.Infrastructure.Persistance;
+using ZBank.Infrastructure.Persistance.Repositories;
 using ZBank.Infrastructure.Services;
 
 namespace ZBank.Infrastructure;
@@ -28,6 +30,10 @@ public static class DependencyInjection
     
     private static IServiceCollection AddPersistence(this IServiceCollection services)
     {
+        services.AddDbContext<ZBankDbContext>(options => options.UseNpgsql(connectionString: "Host=aws-0-eu-central-1.pooler.supabase.com;Port=5432;Username=postgres.ljqnqtjppbnfetuaprxf;Password=tmkrs.psswd0401!;Database=postgres;SSL Mode=Require;Trust Server Certificate=true;"));
+        
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         services.AddScoped<IUserRepository, UserRepository>(); 
         return services;
     }
