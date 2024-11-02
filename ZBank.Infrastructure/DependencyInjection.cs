@@ -31,6 +31,9 @@ public static class DependencyInjection
     private static IServiceCollection AddPersistence(this IServiceCollection services)
     {
         services.AddDbContext<ZBankDbContext>(options => options.UseNpgsql(connectionString: "User Id=postgres.ljqnqtjppbnfetuaprxf;Password=[YOUR-PASSWORD];Server=aws-0-eu-central-1.pooler.supabase.com;Port=6543;Database=postgres;"));
+        
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         services.AddScoped<IUserRepository, UserRepository>(); 
         return services;
     }
