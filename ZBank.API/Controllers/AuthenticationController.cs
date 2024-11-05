@@ -28,11 +28,24 @@ public class AuthenticationController : ApiController
         var command = _mapper.Map<RegisterCommand>(request);
         
         var registerUserResult = await _mediator.Send(command);
+
+
+        if (registerUserResult.IsError)
+        {
+            return Problem(registerUserResult.Errors);
+        }
         
-        return registerUserResult.Match(
-            onValue: value => Ok(_mapper.Map<AuthenticationResponse>(value)),
-            onError: errors => Problem(errors)
-        );
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTime.UtcNow.AddDays(1)
+        };
+
+        HttpContext.Response.Cookies.Append("AuthToken", registerUserResult.Value.Token, cookieOptions);
+
+        return Ok(_mapper.Map<AuthenticationResponse>(registerUserResult.Value));
     }
 
     [HttpPost("login")]
