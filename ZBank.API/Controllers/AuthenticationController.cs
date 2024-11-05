@@ -15,6 +15,14 @@ public class AuthenticationController : ApiController
     private readonly IMapper _mapper;
     
     private readonly IMediator _mediator;
+    
+    private readonly CookieOptions _cookieOptions = new()
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.None,
+        Expires = DateTime.UtcNow.AddDays(1)
+    };
 
     public AuthenticationController(IMapper mapper, IMediator mediator)
     {
@@ -35,15 +43,7 @@ public class AuthenticationController : ApiController
             return Problem(registerUserResult.Errors);
         }
         
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.None,
-            Expires = DateTime.UtcNow.AddDays(1)
-        };
-
-        HttpContext.Response.Cookies.Append("AuthToken", registerUserResult.Value.Token, cookieOptions);
+        HttpContext.Response.Cookies.Append("AuthToken", registerUserResult.Value.Token, _cookieOptions);
 
         return Ok(_mapper.Map<AuthenticationResponse>(registerUserResult.Value));
     }
@@ -55,10 +55,14 @@ public class AuthenticationController : ApiController
         
         var loginQueryResult = await _mediator.Send(query);
 
-        return loginQueryResult.Match(
-            onValue: value => Ok(_mapper.Map<AuthenticationResponse>(value)),
-            onError: errors => Problem(errors)
-        );
+        if (loginQueryResult.IsError)
+        {
+            return Problem(loginQueryResult.Errors);
+        }
+        
+        HttpContext.Response.Cookies.Append("AuthToken", loginQueryResult.Value.Token, _cookieOptions);
+
+        return Ok(_mapper.Map<AuthenticationResponse>(loginQueryResult.Value));
     }
     
 }
