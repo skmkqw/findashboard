@@ -8,6 +8,18 @@ public static class DependencyInjection
     {
         services.AddControllers();
         services.AddMappers();
+        
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend", policy =>
+            {
+                policy.WithOrigins("http://localhost:3000")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+        });
+        
         return services;
     }
 }
