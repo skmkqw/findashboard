@@ -1,3 +1,4 @@
+using ZBank.Domain.ActivityAggregate.Entities;
 using ZBank.Domain.ActivityAggregate.ValueObjects;
 using ZBank.Domain.Common.Models;
 using ZBank.Domain.ProjectAggregate.ValueObjects;
@@ -14,6 +15,10 @@ public class Activity : AggregateRoot<ActivityId>
     public TeamId TeamId { get; }
 
     public ProjectId ProjectId { get; }
+    
+    public IReadOnlyList<ActivityLog> ActivityLogs => _activityLogs.AsReadOnly();
+    
+    private readonly List<ActivityLog> _activityLogs = new();
 
     private Activity(string name, string description, TeamId teamId, ProjectId projectId)
     {
