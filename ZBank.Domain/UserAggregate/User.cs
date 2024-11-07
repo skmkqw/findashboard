@@ -55,6 +55,16 @@ public sealed class User : AggregateRoot<UserId>
         LastName = lastName;
     }
 
+    public void AddTeam(TeamId teamId)
+    {
+        _teamIds.Add(teamId);
+    }
+
+    public void DeleteTeam(TeamId teamId)
+    {
+        _teamIds.Remove(teamId);
+    }
+
 #pragma warning disable CS8618
     private User()
 #pragma warning restore CS8618
