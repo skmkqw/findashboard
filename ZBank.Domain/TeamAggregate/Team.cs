@@ -36,6 +36,12 @@ public class Team : AggregateRoot<TeamId>
     {
         return new Team(name, description, userIds);
     }
+
+    public void Update(string name, string description)
+    {
+        Name = name;
+        Description = description;
+    }
     
 #pragma warning disable CS8618
     private Team()
