@@ -8,7 +8,9 @@ namespace ZBank.Domain.TeamAggregate;
 
 public class Team : AggregateRoot<TeamId>
 { 
-    public string Name { get; }
+    public string Name { get; private set;  }
+
+    public string Description { get; private set; }
     
     public IReadOnlyList<UserId> UserIds => _userIds.AsReadOnly();
     
@@ -22,11 +24,17 @@ public class Team : AggregateRoot<TeamId>
     
     private readonly List<ActivityId> _activityIds = new();
 
-    private Team(string name, List<UserId> userIds)
+    private Team(string name, string description, List<UserId> userIds)
     {
         Id = TeamId.CreateUnique();
         Name = name;
+        Description = description;
         _userIds = userIds;
+    }
+
+    public static Team Create(string name, string description, List<UserId> userIds)
+    {
+        return new Team(name, description, userIds);
     }
     
 #pragma warning disable CS8618
