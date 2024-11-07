@@ -13,6 +13,10 @@ public sealed class User : AggregateRoot<UserId>
 
     public string Password { get; }
     
+    public IReadOnlyList<UserId> UserIds => _userIds.AsReadOnly();
+    
+    private readonly List<UserId> _userIds = new();
+    
     private User(
         UserId id, 
         string firstName, 
