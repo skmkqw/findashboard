@@ -6,10 +6,10 @@ namespace ZBank.Domain.WalletAggregate;
 
 public class Wallet : AggregateRoot<WalletId>
 {
-    public string Address { get; }
+    public string Address { get; private set; }
     
     //TODO This is probably not how i want to implement it
-    public string Type { get; }
+    public string Type { get; private set; }
 
     public ProfileId ProfileId { get; }
 
@@ -23,6 +23,12 @@ public class Wallet : AggregateRoot<WalletId>
     public static Wallet Create(string address, string type, ProfileId profileId)
     {
         return new Wallet(address, type, profileId);
+    }
+
+    public void Update(string address, string type)
+    {
+        Address = address;
+        Type = type;
     }
     
 #pragma warning disable CS8618
