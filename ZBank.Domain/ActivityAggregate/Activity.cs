@@ -32,6 +32,16 @@ public class Activity : AggregateRoot<ActivityId>
     {
         return new Activity(name, description, teamId, projectId);
     }
+
+    public void AddLog(ActivityLog activityLog)
+    {
+        _activityLogs.Add(activityLog);
+    }
+
+    public void DeleteLog(ActivityLog activityLog)
+    {
+        _activityLogs.Remove(activityLog);
+    }
     
 #pragma warning disable CS8618
     private Activity()
