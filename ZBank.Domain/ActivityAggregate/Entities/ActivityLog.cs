@@ -28,4 +28,10 @@ public class ActivityLog : Entity<ActivityLogId>
     {
         return new ActivityLog(userId, profileId, walletId);
     }
+    
+#pragma warning disable CS8618
+    private ActivityLog()
+#pragma warning restore CS8618
+    {
+    }
 }
