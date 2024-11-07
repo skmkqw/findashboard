@@ -1,4 +1,5 @@
 using ZBank.Domain.Common.Models;
+using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Domain.UserAggregate;
@@ -13,9 +14,9 @@ public sealed class User : AggregateRoot<UserId>
 
     public string Password { get; }
     
-    public IReadOnlyList<UserId> UserIds => _userIds.AsReadOnly();
+    public IReadOnlyList<TeamId> TeamIds => _teamIds.AsReadOnly();
     
-    private readonly List<UserId> _userIds = new();
+    private readonly List<TeamId> _teamIds = new();
     
     private User(
         UserId id, 
