@@ -52,6 +52,16 @@ public class Team : AggregateRoot<TeamId>
     {
         _projectIds.Remove(projectId);
     }
+
+    public void AddActivity(ActivityId activityId)
+    {
+        _activityIds.Add(activityId);
+    }
+
+    public void DeleteActivity(ActivityId activityId)
+    {
+        _activityIds.Remove(activityId);
+    }
     
 #pragma warning disable CS8618
     private Team()
