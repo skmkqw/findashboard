@@ -42,6 +42,16 @@ public class Team : AggregateRoot<TeamId>
         Name = name;
         Description = description;
     }
+
+    public void AddProject(ProjectId projectId)
+    {
+        _projectIds.Add(projectId);
+    }
+
+    public void DeleteProject(ProjectId projectId)
+    {
+        _projectIds.Remove(projectId);
+    }
     
 #pragma warning disable CS8618
     private Team()
