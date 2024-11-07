@@ -8,13 +8,13 @@ namespace ZBank.Domain.ActivityAggregate;
 
 public class Activity : AggregateRoot<ActivityId>
 {
-    public string Name { get; }
+    public string Name { get; private set; }
 
-    public string Description { get; }
+    public string Description { get; private set; }
 
     public TeamId TeamId { get; }
 
-    public ProjectId ProjectId { get; }
+    public ProjectId ProjectId { get; private set; }
     
     public IReadOnlyList<ActivityLog> ActivityLogs => _activityLogs.AsReadOnly();
     
@@ -31,6 +31,13 @@ public class Activity : AggregateRoot<ActivityId>
     public static Activity Create(string name, string description, TeamId teamId, ProjectId projectId)
     {
         return new Activity(name, description, teamId, projectId);
+    }
+
+    public void Update(string name, string description, ProjectId projectId)
+    {
+        Name = name;
+        Description = description;
+        ProjectId = projectId;
     }
 
     public void AddLog(ActivityLog activityLog)
