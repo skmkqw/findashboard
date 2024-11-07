@@ -25,5 +25,4 @@ public class ProjectId : ValueObject, IEntityId<ProjectId, Guid>
     {
         yield return Value;
     }
-
 }
