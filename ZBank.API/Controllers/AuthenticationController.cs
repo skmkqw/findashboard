@@ -1,10 +1,13 @@
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using ZBank.Application.Authentication.Commands.Register;
 using ZBank.Application.Authentication.Queries.Login;
 using ZBank.Contracts.Authentication;
+using LoginRequest = ZBank.Contracts.Authentication.LoginRequest;
+using RegisterRequest = ZBank.Contracts.Authentication.RegisterRequest;
 
 namespace ZBank.API.Controllers;
 
@@ -18,7 +21,7 @@ public class AuthenticationController : ApiController
 
     private readonly CookieOptions _cookieOptions = new()
     {
-        HttpOnly = true,
+        HttpOnly = false,
         Secure = true,
         SameSite = SameSiteMode.None,
         Expires = DateTime.UtcNow.AddDays(1)
@@ -69,5 +72,25 @@ public class AuthenticationController : ApiController
         HttpContext.Response.Cookies.Append("AuthToken", loginQueryResult.Value.Token, _cookieOptions);
 
         return Ok(_mapper.Map<AuthenticationResponse>(loginQueryResult.Value));
+    }
+    
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        _logger.LogInformation("Logout request received");
+    
+        HttpContext.Response.Cookies.Delete("AuthToken", new CookieOptions
+        {
+            HttpOnly = false,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Path = "/",
+            Domain = "localhost",
+            Expires = DateTime.UtcNow.AddDays(-1)
+        });
+
+        _logger.LogInformation("Logout successful");
+
+        return Ok(new { Message = "Logged out successfully" });
     }
 }
