@@ -14,7 +14,7 @@ public class ProjectConfigurations : IEntityTypeConfiguration<Project>
     
     public void ConfigureProjectsTable(EntityTypeBuilder<Project> builder)
     {
-        builder.ToTable("Profiles");
+        builder.ToTable("Projects");
         
         //PK
         builder.HasKey(x => x.Id);
