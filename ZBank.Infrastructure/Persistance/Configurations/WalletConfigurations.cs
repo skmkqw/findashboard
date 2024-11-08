@@ -9,10 +9,10 @@ public class WalletConfigurations : IEntityTypeConfiguration<Wallet>
 {
     public void Configure(EntityTypeBuilder<Wallet> builder)
     {
-        ConfigureProfilesTable(builder);
+        ConfigureWalletsTable(builder);
     }
     
-    public void ConfigureProfilesTable(EntityTypeBuilder<Wallet> builder)
+    public void ConfigureWalletsTable(EntityTypeBuilder<Wallet> builder)
     {
         builder.ToTable("Wallets");
         
