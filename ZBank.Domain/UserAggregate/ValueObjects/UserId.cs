@@ -2,7 +2,7 @@ using ZBank.Domain.Common.Models;
 
 namespace ZBank.Domain.UserAggregate.ValueObjects;
 
-public class UserId : ValueObject
+public class UserId : ValueObject, IEntityId<UserId, Guid>
 {
     public Guid Value { get; }
 
