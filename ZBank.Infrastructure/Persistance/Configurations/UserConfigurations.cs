@@ -10,6 +10,8 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         ConfigureUsersTable(builder);
+        ConfigureProfileIdsTable(builder);
+        ConfigureTeamIdsTable(builder);
     }
 
     public void ConfigureUsersTable(EntityTypeBuilder<User> builder)
@@ -41,5 +43,51 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
         //Password
         builder.Property(x => x.Password)
             .HasMaxLength(100);
+    }
+    
+    private void ConfigureTeamIdsTable(EntityTypeBuilder<User> builder)
+    {
+        builder.OwnsMany(r => r.TeamIds, tib =>
+        {
+            tib.ToTable("UserTeamIds");
+            
+            //FK
+            tib.WithOwner().HasForeignKey("UserId");
+            
+            //PK
+            tib.HasKey("Id");
+            
+            //ID
+            tib.Property(d => d.Value)
+                .ValueGeneratedNever()
+                .HasColumnName("TeamId");
+
+        });
+        
+        builder.Metadata.FindNavigation(nameof(User.TeamIds))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+    
+    private void ConfigureProfileIdsTable(EntityTypeBuilder<User> builder)
+    {
+        builder.OwnsMany(r => r.TeamIds, pib =>
+        {
+            pib.ToTable("UserProfileIds");
+            
+            //FK
+            pib.WithOwner().HasForeignKey("OwnerId");
+            
+            //PK
+            pib.HasKey("Id");
+            
+            //ID
+            pib.Property(d => d.Value)
+                .ValueGeneratedNever()
+                .HasColumnName("ProfileId");
+
+        });
+        
+        builder.Metadata.FindNavigation(nameof(User.ProfileIds))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }
