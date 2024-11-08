@@ -8,24 +8,23 @@ public class Wallet : AggregateRoot<WalletId>
 {
     public string Address { get; private set; }
     
-    //TODO This is probably not how i want to implement it
-    public string Type { get; private set; }
+    public WalletType Type { get; private set; }
 
     public ProfileId ProfileId { get; }
 
-    private Wallet(string address, string type, ProfileId profileId)
+    private Wallet(string address, WalletType type, ProfileId profileId)
     {
         Address = address;
         Type = type;
         ProfileId = profileId;
     }
 
-    public static Wallet Create(string address, string type, ProfileId profileId)
+    public static Wallet Create(string address, WalletType type, ProfileId profileId)
     {
         return new Wallet(address, type, profileId);
     }
 
-    public void Update(string address, string type)
+    public void Update(string address, WalletType type)
     {
         Address = address;
         Type = type;
