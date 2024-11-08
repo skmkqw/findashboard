@@ -30,11 +30,6 @@ public class ProfileConfigurations : IEntityTypeConfiguration<Profile>
         //Name
         builder.Property(x => x.Name)
             .HasMaxLength(100);
-        
-        //FK
-        builder.HasOne(o => o.OwnerId)
-            .WithMany()
-            .HasForeignKey(o => o.OwnerId);
     }
 
     private void ConfigureWalletIdsTable(EntityTypeBuilder<Profile> builder)

@@ -11,8 +11,8 @@ public class ProjectConfigurations : IEntityTypeConfiguration<Project>
     {
         ConfigureProjectsTable(builder);
     }
-    
-    public void ConfigureProjectsTable(EntityTypeBuilder<Project> builder)
+
+    private void ConfigureProjectsTable(EntityTypeBuilder<Project> builder)
     {
         builder.ToTable("Projects");
         
@@ -29,10 +29,5 @@ public class ProjectConfigurations : IEntityTypeConfiguration<Project>
         //Name
         builder.Property(x => x.Name)
             .HasMaxLength(100);
-        
-        //FK
-        builder.HasOne(o => o.TeamId)
-            .WithMany()
-            .HasForeignKey(o => o.TeamId);
     }
 }

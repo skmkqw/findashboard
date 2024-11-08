@@ -15,7 +15,7 @@ public class TeamConfigurations : IEntityTypeConfiguration<Team>
         ConfigureActivityIdsTable(builder);
     }
 
-    public void ConfigureTeamsTable(EntityTypeBuilder<Team> builder)
+    private void ConfigureTeamsTable(EntityTypeBuilder<Team> builder)
     {
         builder.ToTable("Teams");
         

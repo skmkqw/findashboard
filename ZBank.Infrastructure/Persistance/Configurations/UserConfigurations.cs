@@ -14,7 +14,7 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
         ConfigureTeamIdsTable(builder);
     }
 
-    public void ConfigureUsersTable(EntityTypeBuilder<User> builder)
+    private void ConfigureUsersTable(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("Users");
         

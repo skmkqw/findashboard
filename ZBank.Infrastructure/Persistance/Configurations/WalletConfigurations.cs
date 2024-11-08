@@ -11,8 +11,8 @@ public class WalletConfigurations : IEntityTypeConfiguration<Wallet>
     {
         ConfigureWalletsTable(builder);
     }
-    
-    public void ConfigureWalletsTable(EntityTypeBuilder<Wallet> builder)
+
+    private void ConfigureWalletsTable(EntityTypeBuilder<Wallet> builder)
     {
         builder.ToTable("Wallets");
         
@@ -29,10 +29,5 @@ public class WalletConfigurations : IEntityTypeConfiguration<Wallet>
         //Name
         builder.Property(x => x.Address)
             .HasMaxLength(50);
-        
-        //FK
-        builder.HasOne(o => o.ProfileId)
-            .WithMany()
-            .HasForeignKey(o => o.ProfileId);
     }
 }
