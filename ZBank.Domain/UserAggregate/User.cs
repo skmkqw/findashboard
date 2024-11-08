@@ -55,26 +55,13 @@ public sealed class User : AggregateRoot<UserId>
         LastName = lastName;
     }
 
-    public void AddTeam(TeamId teamId)
-    {
-        _teamIds.Add(teamId);
-    }
+    public void AddTeam(TeamId teamId) => _teamIds.Add(teamId);
 
-    public void DeleteTeam(TeamId teamId)
-    {
-        _teamIds.Remove(teamId);
-    }
+    public void DeleteTeam(TeamId teamId) => _teamIds.Remove(teamId);
 
+    public void AddProfile(ProfileId profileId) => _profileIds.Add(profileId);
 
-    public void AddProfile(ProfileId profileId)
-    {
-        _profileIds.Add(profileId);
-    }
-
-    public void DeleteProfile(ProfileId profileId)
-    {
-        _profileIds.Remove(profileId);
-    }
+    public void DeleteProfile(ProfileId profileId) => _profileIds.Remove(profileId);
 
 #pragma warning disable CS8618
     private User()

@@ -31,15 +31,10 @@ public class Profile : AggregateRoot<ProfileId>
         Name = name;
     }
 
-    public void AddWallet(WalletId walletId)
-    {
-        _walletIds.Add(walletId);
-    }
+    public void AddWallet(WalletId walletId) => _walletIds.Add(walletId);
 
-    public void DeleteWallet(WalletId walletId)
-    {
-        _walletIds.Remove(walletId);
-    }
+    public void DeleteWallet(WalletId walletId) => _walletIds.Remove(walletId);
+    
 #pragma warning disable CS8618
     private Profile()
 #pragma warning restore CS8618

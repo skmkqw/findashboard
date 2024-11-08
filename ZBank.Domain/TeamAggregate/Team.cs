@@ -43,35 +43,17 @@ public class Team : AggregateRoot<TeamId>
         Description = description;
     }
 
-    public void AddUser(UserId userId)
-    {
-        _userIds.Add(userId);
-    }
+    public void AddUser(UserId userId) => _userIds.Add(userId);
 
-    public void DeleteUser(UserId userId)
-    {
-        _userIds.Remove(userId);
-    }
+    public void DeleteUser(UserId userId) => _userIds.Remove(userId);
 
-    public void AddProject(ProjectId projectId)
-    {
-        _projectIds.Add(projectId);
-    }
+    public void AddProject(ProjectId projectId) => _projectIds.Add(projectId);
 
-    public void DeleteProject(ProjectId projectId)
-    {
-        _projectIds.Remove(projectId);
-    }
+    public void DeleteProject(ProjectId projectId) => _projectIds.Remove(projectId);
 
-    public void AddActivity(ActivityId activityId)
-    {
-        _activityIds.Add(activityId);
-    }
+    public void AddActivity(ActivityId activityId) => _activityIds.Add(activityId);
 
-    public void DeleteActivity(ActivityId activityId)
-    {
-        _activityIds.Remove(activityId);
-    }
+    public void DeleteActivity(ActivityId activityId) => _activityIds.Remove(activityId);
     
 #pragma warning disable CS8618
     private Team()
