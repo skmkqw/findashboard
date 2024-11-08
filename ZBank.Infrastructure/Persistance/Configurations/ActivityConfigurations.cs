@@ -26,25 +26,25 @@ public class ActivityConfigurations : IEntityTypeConfiguration<Activity>
         builder.HasKey(x => x.Id);
         
         //ID
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever()
+            .HasConversion(
+                id => id.Value,
+                value => ActivityId.Create(value));
+        
+        //TeamId
         builder.Property(x => x.TeamId)
             .ValueGeneratedNever()
             .HasConversion(
                 id => id.Value,
                 value => TeamId.Create(value));
         
-        //TeamId
+        //ProjectId
         builder.Property(x => x.ProjectId)
             .ValueGeneratedNever()
             .HasConversion(
                 id => id.Value,
                 value => ProjectId.Create(value));
-        
-        //ProjectId
-        builder.Property(x => x.Id)
-            .ValueGeneratedNever()
-            .HasConversion(
-                id => id.Value,
-                value => ActivityId.Create(value));
         
         //Name
         builder.Property(x => x.Name)
