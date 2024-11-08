@@ -23,7 +23,7 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
         
         //ID
         builder.Property(x => x.Id)
-            .ValueGeneratedOnAdd()
+            .ValueGeneratedNever()
             .HasConversion(
                 id => id.Value,
                 value => UserId.Create(value));

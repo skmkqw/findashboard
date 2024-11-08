@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZBank.Domain.ProfileAggregate;
 using ZBank.Domain.ProfileAggregate.ValueObjects;
+using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Infrastructure.Persistance.Configurations;
 
@@ -12,8 +13,8 @@ public class ProfileConfigurations : IEntityTypeConfiguration<Profile>
         ConfigureProfilesTable(builder);
         ConfigureWalletIdsTable(builder);
     }
-    
-    public void ConfigureProfilesTable(EntityTypeBuilder<Profile> builder)
+
+    private void ConfigureProfilesTable(EntityTypeBuilder<Profile> builder)
     {
         builder.ToTable("Profiles");
         
@@ -22,10 +23,17 @@ public class ProfileConfigurations : IEntityTypeConfiguration<Profile>
         
         //ID
         builder.Property(x => x.Id)
-            .ValueGeneratedOnAdd()
+            .ValueGeneratedNever()
             .HasConversion(
                 id => id.Value,
                 value => ProfileId.Create(value));
+        
+        //OwnerId
+        builder.Property(x => x.OwnerId)
+            .ValueGeneratedNever()
+            .HasConversion(
+                id => id.Value,
+                value => UserId.Create(value));
         
         //Name
         builder.Property(x => x.Name)

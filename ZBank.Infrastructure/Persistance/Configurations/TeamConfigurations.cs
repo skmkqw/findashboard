@@ -24,7 +24,7 @@ public class TeamConfigurations : IEntityTypeConfiguration<Team>
         
         //ID
         builder.Property(x => x.Id)
-            .ValueGeneratedOnAdd()
+            .ValueGeneratedNever ()
             .HasConversion(
                 id => id.Value,
                 value => TeamId.Create(value));
