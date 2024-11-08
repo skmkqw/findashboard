@@ -9,7 +9,8 @@ public class ProfileConfigurations : IEntityTypeConfiguration<Profile>
 {
     public void Configure(EntityTypeBuilder<Profile> builder)
     {
-        throw new NotImplementedException();
+        ConfigureProfilesTable(builder);
+        ConfigureWalletIdsTable(builder);
     }
     
     public void ConfigureProfilesTable(EntityTypeBuilder<Profile> builder)
@@ -36,7 +37,7 @@ public class ProfileConfigurations : IEntityTypeConfiguration<Profile>
             .HasForeignKey(o => o.OwnerId);
     }
 
-    private void ConfigureWallerIdsTable(EntityTypeBuilder<Profile> builder)
+    private void ConfigureWalletIdsTable(EntityTypeBuilder<Profile> builder)
     {
         builder.OwnsMany(r => r.WalletIds, wib =>
         {
