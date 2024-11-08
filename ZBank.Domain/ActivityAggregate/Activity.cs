@@ -20,7 +20,7 @@ public class Activity : AggregateRoot<ActivityId>
     
     private readonly List<ActivityLog> _activityLogs = new();
 
-    private Activity(string name, string description, TeamId teamId, ProjectId projectId)
+    private Activity(ActivityId id, string name, string description, TeamId teamId, ProjectId projectId) : base(id)
     {
         Name = name;
         Description = description;
@@ -30,7 +30,7 @@ public class Activity : AggregateRoot<ActivityId>
 
     public static Activity Create(string name, string description, TeamId teamId, ProjectId projectId)
     {
-        return new Activity(name, description, teamId, projectId);
+        return new Activity(ActivityId.CreateUnique(), name, description, teamId, projectId);
     }
 
     public void Update(string name, string description, ProjectId projectId)

@@ -16,7 +16,7 @@ public class ActivityLog : Entity<ActivityLogId>
 
     public DateTime TimeStamp { get; }
     
-    private ActivityLog(UserId userId, ProfileId profileId, WalletId walletId)
+    private ActivityLog(ActivityLogId id, UserId userId, ProfileId profileId, WalletId walletId) : base(id)
     {
         UserId = userId;
         ProfileId = profileId;
@@ -26,7 +26,7 @@ public class ActivityLog : Entity<ActivityLogId>
 
     public static ActivityLog Create(UserId userId, ProfileId profileId, WalletId walletId)
     {
-        return new ActivityLog(userId, profileId, walletId);
+        return new ActivityLog(ActivityLogId.CreateUnique(), userId, profileId, walletId);
     }
     
 #pragma warning disable CS8618

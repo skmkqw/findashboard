@@ -12,7 +12,7 @@ public class Wallet : AggregateRoot<WalletId>
 
     public ProfileId ProfileId { get; }
 
-    private Wallet(string address, WalletType type, ProfileId profileId)
+    private Wallet(WalletId id, string address, WalletType type, ProfileId profileId) : base(id)
     {
         Address = address;
         Type = type;
@@ -21,7 +21,7 @@ public class Wallet : AggregateRoot<WalletId>
 
     public static Wallet Create(string address, WalletType type, ProfileId profileId)
     {
-        return new Wallet(address, type, profileId);
+        return new Wallet(WalletId.CreateUnique(), address, type, profileId);
     }
 
     public void Update(string address, WalletType type)

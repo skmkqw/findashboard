@@ -15,7 +15,7 @@ public class Profile : AggregateRoot<ProfileId>
     
     private readonly List<WalletId> _walletIds = new();
 
-    private Profile(string name, UserId ownerId)
+    private Profile(ProfileId id, string name, UserId ownerId) : base(id)
     {
         Name = name;
         OwnerId = ownerId;
@@ -23,7 +23,7 @@ public class Profile : AggregateRoot<ProfileId>
 
     public static Profile Create(string name, UserId ownerId)
     {
-        return new Profile(name, ownerId);
+        return new Profile(ProfileId.CreateUnique(), name, ownerId);
     }
     
     public void Update(string name)
