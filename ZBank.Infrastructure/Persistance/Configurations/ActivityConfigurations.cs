@@ -15,6 +15,7 @@ public class ActivityConfigurations : IEntityTypeConfiguration<Activity>
     public void Configure(EntityTypeBuilder<Activity> builder)
     {
         ConfigureActivitiesTable(builder);
+        ConfigureActivityLogsTable(builder);
     }
 
     private void ConfigureActivitiesTable(EntityTypeBuilder<Activity> builder)
@@ -60,12 +61,11 @@ public class ActivityConfigurations : IEntityTypeConfiguration<Activity>
             aib.WithOwner().HasForeignKey("ActivityId");
             
             //PK
-            aib.HasKey("ActivityLogId", "ActivityId");
+            aib.HasKey("Id", "ActivityId");
             
             //ID
             aib.Property(x => x.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("ActivityLogId")
                 .HasConversion(
                     id => id.Value,
                     value => ActivityLogId.Create(value));

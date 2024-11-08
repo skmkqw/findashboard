@@ -68,7 +68,7 @@ public class TeamConfigurations : IEntityTypeConfiguration<Team>
             pib.ToTable("TeamProjectIds");
             
             //FK
-            pib.WithOwner().HasForeignKey("ProjectId");
+            pib.WithOwner().HasForeignKey("TeamId");
             
             //PK
             pib.HasKey("Id");

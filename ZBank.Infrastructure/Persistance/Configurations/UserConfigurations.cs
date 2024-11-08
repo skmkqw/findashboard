@@ -75,7 +75,7 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
             pib.ToTable("UserProfileIds");
             
             //FK
-            pib.WithOwner().HasForeignKey("OwnerId");
+            pib.WithOwner().HasForeignKey("UserId");
             
             //PK
             pib.HasKey("Id");
