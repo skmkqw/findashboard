@@ -10,7 +10,7 @@ public class Project : AggregateRoot<ProjectId>
 
     public TeamId TeamId { get; }
 
-    private Project(string name, TeamId teamId)
+    private Project(ProjectId id, string name, TeamId teamId) : base(id)
     {
         Name = name;
         TeamId = teamId;
@@ -18,7 +18,7 @@ public class Project : AggregateRoot<ProjectId>
 
     public static Project Create(string name, TeamId teamId)
     {
-        return new Project(name, teamId);
+        return new Project(ProjectId.CreateUnique(), name, teamId);
     }
     
 #pragma warning disable CS8618

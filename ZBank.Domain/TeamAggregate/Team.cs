@@ -24,7 +24,7 @@ public class Team : AggregateRoot<TeamId>
     
     private readonly List<ActivityId> _activityIds = new();
 
-    private Team(string name, string description, List<UserId> userIds)
+    private Team(TeamId id, string name, string description, List<UserId> userIds) : base(id)
     {
         Id = TeamId.CreateUnique();
         Name = name;
@@ -34,7 +34,7 @@ public class Team : AggregateRoot<TeamId>
 
     public static Team Create(string name, string description, List<UserId> userIds)
     {
-        return new Team(name, description, userIds);
+        return new Team(TeamId.CreateUnique(), name, description, userIds);
     }
 
     public void Update(string name, string description)

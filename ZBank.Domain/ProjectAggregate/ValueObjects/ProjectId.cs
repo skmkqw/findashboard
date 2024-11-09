@@ -1,7 +1,10 @@
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using ZBank.Domain.Common.Attributes;
 using ZBank.Domain.Common.Models;
 
 namespace ZBank.Domain.ProjectAggregate.ValueObjects;
 
+[EfCoreValueConverter(typeof(ProjectIdValueConverter))]
 public class ProjectId : ValueObject, IEntityId<ProjectId, Guid>
 {
     public Guid Value { get; }
@@ -24,5 +27,14 @@ public class ProjectId : ValueObject, IEntityId<ProjectId, Guid>
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;
+    }
+    
+    public class ProjectIdValueConverter : ValueConverter<ProjectId, Guid>
+    {
+        public ProjectIdValueConverter()
+            : base(
+                id => id.Value,
+                value => Create(value)
+            ) { }
     }
 }

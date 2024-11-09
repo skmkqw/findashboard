@@ -1,7 +1,10 @@
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using ZBank.Domain.Common.Attributes;
 using ZBank.Domain.Common.Models;
 
 namespace ZBank.Domain.UserAggregate.ValueObjects;
 
+[EfCoreValueConverter(typeof(UserIdValueConverter))]
 public class UserId : ValueObject, IEntityId<UserId, Guid>
 {
     public Guid Value { get; }
@@ -24,5 +27,14 @@ public class UserId : ValueObject, IEntityId<UserId, Guid>
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;
+    }
+    
+    public class UserIdValueConverter : ValueConverter<UserId, Guid>
+    {
+        public UserIdValueConverter()
+            : base(
+                id => id.Value,
+                value => Create(value)
+            ) { }
     }
 }

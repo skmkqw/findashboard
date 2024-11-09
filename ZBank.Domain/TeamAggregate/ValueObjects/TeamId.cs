@@ -1,7 +1,11 @@
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using ZBank.Domain.ActivityAggregate.ValueObjects;
+using ZBank.Domain.Common.Attributes;
 using ZBank.Domain.Common.Models;
 
 namespace ZBank.Domain.TeamAggregate.ValueObjects;
 
+[EfCoreValueConverter(typeof(TeamIdValueConverter))]
 public class TeamId : ValueObject, IEntityId<TeamId, Guid>
 {
     public Guid Value { get; }
@@ -24,5 +28,14 @@ public class TeamId : ValueObject, IEntityId<TeamId, Guid>
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;
+    }
+    
+    public class TeamIdValueConverter : ValueConverter<TeamId, Guid>
+    {
+        public TeamIdValueConverter()
+            : base(
+                id => id.Value,
+                value => Create(value)
+            ) { }
     }
 }
