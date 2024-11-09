@@ -1,6 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZBank.Domain.ActivityAggregate;
+using ZBank.Domain.ActivityAggregate.ValueObjects;
+using ZBank.Domain.ProfileAggregate.ValueObjects;
+using ZBank.Domain.UserAggregate.ValueObjects;
+using ZBank.Domain.WalletAggregate.ValueObjects;
 
 namespace ZBank.Infrastructure.Persistance.Configurations;
 
@@ -50,19 +54,35 @@ public class ActivityConfigurations : IEntityTypeConfiguration<Activity>
             
             //ID
             aib.Property(x => x.Id)
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasConversion(
+                    id => id.Value,
+                    value => ActivityLogId.Create(value)
+                );
             
             //UserId
             aib.Property(x => x.UserId)
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasConversion(
+                    id => id.Value,
+                    value => UserId.Create(value)
+                );
             
             //ProfileId
             aib.Property(x => x.ProfileId)
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasConversion(
+                    id => id.Value,
+                    value => ProfileId.Create(value)
+                );
             
             //WalletId
             aib.Property(x => x.WalletId)
-                .ValueGeneratedNever();
+                .ValueGeneratedNever()
+                .HasConversion(
+                    id => id.Value,
+                    value => WalletId.Create(value)
+                );
             
             //Timestamp
             aib.Property(a => a.TimeStamp)

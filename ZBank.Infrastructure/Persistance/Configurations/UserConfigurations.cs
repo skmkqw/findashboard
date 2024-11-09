@@ -66,7 +66,7 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
     
     private void ConfigureProfileIdsTable(EntityTypeBuilder<User> builder)
     {
-        builder.OwnsMany(r => r.TeamIds, pib =>
+        builder.OwnsMany(r => r.ProfileIds, pib =>
         {
             pib.ToTable("UserProfileIds");
             
