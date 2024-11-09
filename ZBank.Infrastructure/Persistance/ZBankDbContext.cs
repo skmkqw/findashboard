@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ZBank.Domain.ActivityAggregate;
-using ZBank.Domain.ActivityAggregate.ValueObjects;
+using ZBank.Domain.Common.Attributes;
 using ZBank.Domain.ProfileAggregate;
-using ZBank.Domain.ProfileAggregate.ValueObjects;
 using ZBank.Domain.ProjectAggregate;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.UserAggregate;
@@ -34,6 +33,6 @@ public class ZBankDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ZBankDbContext).Assembly);
         
-        modelBuilder.AddStronglyTypedIdValueConverters<ZBankDbContext>();
+        modelBuilder.AddStronglyTypedIdValueConverters<EfCoreValueConverterAttribute>();
     }
 }
