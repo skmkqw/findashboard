@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using ZBank.Domain.ActivityAggregate;
+using ZBank.Domain.ActivityAggregate.ValueObjects;
 using ZBank.Domain.ProfileAggregate;
+using ZBank.Domain.ProfileAggregate.ValueObjects;
 using ZBank.Domain.ProjectAggregate;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.UserAggregate;
 using ZBank.Domain.WalletAggregate;
+using ZBank.Infrastructure.Persistance.Extensions;
 
 namespace ZBank.Infrastructure.Persistance;
 
@@ -28,8 +31,9 @@ public class ZBankDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ZBankDbContext).Assembly);
         
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.AddStronglyTypedIdValueConverters<ZBankDbContext>();
     }
 }

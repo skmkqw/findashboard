@@ -1,7 +1,10 @@
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using ZBank.Domain.Common.Attributes;
 using ZBank.Domain.Common.Models;
 
 namespace ZBank.Domain.WalletAggregate.ValueObjects;
 
+[EfCoreValueConverter(typeof(WalletIdValueConverter))]
 public class WalletId : ValueObject, IEntityId<WalletId, Guid>
 {
     public Guid Value { get; }
@@ -24,5 +27,14 @@ public class WalletId : ValueObject, IEntityId<WalletId, Guid>
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;
+    }
+    
+    public class WalletIdValueConverter : ValueConverter<WalletId, Guid>
+    {
+        public WalletIdValueConverter()
+            : base(
+                id => id.Value,
+                value => Create(value)
+            ) { }
     }
 }
