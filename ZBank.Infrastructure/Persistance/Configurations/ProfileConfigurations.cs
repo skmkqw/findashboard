@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZBank.Domain.ProfileAggregate;
-using ZBank.Domain.ProfileAggregate.ValueObjects;
-using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Infrastructure.Persistance.Configurations;
 
@@ -23,17 +21,11 @@ public class ProfileConfigurations : IEntityTypeConfiguration<Profile>
         
         //ID
         builder.Property(x => x.Id)
-            .ValueGeneratedNever()
-            .HasConversion(
-                id => id.Value,
-                value => ProfileId.Create(value));
+            .ValueGeneratedNever();
         
         //OwnerId
         builder.Property(x => x.OwnerId)
-            .ValueGeneratedNever()
-            .HasConversion(
-                id => id.Value,
-                value => UserId.Create(value));
+            .ValueGeneratedNever();
         
         //Name
         builder.Property(x => x.Name)

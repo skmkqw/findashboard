@@ -1,12 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZBank.Domain.ActivityAggregate;
-using ZBank.Domain.ActivityAggregate.ValueObjects;
-using ZBank.Domain.ProfileAggregate.ValueObjects;
-using ZBank.Domain.ProjectAggregate.ValueObjects;
-using ZBank.Domain.TeamAggregate.ValueObjects;
-using ZBank.Domain.UserAggregate.ValueObjects;
-using ZBank.Domain.WalletAggregate.ValueObjects;
 
 namespace ZBank.Infrastructure.Persistance.Configurations;
 
@@ -27,24 +21,15 @@ public class ActivityConfigurations : IEntityTypeConfiguration<Activity>
         
         //ID
         builder.Property(x => x.Id)
-            .ValueGeneratedNever()
-            .HasConversion(
-                id => id.Value,
-                value => ActivityId.Create(value));
+            .ValueGeneratedNever();
         
         //TeamId
         builder.Property(x => x.TeamId)
-            .ValueGeneratedNever()
-            .HasConversion(
-                id => id.Value,
-                value => TeamId.Create(value));
+            .ValueGeneratedNever();
         
         //ProjectId
         builder.Property(x => x.ProjectId)
-            .ValueGeneratedNever()
-            .HasConversion(
-                id => id.Value,
-                value => ProjectId.Create(value));
+            .ValueGeneratedNever();
         
         //Name
         builder.Property(x => x.Name)
@@ -65,31 +50,19 @@ public class ActivityConfigurations : IEntityTypeConfiguration<Activity>
             
             //ID
             aib.Property(x => x.Id)
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => ActivityLogId.Create(value));
+                .ValueGeneratedNever();
             
             //UserId
             aib.Property(x => x.UserId)
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => UserId.Create(value));
+                .ValueGeneratedNever();
             
             //ProfileId
             aib.Property(x => x.ProfileId)
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => ProfileId.Create(value));
+                .ValueGeneratedNever();
             
             //WalletId
             aib.Property(x => x.WalletId)
-                .ValueGeneratedNever()
-                .HasConversion(
-                    id => id.Value,
-                    value => WalletId.Create(value));
+                .ValueGeneratedNever();
             
             //Timestamp
             aib.Property(a => a.TimeStamp)

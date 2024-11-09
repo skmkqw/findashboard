@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZBank.Domain.UserAggregate;
-using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Infrastructure.Persistance.Configurations;
 
@@ -23,10 +22,7 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
         
         //ID
         builder.Property(x => x.Id)
-            .ValueGeneratedNever()
-            .HasConversion(
-                id => id.Value,
-                value => UserId.Create(value));
+            .ValueGeneratedNever();
         
         //FirstName
         builder.Property(x => x.FirstName)
