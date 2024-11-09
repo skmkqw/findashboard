@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ZBank.Domain.Common.Attributes;
+using ZBank.Domain.Common.Models;
 
 namespace ZBank.Infrastructure.Persistance.Extensions;
 
@@ -30,13 +31,18 @@ public static class ModelBuilderExtensions
         return modelBuilder;
     }
 
-    public static ModelBuilder UseValueConverter(
+    private static ModelBuilder UseValueConverter(
         this ModelBuilder modelBuilder, ValueConverter converter)
     {
         var type = converter.ModelClrType;
-
+        
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
+            if (entityType.IsOwned() && !(typeof(ValueObject).IsAssignableFrom(entityType.ClrType) && entityType.ClrType != typeof(ValueObject)))
+            {
+                continue;
+            }
+            
             var properties = entityType
                 .ClrType
                 .GetProperties()
