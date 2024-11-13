@@ -44,7 +44,7 @@ public class AuthenticationController : ApiController
 
         if (registerUserResult.IsError)
         {
-            _logger.LogWarning("Registration failed for email: {Email}. Errors: {Errors}", request.Email, registerUserResult.Errors);
+            _logger.LogInformation("Registration failed for email: {Email}. Errors: {Errors}", request.Email, registerUserResult.Errors);
             return Problem(registerUserResult.Errors);
         }
 
@@ -64,7 +64,7 @@ public class AuthenticationController : ApiController
 
         if (loginQueryResult.IsError)
         {
-            _logger.LogWarning("Login failed for email: {Email}. Errors: {Errors}", request.Email, loginQueryResult.Errors);
+            _logger.LogInformation("Login failed for email: {Email}. Errors: {Errors}", request.Email, loginQueryResult.Errors);
             return Problem(loginQueryResult.Errors);
         }
 
