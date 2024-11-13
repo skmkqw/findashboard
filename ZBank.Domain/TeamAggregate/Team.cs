@@ -10,7 +10,7 @@ public class Team : AggregateRoot<TeamId>
 { 
     public string Name { get; private set;  }
 
-    public string Description { get; private set; }
+    public string? Description { get; private set; }
     
     public IReadOnlyList<UserId> UserIds => _userIds.AsReadOnly();
     
@@ -24,7 +24,7 @@ public class Team : AggregateRoot<TeamId>
     
     private readonly List<ActivityId> _activityIds = new();
 
-    private Team(TeamId id, string name, string description, List<UserId> userIds) : base(id)
+    private Team(TeamId id, string name, string? description, List<UserId> userIds) : base(id)
     {
         Id = TeamId.CreateUnique();
         Name = name;
@@ -32,7 +32,7 @@ public class Team : AggregateRoot<TeamId>
         _userIds = userIds;
     }
 
-    public static Team Create(string name, string description, List<UserId> userIds)
+    public static Team Create(string name, string? description, List<UserId> userIds)
     {
         return new Team(TeamId.CreateUnique(), name, description, userIds);
     }
