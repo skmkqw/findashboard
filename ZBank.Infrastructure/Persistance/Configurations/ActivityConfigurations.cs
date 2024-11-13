@@ -37,6 +37,7 @@ public class ActivityConfigurations : IEntityTypeConfiguration<Activity>
         
         //Name
         builder.Property(x => x.Name)
+            .IsRequired()
             .HasMaxLength(100);
     }
 

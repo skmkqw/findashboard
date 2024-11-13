@@ -10,6 +10,7 @@ public static partial class Errors
             code: "User.DuplicateEmail", 
             description: "A user with given email already exists");
         
+        //TODO add Email param to error message
         public static Error NotFound => Error.NotFound(
             code: "User.NotFound",
             description: "User not found or doesn't exist");

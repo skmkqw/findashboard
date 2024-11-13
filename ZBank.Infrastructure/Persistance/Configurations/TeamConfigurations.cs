@@ -27,10 +27,12 @@ public class TeamConfigurations : IEntityTypeConfiguration<Team>
         
         //Name
         builder.Property(x => x.Name)
+            .IsRequired()
             .HasMaxLength(100);
         
         //Description
         builder.Property(x => x.Description)
+            .IsRequired(false)
             .HasMaxLength(200);
     }
     

@@ -35,13 +35,13 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<Authenticat
 
         if (await _userRepository.FindByEmailAsync(request.Email) is not User user)
         {
-            _logger.LogWarning("Login failed: User not found for email: {Email}", request.Email);
+            _logger.LogInformation("Login failed: User not found for email: {Email}", request.Email);
             return Errors.Authentication.InvalidCredentials;
         }
 
         if (!_passwordHasher.VerifyHashedPassword(user.Password, request.Password))
         {
-            _logger.LogWarning("Login failed: Invalid password for email: {Email}", request.Email);
+            _logger.LogInformation("Login failed: Invalid password for email: {Email}", request.Email);
             return Errors.Authentication.InvalidCredentials;
         }
 

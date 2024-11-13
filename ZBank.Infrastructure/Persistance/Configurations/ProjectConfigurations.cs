@@ -28,6 +28,7 @@ public class ProjectConfigurations : IEntityTypeConfiguration<Project>
         
         //Name
         builder.Property(x => x.Name)
+            .IsRequired()
             .HasMaxLength(100);
     }
 }

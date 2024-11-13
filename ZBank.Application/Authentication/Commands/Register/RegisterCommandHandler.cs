@@ -37,7 +37,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
 
         if (await _userRepository.FindByEmailAsync(request.Email) is not null)
         {
-            _logger.LogWarning("Duplicate email found: {Email}", request.Email);
+            _logger.LogInformation("Duplicate email found: {Email}", request.Email);
             return Errors.User.DuplicateEmail;
         }
 

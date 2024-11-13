@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using ErrorOr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,21 @@ namespace ZBank.API.Controllers;
 [Authorize]
 public class ApiController : ControllerBase
 {
+    protected Guid? GetUserId()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (Guid.TryParse(userId, out var validUserId))
+        {
+            return validUserId;
+        }
+
+        return null;
+    }
+
+    protected IActionResult UnauthorizedUserIdProblem()
+    {
+        return Problem([Error.Unauthorized(description: "Invalid or missing user ID in token")]);
+    }
     protected IActionResult Problem(List<Error> errors)
     {
         if (errors.Count == 0)
