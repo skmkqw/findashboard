@@ -33,6 +33,16 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
     {
         _logger.LogInformation("Handling team creation for emails: {Email}", String.Join(", ", request.MemberEmails));
         List<User> members = new();
+
+        var owner = await _userRepository.FindByIdAsync(request.OwnerId);
+
+        if (owner is null)
+        {
+            _logger.LogInformation("Team owner with id: {Id} not found", request.OwnerId);
+            return Errors.User.NotFound;
+        }
+        
+        members.Add(owner);
         
         foreach (var email in request.MemberEmails)
         {
@@ -43,7 +53,7 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
                 members.Add(member);
                 continue;
             }
-            
+            // TODO Domain Errors for TEAM????
             _logger.LogInformation("Team member with email: {Email} not found", email);
 
             return Errors.User.NotFound;
