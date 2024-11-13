@@ -23,7 +23,13 @@ public class TeamController : ApiController
     [HttpPost]
     public async Task<IActionResult> Create(CreateTeamRequest request)
     {
-        var command = _mapper.Map<CreateTeamCommand>(request);
+        var ownerId = GetUserId();
+        if (!ownerId.HasValue)
+        {
+            return UnauthorizedUserIdProblem();
+        }
+        
+        var command = _mapper.Map<CreateTeamCommand>((request, ownerId));
 
         var createTeamResult = await _mediator.Send(command);
 
