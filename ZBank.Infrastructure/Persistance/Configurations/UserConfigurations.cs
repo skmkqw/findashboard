@@ -26,18 +26,22 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
         
         //FirstName
         builder.Property(x => x.FirstName)
+            .IsRequired()
             .HasMaxLength(100);
         
         //LastName
         builder.Property(x => x.LastName)
+            .IsRequired()
             .HasMaxLength(200);
         
         //Email
         builder.Property(x => x.Email)
+            .IsRequired()
             .HasMaxLength(100);
         
         //Password
         builder.Property(x => x.Password)
+            .IsRequired()
             .HasMaxLength(100);
     }
     
