@@ -4,12 +4,10 @@ using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Domain.NotificationAggregate;
 
-public abstract class Notification : Entity<NotificationId>
+public abstract class Notification : AggregateRoot<NotificationId>
 {
     public string Content { get; protected set; }
-
-    public DateTime CreatedAt { get; set; }
-
+    
     public bool IsRead { get; set; }
 
     public NotificationSender NotificationSender { get; }
@@ -23,7 +21,6 @@ public abstract class Notification : Entity<NotificationId>
     {
         Content = content ?? string.Empty;
         IsRead = false;
-        CreatedAt = DateTime.UtcNow;
         NotificationSender = notificationSender;
         NotificationReceiverId = notificationReceiverId;
     }
