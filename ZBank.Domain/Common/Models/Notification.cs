@@ -10,7 +10,7 @@ public abstract class Notification : Entity<NotificationId>
 
     public bool IsRead { get; set; }
 
-    private NotificationSender NotificationSender { get; }
+    public NotificationSender NotificationSender { get; }
     
     protected Notification(NotificationId id, NotificationSender notificationSender, string? content = null) : base(id)
     {
