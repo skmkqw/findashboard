@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ZBank.Domain.Common.Attributes;
 using ZBank.Domain.Common.Models;
 
-namespace ZBank.Domain.UserAggregate.ValueObjects;
+namespace ZBank.Domain.NotificationAggregate.ValueObjects;
 
 [EfCoreValueConverter(typeof(NotificationIdValueConverter))]
 public class NotificationId : ValueObject, IEntityId<NotificationId, Guid>

@@ -1,6 +1,7 @@
 using ZBank.Domain.Common.Models;
+using ZBank.Domain.UserAggregate.ValueObjects;
 
-namespace ZBank.Domain.UserAggregate.ValueObjects;
+namespace ZBank.Domain.NotificationAggregate.ValueObjects;
 
 public class NotificationSender : ValueObject
 {

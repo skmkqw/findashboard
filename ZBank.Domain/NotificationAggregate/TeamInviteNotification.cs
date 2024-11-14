@@ -1,8 +1,8 @@
-using ZBank.Domain.Common.Models;
+using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
-namespace ZBank.Domain.UserAggregate.Entities;
+namespace ZBank.Domain.NotificationAggregate;
 
 public class TeamInviteNotification : Notification
 {
@@ -12,7 +12,8 @@ public class TeamInviteNotification : Notification
     
     internal TeamInviteNotification(NotificationId id,
         NotificationSender notificationSender,
-        TeamId teamId, string teamName) : base(id, notificationSender)
+        UserId receiverId,
+        TeamId teamId, string teamName) : base(id, notificationSender, receiverId)
     {
         TeamId = teamId;
         TeamName = teamName;

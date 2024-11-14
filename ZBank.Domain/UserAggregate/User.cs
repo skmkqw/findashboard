@@ -1,4 +1,5 @@
 using ZBank.Domain.Common.Models;
+using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.ProfileAggregate.ValueObjects;
 using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
@@ -19,13 +20,13 @@ public sealed class User : AggregateRoot<UserId>
     
     public IReadOnlyList<ProfileId> ProfileIds => _profileIds.AsReadOnly();
     
-    public IReadOnlyList<Notification> Notifications => _notifications.AsReadOnly();
+    public IReadOnlyList<NotificationId> NotificationIds => _notificationIds.AsReadOnly();
     
     private readonly List<TeamId> _teamIds = new();
     
     private readonly List<ProfileId> _profileIds = new();
     
-    private readonly List<Notification> _notifications = new();
+    private readonly List<NotificationId> _notificationIds = new();
     
     private User(
         UserId id, 
@@ -67,9 +68,9 @@ public sealed class User : AggregateRoot<UserId>
 
     public void DeleteProfile(ProfileId profileId) => _profileIds.Remove(profileId);
     
-    public void AddNotification(Notification notification) => _notifications.Add(notification);
+    public void AddNotification(NotificationId notificationId) => _notificationIds.Add(notificationId);
 
-    public void DeleteNotification(Notification notification) => _notifications.Remove(notification);
+    public void DeleteNotification(NotificationId notificationId) => _notificationIds.Remove(notificationId);
 
 #pragma warning disable CS8618
     private User()
