@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
+using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Infrastructure.Persistance.Configurations;
 
@@ -29,8 +30,19 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         
         builder.OwnsOne(n => n.NotificationSender, nb =>
         {
-            nb.Property(ns => ns.SenderFullName).HasColumnName("SenderFullName");
-            nb.Property(ns => ns.SenderId).HasColumnName("SenderId");
+            //SenderFullName
+            nb.Property(ns => ns.SenderFullName).HasColumnName("SenderFullName")
+                .IsRequired()
+                .HasMaxLength(200);
+            
+            //SenderId
+            nb.Property(ns => ns.SenderId)
+                .ValueGeneratedNever()
+                .HasColumnName("SenderId")
+                .HasConversion(
+                    id => id.Value,
+                    value => UserId.Create(value)
+                );
         });
     }
 }

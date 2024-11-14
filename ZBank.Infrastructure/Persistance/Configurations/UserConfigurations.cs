@@ -11,6 +11,7 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
         ConfigureUsersTable(builder);
         ConfigureProfileIdsTable(builder);
         ConfigureTeamIdsTable(builder);
+        ConfigureNotificationIdsTable(builder);
     }
 
     private void ConfigureUsersTable(EntityTypeBuilder<User> builder)
