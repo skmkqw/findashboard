@@ -5,8 +5,8 @@ namespace ZBank.Domain.UserAggregate.Entities;
 
 public class InformationNotification : Notification
 {
-    internal InformationNotification(NotificationId id, string content, UserId senderId) 
-        : base(id, content, senderId)
+    internal InformationNotification(NotificationId id, string content, NotificationSender notificationSender) 
+        : base(id, notificationSender, content)
     {
     }
 }

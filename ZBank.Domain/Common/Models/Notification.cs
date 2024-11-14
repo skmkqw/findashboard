@@ -6,18 +6,18 @@ public abstract class Notification : Entity<NotificationId>
 {
     public string Content { get; protected set; }
 
-    public DateTime CreatedAt { get; protected set; }
+    public DateTime CreatedAt { get; set; }
 
     public bool IsRead { get; set; }
 
-    public UserId SenderId { get; }
+    private NotificationSender NotificationSender { get; }
     
-    protected Notification(NotificationId id, string content, UserId senderId) : base(id)
+    protected Notification(NotificationId id, NotificationSender notificationSender, string? content = null) : base(id)
     {
         Content = content;
         IsRead = false;
         CreatedAt = DateTime.UtcNow;
-        SenderId = senderId;
+        NotificationSender = notificationSender;
     }
     
     public void MarkAsRead() => IsRead = true;
