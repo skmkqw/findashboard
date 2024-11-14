@@ -10,4 +10,10 @@ public static class NotificationFactory
     {
         return new InformationNotification(NotificationId.CreateUnique(), content, notificationSender);
     }
+
+    public static TeamInviteNotification CreateTeamInviteNotification(NotificationSender notificationSender,
+        TeamId teamId, string teamName)
+    {
+        return new TeamInviteNotification(NotificationId.CreateUnique(), notificationSender, teamId, teamName);
+    }
 }
