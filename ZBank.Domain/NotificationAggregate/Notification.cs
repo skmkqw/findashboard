@@ -26,4 +26,10 @@ public abstract class Notification : AggregateRoot<NotificationId>
     }
     
     public void MarkAsRead() => IsRead = true;
+    
+#pragma warning disable CS8618
+    protected Notification()
+#pragma warning restore CS8618
+    {
+    }
 }

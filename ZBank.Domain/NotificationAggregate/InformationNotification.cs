@@ -9,4 +9,10 @@ public class InformationNotification : Notification
         : base(id, notificationSender, receiverId, content)
     {
     }
+    
+#pragma warning disable CS8618
+    private InformationNotification()
+#pragma warning restore CS8618
+    {
+    }
 }

@@ -19,4 +19,10 @@ public class TeamInviteNotification : Notification
         TeamName = teamName;
         Content = $"{notificationSender.SenderFullName} has invited you to team: {teamName}";
     }
+    
+#pragma warning disable CS8618
+    private TeamInviteNotification()
+#pragma warning restore CS8618
+    {
+    }
 }
