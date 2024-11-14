@@ -19,9 +19,13 @@ public sealed class User : AggregateRoot<UserId>
     
     public IReadOnlyList<ProfileId> ProfileIds => _profileIds.AsReadOnly();
     
+    public IReadOnlyList<Notification> Notifications => _notifications.AsReadOnly();
+    
     private readonly List<TeamId> _teamIds = new();
     
     private readonly List<ProfileId> _profileIds = new();
+    
+    private readonly List<Notification> _notifications = new();
     
     private User(
         UserId id, 
@@ -62,6 +66,10 @@ public sealed class User : AggregateRoot<UserId>
     public void AddProfile(ProfileId profileId) => _profileIds.Add(profileId);
 
     public void DeleteProfile(ProfileId profileId) => _profileIds.Remove(profileId);
+    
+    public void AddNotification(Notification notification) => _notifications.Add(notification);
+
+    public void DeleteNotification(Notification notification) => _notifications.Remove(notification);
 
 #pragma warning disable CS8618
     private User()
