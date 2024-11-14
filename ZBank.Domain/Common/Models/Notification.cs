@@ -14,7 +14,7 @@ public abstract class Notification : Entity<NotificationId>
     
     protected Notification(NotificationId id, NotificationSender notificationSender, string? content = null) : base(id)
     {
-        Content = content;
+        Content = content ?? string.Empty;
         IsRead = false;
         CreatedAt = DateTime.UtcNow;
         NotificationSender = notificationSender;
