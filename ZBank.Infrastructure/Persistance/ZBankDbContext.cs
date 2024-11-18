@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ZBank.Domain.ActivityAggregate;
 using ZBank.Domain.Common.Attributes;
+using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.ProfileAggregate;
 using ZBank.Domain.ProjectAggregate;
 using ZBank.Domain.TeamAggregate;
@@ -23,6 +24,8 @@ public class ZBankDbContext : DbContext
     public DbSet<Team> Teams { get; set; }
     
     public DbSet<Wallet> Wallets { get; set; }
+    
+    public DbSet<Notification> Notifications { get; set; }
     
     public ZBankDbContext(DbContextOptions<ZBankDbContext> options) : base(options)
     {
