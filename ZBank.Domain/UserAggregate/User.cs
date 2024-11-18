@@ -68,9 +68,9 @@ public sealed class User : AggregateRoot<UserId>
 
     public void DeleteProfile(ProfileId profileId) => _profileIds.Remove(profileId);
     
-    public void AddNotification(NotificationId notificationId) => _notificationIds.Add(notificationId);
+    public void AddNotificationId(NotificationId notificationId) => _notificationIds.Add(notificationId);
 
-    public void DeleteNotification(NotificationId notificationId) => _notificationIds.Remove(notificationId);
+    public void DeleteNotificationId(NotificationId notificationId) => _notificationIds.Remove(notificationId);
 
 #pragma warning disable CS8618
     private User()
