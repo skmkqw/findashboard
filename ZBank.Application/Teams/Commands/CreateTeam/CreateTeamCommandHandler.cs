@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.TeamAggregate;
-using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Teams.Commands.CreateTeam;
 
@@ -17,7 +16,6 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
     private readonly ITeamRepository _teamRepository;
     
     private readonly IUnitOfWork _unitOfWork;
-
     public CreateTeamCommandHandler(IUserRepository userRepository,
         IUnitOfWork unitOfWork,
         ITeamRepository teamRepository,
@@ -31,8 +29,7 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
 
     public async Task<ErrorOr<Team>> Handle(CreateTeamCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Handling team creation for emails: {Email}", String.Join(", ", request.MemberEmails));
-        List<User> members = new();
+        _logger.LogInformation("Handling team creation for: {OwnerId}", request.OwnerId);
 
         var owner = await _userRepository.FindByIdAsync(request.OwnerId);
 
@@ -42,34 +39,17 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
             return Errors.User.IdNotFound(request.OwnerId.Value.ToString());
         }
         
-        members.Add(owner);
-        
-        foreach (var email in request.MemberEmails)
-        {
-            var member = await _userRepository.FindByEmailAsync(email);
-
-            if (member is not null)
-            {
-                members.Add(member);
-                continue;
-            }
-            
-            _logger.LogInformation("Team member with email: {Email} not found", email);
-
-            return Errors.User.EmailNotFound(email);
-        }
-        
         var team = Team.Create(
             name: request.Name,
             description: request.Description,
-            userIds: members.Select(m => m.Id).ToList()
+            userIds: [owner.Id]
         );
         
         _teamRepository.Add(team);
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        _logger.LogInformation("Successfully created team.");
+        _logger.LogInformation("Successfully created a team.");
         return team;
     }
 }
