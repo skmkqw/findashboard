@@ -11,6 +11,7 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
         ConfigureUsersTable(builder);
         ConfigureProfileIdsTable(builder);
         ConfigureTeamIdsTable(builder);
+        ConfigureNotificationIdsTable(builder);
     }
 
     private void ConfigureUsersTable(EntityTypeBuilder<User> builder)
@@ -88,6 +89,25 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
         });
         
         builder.Metadata.FindNavigation(nameof(User.ProfileIds))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+    
+    private void ConfigureNotificationIdsTable(EntityTypeBuilder<User> builder)
+    {
+        builder.OwnsMany(n => n.NotificationIds, nb =>
+        {
+            nb.ToTable("UserNotificationIds");
+
+            //FK
+            nb.WithOwner().HasForeignKey("UserId");
+
+            //PK
+            nb.HasKey("Id");
+
+            nb.Property(d => d.Value).ValueGeneratedNever().HasColumnName("NotificationId");
+        });
+
+        builder.Metadata.FindNavigation(nameof(User.NotificationIds))!
             .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }
