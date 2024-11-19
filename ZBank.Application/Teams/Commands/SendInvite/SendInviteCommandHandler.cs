@@ -77,7 +77,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
             return Errors.Team.MemberAlreadyExists(receiver.Email);
         }
 
-        var existingInvite = await _notificationRepository.GetTeamInviteNotification(receiver.Id, team.Id);
+        var existingInvite = await _notificationRepository.FindTeamInviteNotification(receiver.Id, team.Id);
         
         if (existingInvite is not null && receiver.NotificationIds.Contains(existingInvite.Id))
         {
