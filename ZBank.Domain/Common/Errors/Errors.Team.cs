@@ -10,7 +10,7 @@ public static partial class Errors
             code: "Team.NotFound",
             description: "Team not found or doesn't exist");
         
-        public static Error MemberNotExists(string email) => Error.Conflict(
+        public static Error MemberNotExists(string email) => Error.NotFound(
             code: "Team.MemberNotExists", 
             description: $"A user with email '{email}' is not a team member");
         

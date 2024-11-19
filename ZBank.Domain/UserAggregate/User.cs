@@ -60,13 +60,13 @@ public sealed class User : AggregateRoot<UserId>
         LastName = lastName;
     }
 
-    public void AddTeam(TeamId teamId) => _teamIds.Add(teamId);
+    public void AddTeamId(TeamId teamId) => _teamIds.Add(teamId);
 
-    public void DeleteTeam(TeamId teamId) => _teamIds.Remove(teamId);
+    public void DeleteTeamId(TeamId teamId) => _teamIds.Remove(teamId);
 
-    public void AddProfile(ProfileId profileId) => _profileIds.Add(profileId);
+    public void AddProfileId(ProfileId profileId) => _profileIds.Add(profileId);
 
-    public void DeleteProfile(ProfileId profileId) => _profileIds.Remove(profileId);
+    public void DeleteProfileId(ProfileId profileId) => _profileIds.Remove(profileId);
     
     public void AddNotificationId(NotificationId notificationId) => _notificationIds.Add(notificationId);
 
