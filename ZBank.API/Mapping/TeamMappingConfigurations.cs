@@ -13,8 +13,8 @@ public class TeamMappingConfigurations : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<(SendInviteRequest request, UserId senderId), SendInviteCommand>()
-            .Map(dest => dest.SenderId, src => src.senderId)
+        config.NewConfig<(SendInviteRequest request, Guid? senderId), SendInviteCommand>()
+            .Map(dest => dest.SenderId, src => UserId.Create(src.senderId!.Value))
             .Map(dest => dest.TeamId, src => TeamId.Create(src.request.TeamId))
             .Map(dest => dest, src => src.request);
         

@@ -48,7 +48,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
         
         var receiver = await _userRepository.FindByEmailAsync(request.ReceiverEmail);
 
-        if (receiver is not null)
+        if (receiver is null)
         {
             _logger.LogInformation("User with email: {Email} not found", request.ReceiverEmail);
 
