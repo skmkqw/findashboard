@@ -15,9 +15,14 @@ public class NotificationRepository : INotificationRepository
         _dbContext = dbContext;
     }
 
-    public void AddTeamInvite(TeamInviteNotification teamInviteNotification)
+    public void AddTeamInviteNotification(TeamInviteNotification teamInviteNotification)
     {
         _dbContext.Notifications.Add(teamInviteNotification);
+    }
+
+    public void AddInformationalNotification(InformationNotification informationNotification)
+    {
+        _dbContext.Notifications.Add(informationNotification);
     }
 
     public async Task<TeamInviteNotification?> GetTeamInviteNotification(UserId receiverId, TeamId teamId)

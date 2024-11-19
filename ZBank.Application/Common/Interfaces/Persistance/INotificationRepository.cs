@@ -6,7 +6,9 @@ namespace ZBank.Application.Common.Interfaces.Persistance;
 
 public interface INotificationRepository
 {
-    void AddTeamInvite(TeamInviteNotification teamInviteNotification);
+    void AddTeamInviteNotification(TeamInviteNotification teamInviteNotification);
+    
+    void AddInformationalNotification(InformationNotification informationNotification);
     
     Task<TeamInviteNotification?> GetTeamInviteNotification(UserId receiverId, TeamId teamId);
 }
