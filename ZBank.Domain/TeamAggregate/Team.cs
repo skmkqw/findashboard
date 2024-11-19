@@ -43,9 +43,9 @@ public class Team : AggregateRoot<TeamId>
         Description = description;
     }
 
-    public void AddUser(UserId userId) => _userIds.Add(userId);
+    public void AddUserId(UserId userId) => _userIds.Add(userId);
 
-    public void DeleteUser(UserId userId) => _userIds.Remove(userId);
+    public void DeleteUserId(UserId userId) => _userIds.Remove(userId);
 
     public void AddProject(ProjectId projectId) => _projectIds.Add(projectId);
 

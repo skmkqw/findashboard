@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.Common.Errors;
+using ZBank.Domain.NotificationAggregate.Factories;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.UserAggregate;
 
@@ -16,60 +17,57 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
     
     private readonly ITeamRepository _teamRepository;
     
+    private readonly INotificationRepository _notificationRepository;
+    
     private readonly IUnitOfWork _unitOfWork;
-
     public CreateTeamCommandHandler(IUserRepository userRepository,
         IUnitOfWork unitOfWork,
         ITeamRepository teamRepository,
-        ILogger<CreateTeamCommandHandler> logger)
+        ILogger<CreateTeamCommandHandler> logger,
+        INotificationRepository notificationRepository)
     {
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
         _teamRepository = teamRepository;
         _logger = logger;
+        _notificationRepository = notificationRepository;
     }
 
     public async Task<ErrorOr<Team>> Handle(CreateTeamCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Handling team creation for emails: {Email}", String.Join(", ", request.MemberEmails));
-        List<User> members = new();
+        _logger.LogInformation("Handling team creation for: {OwnerId}", request.OwnerId);
 
         var owner = await _userRepository.FindByIdAsync(request.OwnerId);
 
         if (owner is null)
         {
             _logger.LogInformation("Team owner with id: {Id} not found", request.OwnerId);
-            return Errors.User.IdNotFound(request.OwnerId.Value.ToString());
-        }
-        
-        members.Add(owner);
-        
-        foreach (var email in request.MemberEmails)
-        {
-            var member = await _userRepository.FindByEmailAsync(email);
-
-            if (member is not null)
-            {
-                members.Add(member);
-                continue;
-            }
-            
-            _logger.LogInformation("Team member with email: {Email} not found", email);
-
-            return Errors.User.EmailNotFound(email);
+            return Errors.User.IdNotFound(request.OwnerId);
         }
         
         var team = Team.Create(
             name: request.Name,
             description: request.Description,
-            userIds: members.Select(m => m.Id).ToList()
+            userIds: [owner.Id]
         );
         
         _teamRepository.Add(team);
         
+        SendTeamCreatedNotification(owner, team);
+        _logger.LogInformation("'TeamCreated' notification sent");
+        
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        _logger.LogInformation("Successfully created team.");
+        _logger.LogInformation("Successfully created a team.");
         return team;
+    }
+    
+    private void SendTeamCreatedNotification(User teamCreator, Team team)
+    {
+        var notification = NotificationFactory.CreateTeamCreatedNotification(teamCreator, team);
+        
+        _notificationRepository.AddInformationalNotification(notification);
+        
+        teamCreator.AddNotificationId(notification.Id);
     }
 }
