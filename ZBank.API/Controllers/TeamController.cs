@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ZBank.Application.Teams.Commands.AcceptInvite;
 using ZBank.Application.Teams.Commands.CreateTeam;
+using ZBank.Application.Teams.Commands.DeclineInvite;
 using ZBank.Application.Teams.Commands.SendInvite;
 using ZBank.Contracts.Teams.AcceptOrDeclinveInvite;
 using ZBank.Contracts.Teams.CreateTeam;
@@ -104,7 +105,7 @@ public class TeamController : ApiController
             return UnauthorizedUserIdProblem();
         }
         
-        var command = _mapper.Map<AcceptInviteCommand>((receiverId, inviteId));
+        var command = _mapper.Map<DeclineInviteCommand>((receiverId, inviteId));
         
         var declineInviteResult = await _mediator.Send(command);
 

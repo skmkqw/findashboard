@@ -91,7 +91,7 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        _logger.LogInformation("Successfully accepted team invite");
+        _logger.LogInformation("Successfully declined team invite");
         
         return Unit.Value;
     }
