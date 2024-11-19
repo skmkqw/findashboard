@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.NotificationAggregate;
+using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
@@ -25,7 +26,18 @@ public class NotificationRepository : INotificationRepository
         _dbContext.Notifications.Add(informationNotification);
     }
 
-    public async Task<TeamInviteNotification?> GetTeamInviteNotification(UserId receiverId, TeamId teamId)
+    public void DeleteTeamInviteNotification(TeamInviteNotification teamInviteNotification)
+    {
+        _dbContext.Notifications.Remove(teamInviteNotification);
+    }
+
+    public async Task<TeamInviteNotification?> FindTeamInviteNotificationById(NotificationId notificationId)
+    {
+        return await _dbContext.Notifications.OfType<TeamInviteNotification>()
+            .FirstOrDefaultAsync(x => x.Id == notificationId);
+    }
+
+    public async Task<TeamInviteNotification?> FindTeamInviteNotification(UserId receiverId, TeamId teamId)
     {
         return await _dbContext.Notifications.OfType<TeamInviteNotification>()
             .FirstOrDefaultAsync(n => n.NotificationReceiverId == receiverId && n.TeamId == teamId);
