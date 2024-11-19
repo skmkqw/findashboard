@@ -13,6 +13,16 @@ public static class NotificationFactory
         return new InformationNotification(NotificationId.CreateUnique(), notificationSender, receiverId, content);
     }
     
+    public static InformationNotification CreateTeamCreatedNotification(User teamCreator, Team team)
+    {
+        return new InformationNotification(
+            id: NotificationId.CreateUnique(),
+            notificationSender: NotificationSender.Create(teamCreator.Id, string.Join(" ", teamCreator.FirstName, teamCreator.LastName)),
+            receiverId: teamCreator.Id,
+            content: $"Team '{team.Name}' is created successfully'"
+        );
+    }
+    
     public static InformationNotification CreateTemInviteSentNotification(User inviteSender, User inviteReceiver, Team team)
     {
         return new InformationNotification(

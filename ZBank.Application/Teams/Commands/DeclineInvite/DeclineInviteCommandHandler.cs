@@ -87,6 +87,7 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
         inviteReceiver.DeleteNotificationId(invite.Id);
         
         SendInviteDeclinedNotification(inviteSender, inviteReceiver, team);
+        _logger.LogInformation("'InviteDeclined' notification sent");
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

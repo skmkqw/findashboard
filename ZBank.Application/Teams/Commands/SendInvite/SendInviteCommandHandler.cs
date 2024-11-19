@@ -97,6 +97,8 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
         receiver.AddNotificationId(teamInvite.Id);
         
         SendInviteCreatedNotification(sender, receiver, team);
+        _logger.LogInformation("'InviteCreated' notification sent");
+
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

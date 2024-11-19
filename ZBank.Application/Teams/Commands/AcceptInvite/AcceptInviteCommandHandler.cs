@@ -90,6 +90,7 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         inviteReceiver.DeleteNotificationId(invite.Id);
         
         SendInviteAcceptedNotification(inviteSender, inviteReceiver, team);
+        _logger.LogInformation("'InviteAccepted' notification sent");
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
