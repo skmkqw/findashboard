@@ -1,8 +1,8 @@
 using Mapster;
 using ZBank.Application.Teams.Commands.AcceptInvite;
 using ZBank.Application.Teams.Commands.CreateTeam;
+using ZBank.Application.Teams.Commands.DeclineInvite;
 using ZBank.Application.Teams.Commands.SendInvite;
-using ZBank.Contracts.Teams.AcceptInvite;
 using ZBank.Contracts.Teams.CreateTeam;
 using ZBank.Contracts.Teams.SendInvite;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
@@ -22,6 +22,10 @@ public class TeamMappingConfigurations : IRegister
             .Map(dest => dest, src => src.request);
 
         config.NewConfig<(Guid? userId, Guid inviteId), AcceptInviteCommand>()
+            .Map(dest => dest.UserId, src => UserId.Create(src.userId!.Value))
+            .Map(dest => dest.NotificationId, src => NotificationId.Create(src.inviteId));
+        
+        config.NewConfig<(Guid? userId, Guid inviteId), DeclineInviteCommand>()
             .Map(dest => dest.UserId, src => UserId.Create(src.userId!.Value))
             .Map(dest => dest.NotificationId, src => NotificationId.Create(src.inviteId));
         
