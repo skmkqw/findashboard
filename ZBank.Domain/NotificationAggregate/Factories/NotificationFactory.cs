@@ -22,6 +22,16 @@ public static class NotificationFactory
             content: $"{string.Join(" ", inviteReceiver.FirstName, inviteReceiver.LastName)} ({inviteReceiver.Email}) has been invited to {team.Name}"
         );
     }
+    
+    public static InformationNotification CreateTemInviteAcceptedNotification(User inviteSender, User inviteReceiver, Team team)
+    {
+        return new InformationNotification(
+            id: NotificationId.CreateUnique(),
+            notificationSender: NotificationSender.Create(inviteReceiver.Id, string.Join(" ", inviteReceiver.FirstName, inviteReceiver.LastName)),
+            receiverId: inviteSender.Id,
+            content: $"{string.Join(" ", inviteReceiver.FirstName, inviteReceiver.LastName)} ({inviteReceiver.Email}) has joined {team.Name}"
+        );
+    }
 
     public static TeamInviteNotification CreateTeamInviteNotification(NotificationSender notificationSender,
         UserId receiverId,
