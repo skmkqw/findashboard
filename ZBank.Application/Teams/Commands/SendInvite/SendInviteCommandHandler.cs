@@ -107,11 +107,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
 
     private void SendInviteCreatedNotification(User inviteSender, User inviteReceiver, Team team)
     {
-        var notification = NotificationFactory.CreateInformationNotification(
-            notificationSender: NotificationSender.Create(inviteSender.Id, string.Join(" ", inviteSender.FirstName, inviteSender.LastName)),
-            receiverId: inviteSender.Id, 
-            content: $"{string.Join(" ", inviteReceiver.FirstName, inviteReceiver.LastName)} ({inviteReceiver.Email}) has been invited to {team.Name}"
-        );
+        var notification = NotificationFactory.CreateTemInviteSentNotification(inviteSender, inviteReceiver, team);
         
         _notificationRepository.AddInformationalNotification(notification);
         
