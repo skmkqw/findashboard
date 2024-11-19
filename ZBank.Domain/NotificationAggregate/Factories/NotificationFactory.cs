@@ -32,6 +32,16 @@ public static class NotificationFactory
             content: $"{string.Join(" ", inviteReceiver.FirstName, inviteReceiver.LastName)} ({inviteReceiver.Email}) has joined {team.Name}"
         );
     }
+    
+    public static InformationNotification CreateTemInviteDeclinedNotification(User inviteSender, User inviteReceiver, Team team)
+    {
+        return new InformationNotification(
+            id: NotificationId.CreateUnique(),
+            notificationSender: NotificationSender.Create(inviteReceiver.Id, string.Join(" ", inviteReceiver.FirstName, inviteReceiver.LastName)),
+            receiverId: inviteSender.Id,
+            content: $"{string.Join(" ", inviteReceiver.FirstName, inviteReceiver.LastName)} ({inviteReceiver.Email}) has declined join request to {team.Name}"
+        );
+    }
 
     public static TeamInviteNotification CreateTeamInviteNotification(NotificationSender notificationSender,
         UserId receiverId,
