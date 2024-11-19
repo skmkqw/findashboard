@@ -61,6 +61,7 @@ public class TeamController : ApiController
         if (sendInviteResult.IsError)
         {
             _logger.LogInformation("Failed to send team request from {SenderId} to {ReceiverEmail}. Errors: {Errors}", senderId, request.ReceiverEmail, sendInviteResult.Errors);   
+            return Problem(sendInviteResult.Errors);
         }
         
         _logger.LogInformation("Successfully sent team request from {SenderId} to {ReceiverEmail}.", senderId, request.ReceiverEmail);
