@@ -2,7 +2,9 @@ using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ZBank.Application.Teams.Commands.CreateTeam;
+using ZBank.Application.Teams.Commands.SendInvite;
 using ZBank.Contracts.Teams.CreateTeam;
+using ZBank.Contracts.Teams.SendInvite;
 
 namespace ZBank.API.Controllers;
 
@@ -35,11 +37,34 @@ public class TeamController : ApiController
 
         if (createTeamResult.IsError)
         {
-            _logger.LogInformation("Failed to create team for emails: {Emails}.\nErrors: {Errors}", String.Join(", ", request.MemberEmails), createTeamResult.Errors);
+            _logger.LogInformation("Failed to create team for: {OwnerId}.\nErrors: {Errors}", ownerId, createTeamResult.Errors);
             return Problem(createTeamResult.Errors);
         }
         
         _logger.LogInformation("Successfully created team with id: {Id}", createTeamResult.Value.Id.Value);
         return Ok(_mapper.Map<CreateTeamResponse>(createTeamResult.Value));
+    }
+
+    [HttpPost("invites/send")]
+    public async Task<IActionResult> SendInvite(SendInviteRequest request)
+    {
+        var senderId = GetUserId();
+        if (!senderId.HasValue)
+        {
+            return UnauthorizedUserIdProblem();
+        }
+        
+        var command = _mapper.Map<SendInviteCommand>((request, senderId));
+        
+        var sendInviteResult = await _mediator.Send(command);
+
+        if (sendInviteResult.IsError)
+        {
+            _logger.LogInformation("Failed to send team request from {SenderId} to {ReceiverEmail}. Errors: {Errors}", senderId, request.ReceiverEmail, sendInviteResult.Errors);   
+        }
+        
+        _logger.LogInformation("Successfully sent team request from {SenderId} to {ReceiverEmail}.", senderId, request.ReceiverEmail);
+        
+        return Ok(new SendInviteResponse($"Successfully sent team join request from to {request.ReceiverEmail}."));
     }
 }
