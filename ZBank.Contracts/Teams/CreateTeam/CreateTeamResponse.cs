@@ -1,4 +1,3 @@
 namespace ZBank.Contracts.Teams.CreateTeam;
 
-//TODO Include team id in response
-public record CreateTeamResponse(string Name, string Description, List<string> MemberIds);
+public record CreateTeamResponse(string Id, string Name, string Description, List<string> MemberIds);

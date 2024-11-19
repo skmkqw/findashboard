@@ -34,6 +34,7 @@ public class TeamMappingConfigurations : IRegister
             .Map(dest => dest, src => src.request);
 
         config.NewConfig<Team, CreateTeamResponse>()
+            .Map(dest => dest.Id, src => src.Id.Value.ToString())
             .Map(dest => dest.MemberIds, src => src.UserIds.Select(u => u.Value.ToString()).ToList());
     }
 }

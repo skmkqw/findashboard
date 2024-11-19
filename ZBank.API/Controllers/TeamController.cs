@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ZBank.Application.Teams.Commands.AcceptInvite;
 using ZBank.Application.Teams.Commands.CreateTeam;
 using ZBank.Application.Teams.Commands.SendInvite;
-using ZBank.Contracts.Teams.AcceptInvite;
+using ZBank.Contracts.Teams.AcceptOrDeclinveInvite;
 using ZBank.Contracts.Teams.CreateTeam;
 using ZBank.Contracts.Teams.SendInvite;
 
@@ -72,7 +72,7 @@ public class TeamController : ApiController
     }
     
     [HttpPost("invites/{inviteId}/accept")]
-    public async Task<IActionResult> SendInvite([FromRoute] Guid inviteId)
+    public async Task<IActionResult> AcceptInvite([FromRoute] Guid inviteId)
     {
         var receiverId = GetUserId();
         if (!receiverId.HasValue)
@@ -92,6 +92,30 @@ public class TeamController : ApiController
         
         _logger.LogInformation("Successfully accepted team invite for receiver with id: {ReceiverId}. Invite id: {InviteId}.", receiverId, inviteId);
         
-        return Ok(new AcceptInviteResponse($"Successfully accepted team invite for receiver with id: {receiverId}."));
+        return Ok(new AcceptOrDeclineInviteResponse($"Successfully accepted team invite for receiver with id: {receiverId}."));
+    }
+    
+    [HttpPost("invites/{inviteId}/decline")]
+    public async Task<IActionResult> DeclineInvite([FromRoute] Guid inviteId)
+    {
+        var receiverId = GetUserId();
+        if (!receiverId.HasValue)
+        {
+            return UnauthorizedUserIdProblem();
+        }
+        
+        var command = _mapper.Map<AcceptInviteCommand>((receiverId, inviteId));
+        
+        var declineInviteResult = await _mediator.Send(command);
+
+        if (declineInviteResult.IsError)
+        {
+            _logger.LogInformation("Failed to decline team invite {ReceiverId}. Invite id: {InviteId}. Errors: {Errors}", receiverId, inviteId, declineInviteResult.Errors);   
+            return Problem(declineInviteResult.Errors);
+        }
+        
+        _logger.LogInformation("Successfully declined team invite for receiver with id: {ReceiverId}. Invite id: {InviteId}.", receiverId, inviteId);
+        
+        return Ok(new AcceptOrDeclineInviteResponse($"Successfully declined team invite for receiver with id: {receiverId}."));
     }
 }
