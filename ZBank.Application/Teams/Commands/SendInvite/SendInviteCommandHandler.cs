@@ -5,6 +5,8 @@ using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.NotificationAggregate.Factories;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
+using ZBank.Domain.TeamAggregate;
+using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Teams.Commands.SendInvite;
 
@@ -90,14 +92,29 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
             teamName: team.Name
         );
         
-        _notificationRepository.AddTeamInvite(teamInvite);
+        _notificationRepository.AddTeamInviteNotification(teamInvite);
         
         receiver.AddNotificationId(teamInvite.Id);
+        
+        SendInviteCreatedNotification(sender, receiver, team);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         _logger.LogInformation("Successfully created and sent team invite");
         
         return Unit.Value;
+    }
+
+    private void SendInviteCreatedNotification(User inviteSender, User inviteReceiver, Team team)
+    {
+        var notification = NotificationFactory.CreateInformationNotification(
+            notificationSender: NotificationSender.Create(inviteSender.Id, string.Join(" ", inviteSender.FirstName, inviteSender.LastName)),
+            receiverId: inviteSender.Id, 
+            content: $"{string.Join(" ", inviteReceiver.FirstName, inviteReceiver.LastName)} ({inviteReceiver.Email}) has been invited to {team.Name}"
+        );
+        
+        _notificationRepository.AddInformationalNotification(notification);
+        
+        inviteSender.AddNotificationId(notification.Id);
     }
 }
