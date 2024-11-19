@@ -1,8 +1,10 @@
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ZBank.Application.Teams.Commands.AcceptInvite;
 using ZBank.Application.Teams.Commands.CreateTeam;
 using ZBank.Application.Teams.Commands.SendInvite;
+using ZBank.Contracts.Teams.AcceptInvite;
 using ZBank.Contracts.Teams.CreateTeam;
 using ZBank.Contracts.Teams.SendInvite;
 
@@ -67,5 +69,29 @@ public class TeamController : ApiController
         _logger.LogInformation("Successfully sent team request from {SenderId} to {ReceiverEmail}.", senderId, request.ReceiverEmail);
         
         return Ok(new SendInviteResponse($"Successfully sent team join request to {request.ReceiverEmail}."));
+    }
+    
+    [HttpPost("invites/{inviteId}/accept")]
+    public async Task<IActionResult> SendInvite([FromRoute] Guid inviteId)
+    {
+        var receiverId = GetUserId();
+        if (!receiverId.HasValue)
+        {
+            return UnauthorizedUserIdProblem();
+        }
+        
+        var command = _mapper.Map<AcceptInviteCommand>((receiverId, inviteId));
+        
+        var acceptInviteResult = await _mediator.Send(command);
+
+        if (acceptInviteResult.IsError)
+        {
+            _logger.LogInformation("Failed to accept team invite {ReceiverId}. Invite id: {InviteId}. Errors: {Errors}", receiverId, inviteId, acceptInviteResult.Errors);   
+            return Problem(acceptInviteResult.Errors);
+        }
+        
+        _logger.LogInformation("Successfully accepted team invite for receiver with id: {ReceiverId}. Invite id: {InviteId}.", receiverId, inviteId);
+        
+        return Ok(new AcceptInviteResponse($"Successfully accepted team invite for receiver with id: {receiverId}."));
     }
 }
