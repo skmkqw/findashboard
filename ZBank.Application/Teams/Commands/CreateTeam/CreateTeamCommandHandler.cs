@@ -36,7 +36,7 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
         if (owner is null)
         {
             _logger.LogInformation("Team owner with id: {Id} not found", request.OwnerId);
-            return Errors.User.IdNotFound(request.OwnerId.Value.ToString());
+            return Errors.User.IdNotFound(request.OwnerId);
         }
         
         var team = Team.Create(

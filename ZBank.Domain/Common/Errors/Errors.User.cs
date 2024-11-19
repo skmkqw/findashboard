@@ -1,4 +1,5 @@
 using ErrorOr;
+using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Domain.Common.Errors;
 
@@ -19,9 +20,9 @@ public static partial class Errors
             code: "User.NotFound",
             description: $"User with email '{email}' not found or doesn't exist");
         
-        public static Error IdNotFound(string id) => Error.NotFound(
+        public static Error IdNotFound(UserId id) => Error.NotFound(
             code: "User.NotFound",
-            description: $"User with ID: '{id}' not found or doesn't exist");
+            description: $"User with ID: '{id.Value.ToString()}' not found or doesn't exist");
         
         public static Error Unauthorized => Error.Unauthorized(
             code: "User.Unauthorized",
