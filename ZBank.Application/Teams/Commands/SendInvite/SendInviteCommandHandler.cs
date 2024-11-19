@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.NotificationAggregate.Factories;
+using ZBank.Domain.NotificationAggregate.ValueObjects;
 
 namespace ZBank.Application.Teams.Commands.SendInvite;
 
@@ -34,11 +35,20 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
 
     public async Task<ErrorOr<Unit>> Handle(SendInviteCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Handling team invite creation from {SenderId} {TeamName} to {ReceiverEmail}", request.Sender.SenderId.Value, request.TeamName, request.ReceiverEmail);
+        _logger.LogInformation("Handling team invite creation from {SenderId} to {ReceiverEmail}. Team id: {TeamId}", request.SenderId.Value, request.ReceiverEmail, request.TeamId);
         
-        var member = await _userRepository.FindByEmailAsync(request.ReceiverEmail);
+        var sender = await _userRepository.FindByIdAsync(request.SenderId);
 
-        if (member is not null)
+        if (sender is null)
+        {
+            _logger.LogInformation("User with ID: {Id} not found", request.SenderId);
+
+            return Errors.User.IdNotFound(request.SenderId);
+        }
+        
+        var receiver = await _userRepository.FindByEmailAsync(request.ReceiverEmail);
+
+        if (receiver is not null)
         {
             _logger.LogInformation("User with email: {Email} not found", request.ReceiverEmail);
 
@@ -53,22 +63,22 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
             return Errors.Team.NotFound;
         }
 
-        if (team.UserIds.Contains(member!.Id))
+        if (team.UserIds.Contains(receiver!.Id))
         {
             _logger.LogInformation("User with email: {Email} is already in team", request.ReceiverEmail);
-            return Errors.Team.MemberExists(member.Email);
+            return Errors.Team.MemberExists(receiver.Email);
         }
         
         var teamInvite = NotificationFactory.CreateTeamInviteNotification(
-            notificationSender: request.Sender,
-            receiverId: member!.Id,
+            notificationSender: NotificationSender.Create(request.SenderId, string.Join(" ", sender.FirstName, sender.LastName)),
+            receiverId: receiver.Id,
             teamId: request.TeamId,
-            teamName: request.TeamName
+            teamName: team.Name
         );
         
         _notificationRepository.AddTeamInvite(teamInvite);
         
-        member.AddNotificationId(teamInvite.Id);
+        receiver.AddNotificationId(teamInvite.Id);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

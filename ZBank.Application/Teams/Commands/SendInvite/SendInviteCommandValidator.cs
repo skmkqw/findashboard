@@ -1,5 +1,4 @@
 using FluentValidation;
-using ZBank.Application.Common.Validators;
 
 namespace ZBank.Application.Teams.Commands.SendInvite;
 
@@ -7,10 +6,9 @@ public class SendInviteCommandValidator : AbstractValidator<SendInviteCommand>
 {
     public SendInviteCommandValidator()
     {
-        RuleFor(x => x.Sender)
+        RuleFor(x => x.SenderId.Value)
             .NotEmpty()
-            .WithMessage("Notification sender is required.")
-            .SetValidator(new NotificationSenderValidator());
+            .WithMessage("Sender ID is required.");
         
         RuleFor(x => x.ReceiverEmail)
             .NotEmpty()
@@ -21,9 +19,5 @@ public class SendInviteCommandValidator : AbstractValidator<SendInviteCommand>
         RuleFor(x => x.TeamId.Value)
             .NotEmpty()
             .WithMessage("Team ID is required.");
-        
-        RuleFor(x => x.TeamName)
-            .NotEmpty()
-            .WithMessage("Team name is required.");
     }
 }

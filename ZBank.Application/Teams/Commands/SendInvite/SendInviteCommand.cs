@@ -1,8 +1,8 @@
 using ErrorOr;
 using MediatR;
-using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.TeamAggregate.ValueObjects;
+using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Application.Teams.Commands.SendInvite;
 
-public record SendInviteCommand(NotificationSender Sender, string ReceiverEmail, TeamId TeamId, string TeamName) : IRequest<ErrorOr<Unit>>;
+public record SendInviteCommand(UserId SenderId, string ReceiverEmail, TeamId TeamId) : IRequest<ErrorOr<Unit>>;
