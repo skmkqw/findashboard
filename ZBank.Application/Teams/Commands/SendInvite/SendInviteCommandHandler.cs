@@ -63,10 +63,16 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
             return Errors.Team.NotFound;
         }
 
+        if (!team.UserIds.Contains(sender.Id))
+        {
+            _logger.LogInformation("Sender with email: {SenderEmail} is not a team member", sender.Email);
+            return Errors.Team.MemberNotExists(sender.Email);
+        }
+
         if (team.UserIds.Contains(receiver!.Id))
         {
             _logger.LogInformation("User with email: {Email} is already in team", request.ReceiverEmail);
-            return Errors.Team.MemberExists(receiver.Email);
+            return Errors.Team.MemberAlreadyExists(receiver.Email);
         }
         
         var teamInvite = NotificationFactory.CreateTeamInviteNotification(

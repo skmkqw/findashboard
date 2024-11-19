@@ -65,6 +65,6 @@ public class TeamController : ApiController
         
         _logger.LogInformation("Successfully sent team request from {SenderId} to {ReceiverEmail}.", senderId, request.ReceiverEmail);
         
-        return Ok(new SendInviteResponse($"Successfully sent team join request from to {request.ReceiverEmail}."));
+        return Ok(new SendInviteResponse($"Successfully sent team join request to {request.ReceiverEmail}."));
     }
 }
