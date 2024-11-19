@@ -9,7 +9,7 @@ public static partial class Errors
     {
         public static class TeamInvite
         {
-            public static Error AccessDenied => Error.Forbidden(
+            public static Error AccessDenied => Error.Unauthorized(
                 code: "Notification.TeamInvite.AccessDenied",
                 description: "You are not allowed to accept/decline this request");
             public static Error TeamInviteNotFound(NotificationId notificationId) => Error.NotFound(

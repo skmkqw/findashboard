@@ -74,12 +74,20 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
             _logger.LogInformation("Team with id: {TeamId} not found", invite.TeamId.Value);
             return Errors.Team.NotFound;
         }
+
+        if (team.UserIds.Contains(inviteReceiver.Id))
+        {
+            _logger.LogInformation("User with id: {ReceiverId} is already a member of this team", inviteReceiver.Id.Value);
+            return Errors.Team.MemberAlreadyExists(inviteReceiver.Email);
+        }
         
         team.AddUserId(inviteReceiver.Id);
         
         inviteReceiver.AddTeamId(team.Id);
         
         _notificationRepository.DeleteTeamInviteNotification(invite);
+        
+        inviteReceiver.DeleteNotificationId(invite.Id);
         
         SendInviteAcceptedNotification(inviteSender, inviteReceiver, team);
         
