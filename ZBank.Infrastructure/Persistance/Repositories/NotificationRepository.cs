@@ -23,6 +23,6 @@ public class NotificationRepository : INotificationRepository
     public async Task<TeamInviteNotification?> GetTeamInviteNotification(UserId receiverId, TeamId teamId)
     {
         return await _dbContext.Notifications.OfType<TeamInviteNotification>()
-            .FirstAsync(n => n.NotificationReceiverId == receiverId && n.TeamId == teamId);
+            .FirstOrDefaultAsync(n => n.NotificationReceiverId == receiverId && n.TeamId == teamId);
     }
 }
