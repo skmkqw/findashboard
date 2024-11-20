@@ -30,7 +30,7 @@ public static class ModelBuilderExtensions
     {
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            if (!IsAggregateRootWithStronglyTypedId(entityType.ClrType, stronglyTypedIdType))
+            if (!IsAggregateRootWithStronglyTypedId(entityType.ClrType))
                 continue;
 
             var properties = entityType.ClrType.GetProperties().Where(p => p.PropertyType == stronglyTypedIdType);
@@ -48,7 +48,7 @@ public static class ModelBuilderExtensions
         return modelBuilder;
     }
 
-    private static bool IsAggregateRootWithStronglyTypedId(Type entityType, Type stronglyTypedIdType)
+    private static bool IsAggregateRootWithStronglyTypedId(Type entityType)
     {
         var baseType = entityType;
         while (baseType != null)

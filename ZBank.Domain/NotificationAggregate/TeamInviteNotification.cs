@@ -8,7 +8,7 @@ public class TeamInviteNotification : Notification
 {
     public TeamId TeamId { get; }
 
-    public string TeamName { get; }
+    public string TeamName { get; init; }
     
     internal TeamInviteNotification(NotificationId id,
         NotificationSender notificationSender,

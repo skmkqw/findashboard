@@ -10,7 +10,26 @@ namespace ZBank.Infrastructure.Persistance.Repositories;
 public class NotificationRepository : INotificationRepository
 { 
     private readonly ZBankDbContext _dbContext;
+    
+    public async Task<List<Notification>> FindUserNotifications(UserId userId)
+    {
+        return await _dbContext.Notifications
+            .Where(n => n.NotificationReceiverId == userId)
+            .ToListAsync();
+    }
 
+    public async Task<TeamInviteNotification?> FindTeamInviteNotificationById(NotificationId notificationId)
+    {
+        return await _dbContext.Notifications.OfType<TeamInviteNotification>()
+            .FirstOrDefaultAsync(x => x.Id == notificationId);
+    }
+
+    public async Task<TeamInviteNotification?> FindTeamInviteNotification(UserId receiverId, TeamId teamId)
+    {
+        return await _dbContext.Notifications.OfType<TeamInviteNotification>()
+            .FirstOrDefaultAsync(n => n.NotificationReceiverId == receiverId && n.TeamId == teamId);
+    }
+    
     public NotificationRepository(ZBankDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -29,17 +48,5 @@ public class NotificationRepository : INotificationRepository
     public void DeleteTeamInviteNotification(TeamInviteNotification teamInviteNotification)
     {
         _dbContext.Notifications.Remove(teamInviteNotification);
-    }
-
-    public async Task<TeamInviteNotification?> FindTeamInviteNotificationById(NotificationId notificationId)
-    {
-        return await _dbContext.Notifications.OfType<TeamInviteNotification>()
-            .FirstOrDefaultAsync(x => x.Id == notificationId);
-    }
-
-    public async Task<TeamInviteNotification?> FindTeamInviteNotification(UserId receiverId, TeamId teamId)
-    {
-        return await _dbContext.Notifications.OfType<TeamInviteNotification>()
-            .FirstOrDefaultAsync(n => n.NotificationReceiverId == receiverId && n.TeamId == teamId);
     }
 }
