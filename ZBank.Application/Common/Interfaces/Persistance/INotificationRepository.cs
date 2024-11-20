@@ -1,4 +1,3 @@
-using ZBank.Domain.Common.Errors;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.TeamAggregate.ValueObjects;
@@ -8,6 +7,7 @@ namespace ZBank.Application.Common.Interfaces.Persistance;
 
 public interface INotificationRepository
 {
+    Task<List<Notification>> FindUserNotifications(UserId userId);
     Task<TeamInviteNotification?> FindTeamInviteNotificationById(NotificationId notificationId);
     Task<TeamInviteNotification?> FindTeamInviteNotification(UserId receiverId, TeamId teamId);
 
