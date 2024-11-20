@@ -39,7 +39,6 @@ public class UserController : ApiController
             return Problem(getUserNotificationsResult.Errors);
         }
         
-        //TODO: add TeamName prop in database config
         _logger.LogInformation("Successfully fetched notifications for user with id: {UserId}", userId);
         
         return Ok(_mapper.Map<GetUserNotificationsResponse>(getUserNotificationsResult.Value));
