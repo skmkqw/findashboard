@@ -25,7 +25,11 @@ public class NotificationMappingConfigurations : IRegister
             .Map(dest => dest.Team, src => new NotificationTeamResponse(src.TeamId.Value.ToString(), src.TeamName));
 
         config.NewConfig<Dictionary<string, List<Notification>>, GetUserNotificationsResponse>()
-            .Map(dest => dest.InformationNotifications, src => src["InformationNotification"])
-            .Map(dest => dest.TeamInviteNotifications, src => src["TeamInviteNotification"]);
+            .Map(dest => dest.InformationNotifications, src => src["InformationNotification"]
+                    .Select(n => n as InformationNotification)
+                    .Adapt<List<InformationNotificationResponse>>())
+            .Map(dest => dest.TeamInviteNotifications, src => src["TeamInviteNotification"]
+                    .Select(n => n as TeamInviteNotification)
+                    .Adapt<List<TeamInviteNotificationResponse>>());
     }
 }
