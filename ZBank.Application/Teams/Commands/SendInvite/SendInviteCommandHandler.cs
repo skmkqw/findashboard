@@ -37,13 +37,13 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
 
     public async Task<ErrorOr<Unit>> Handle(SendInviteCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Handling team invite creation from {SenderId} to {ReceiverEmail}. Team id: {TeamId}", request.SenderId.Value, request.ReceiverEmail, request.TeamId);
+        _logger.LogInformation("Handling team invite creation from {SenderId} to {ReceiverEmail}. Team id: {TeamId}", request.SenderId.Value, request.ReceiverEmail, request.TeamId.Value);
         
         var sender = await _userRepository.FindByIdAsync(request.SenderId);
 
         if (sender is null)
         {
-            _logger.LogInformation("User with ID: {Id} not found", request.SenderId);
+            _logger.LogInformation("User with ID: {Id} not found", request.SenderId.Value);
 
             return Errors.User.IdNotFound(request.SenderId);
         }
@@ -61,7 +61,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
 
         if (team is null)
         {
-            _logger.LogInformation("Team with id: {TeamId} not found", request.TeamId);
+            _logger.LogInformation("Team with id: {TeamId} not found", request.TeamId.Value);
             return Errors.Team.NotFound;
         }
 
