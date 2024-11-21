@@ -1,5 +1,6 @@
 using Mapster;
 using ZBank.Application.Notifications.Commands;
+using ZBank.Application.Notifications.Commands.DeleteNotification;
 using ZBank.Application.Notifications.Commands.MarkAsRead;
 using ZBank.Application.Notifications.Queries.GetUserNotifications;
 using ZBank.Contracts.Notifications.GetUserNotifications;
@@ -37,6 +38,10 @@ public class NotificationMappingConfigurations : IRegister
                     .Adapt<List<TeamInviteNotificationResponse>>());
         
         config.NewConfig<(Guid userId, Guid notificationId), MarkAsReadCommand>()
+            .Map(dest => dest.UserId, src => UserId.Create(src.userId))
+            .Map(dest => dest.NotificationId, src => NotificationId.Create(src.notificationId));
+        
+        config.NewConfig<(Guid userId, Guid notificationId), DeleteNotificationCommand>()
             .Map(dest => dest.UserId, src => UserId.Create(src.userId))
             .Map(dest => dest.NotificationId, src => NotificationId.Create(src.notificationId));
     }
