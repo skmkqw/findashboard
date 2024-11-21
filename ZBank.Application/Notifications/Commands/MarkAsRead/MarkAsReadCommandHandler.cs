@@ -3,9 +3,8 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.Common.Errors;
-using ZBank.Domain.UserAggregate;
 
-namespace ZBank.Application.Notifications.Commands;
+namespace ZBank.Application.Notifications.Commands.MarkAsRead;
 
 public class MarkAsReadCommandHandler : IRequestHandler<MarkAsReadCommand, ErrorOr<Unit>>
 {

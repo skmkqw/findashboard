@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace ZBank.Application.Notifications.Commands;
+namespace ZBank.Application.Notifications.Commands.MarkAsRead;
 
 public class MarkAsReadCommandValidator : AbstractValidator<MarkAsReadCommand>
 {

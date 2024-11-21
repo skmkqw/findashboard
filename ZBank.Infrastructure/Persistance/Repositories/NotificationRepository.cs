@@ -55,4 +55,9 @@ public class NotificationRepository : INotificationRepository
     {
         _dbContext.Notifications.Remove(teamInviteNotification);
     }
+
+    public void DeleteInformationNotification(InformationNotification informationNotification)
+    {
+        _dbContext.Notifications.Remove(informationNotification);
+    }
 }
