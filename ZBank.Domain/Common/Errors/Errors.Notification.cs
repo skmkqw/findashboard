@@ -19,6 +19,10 @@ public static partial class Errors
             public static Error IsAlreadyRead(NotificationId notificationId) => Error.Conflict(
                 code: "Notification.InformationNotification.IsAlreadyRead",
                 description: $"Informational notification with id '{notificationId.Value.ToString()}' is already marked as read.");
+            
+            public static Error IsNotRead(NotificationId notificationId) => Error.Conflict(
+                code: "Notification.InformationNotification.IsNotRead",
+                description: $"Informational notification with id '{notificationId.Value.ToString()}' is not marked as read.");
         }
         
         public static class TeamInvite
