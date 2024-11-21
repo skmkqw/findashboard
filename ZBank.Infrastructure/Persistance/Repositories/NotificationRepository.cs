@@ -16,16 +16,16 @@ public class NotificationRepository : INotificationRepository
         _dbContext = dbContext;
     }
     
+    public async Task<T?> FindNotificationById<T>(NotificationId id) where T : Notification
+    {
+        return await _dbContext.Notifications.OfType<T>().FirstOrDefaultAsync(n => n.Id == id);
+    }
+    
     public async Task<List<Notification>> FindUserNotifications(UserId userId)
     {
         return await _dbContext.Notifications
             .Where(n => n.NotificationReceiverId == userId)
             .ToListAsync();
-    }
-
-    public async Task<T?> FindNotificationById<T>(NotificationId id) where T : Notification
-    {
-        return await _dbContext.Notifications.OfType<T>().FirstOrDefaultAsync(n => n.Id == id);
     }
 
     public async Task<TeamInviteNotification?> FindTeamInviteNotification(UserId receiverId, TeamId teamId)
@@ -34,14 +34,9 @@ public class NotificationRepository : INotificationRepository
             .FirstOrDefaultAsync(n => n.NotificationReceiverId == receiverId && n.TeamId == teamId);
     }
 
-    public void AddTeamInviteNotification(TeamInviteNotification teamInviteNotification)
+    public void AddNotification(Notification notification)
     {
-        _dbContext.Notifications.Add(teamInviteNotification);
-    }
-
-    public void AddInformationalNotification(InformationNotification informationNotification)
-    {
-        _dbContext.Notifications.Add(informationNotification);
+        _dbContext.Notifications.Add(notification);
     }
 
     public void DeleteTeamInviteNotification(TeamInviteNotification teamInviteNotification)

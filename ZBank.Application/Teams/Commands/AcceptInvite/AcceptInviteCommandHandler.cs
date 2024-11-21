@@ -106,7 +106,7 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
     {
         var notification = NotificationFactory.CreateTemInviteAcceptedNotification(inviteSender, inviteReceiver, team);
         
-        _notificationRepository.AddInformationalNotification(notification);
+        _notificationRepository.AddNotification(notification);
         
         inviteSender.AddNotificationId(notification.Id);
     }
@@ -115,7 +115,7 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
     {
         var notification = NotificationFactory.CreateTeamJoinedNotification(inviteReceiver, team);
         
-        _notificationRepository.AddInformationalNotification(notification);
+        _notificationRepository.AddNotification(notification);
         
         inviteReceiver.AddNotificationId(notification.Id);
     }

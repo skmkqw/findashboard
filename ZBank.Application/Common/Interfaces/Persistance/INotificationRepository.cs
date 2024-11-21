@@ -7,15 +7,13 @@ namespace ZBank.Application.Common.Interfaces.Persistance;
 
 public interface INotificationRepository
 {
-    Task<List<Notification>> FindUserNotifications(UserId userId);
-    
     Task<T?> FindNotificationById<T>(NotificationId id) where T : Notification;
+    
+    Task<List<Notification>> FindUserNotifications(UserId userId);
     
     Task<TeamInviteNotification?> FindTeamInviteNotification(UserId receiverId, TeamId teamId);
     
-    void AddTeamInviteNotification(TeamInviteNotification teamInviteNotification);
-    
-    void AddInformationalNotification(InformationNotification informationNotification);
+    void AddNotification(Notification notification);
     
     void DeleteTeamInviteNotification(TeamInviteNotification teamInviteNotification);
     

@@ -66,7 +66,7 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
     {
         var notification = NotificationFactory.CreateTeamCreatedNotification(teamCreator, team);
         
-        _notificationRepository.AddInformationalNotification(notification);
+        _notificationRepository.AddNotification(notification);
         
         teamCreator.AddNotificationId(notification.Id);
     }

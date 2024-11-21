@@ -92,7 +92,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
             teamName: team.Name
         );
         
-        _notificationRepository.AddTeamInviteNotification(teamInvite);
+        _notificationRepository.AddNotification(teamInvite);
         
         receiver.AddNotificationId(teamInvite.Id);
         
@@ -111,7 +111,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
     {
         var notification = NotificationFactory.CreateTemInviteSentNotification(inviteSender, inviteReceiver, team);
         
-        _notificationRepository.AddInformationalNotification(notification);
+        _notificationRepository.AddNotification(notification);
         
         inviteSender.AddNotificationId(notification.Id);
     }

@@ -101,7 +101,7 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
     {
         var notification = NotificationFactory.CreateTemInviteDeclinedNotification(inviteSender, inviteReceiver, team);
         
-        _notificationRepository.AddInformationalNotification(notification);
+        _notificationRepository.AddNotification(notification);
         
         inviteSender.AddNotificationId(notification.Id);
     }
