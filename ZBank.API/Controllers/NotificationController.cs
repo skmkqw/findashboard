@@ -2,6 +2,7 @@ using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ZBank.Application.Notifications.Commands;
+using ZBank.Application.Notifications.Commands.MarkAsRead;
 using ZBank.Contracts.Notifications.MarkAsRead;
 
 namespace ZBank.API.Controllers;

@@ -1,5 +1,6 @@
 using Mapster;
 using ZBank.Application.Notifications.Commands;
+using ZBank.Application.Notifications.Commands.MarkAsRead;
 using ZBank.Application.Notifications.Queries.GetUserNotifications;
 using ZBank.Contracts.Notifications.GetUserNotifications;
 using ZBank.Domain.NotificationAggregate;
