@@ -60,7 +60,7 @@ public class DeleteNotificationCommandHandler : IRequestHandler<DeleteNotificati
             return Errors.Notification.InformationNotification.IsNotRead(notification.Id);
         }
         
-        _notificationRepository.DeleteInformationNotification(notification);
+        _notificationRepository.DeleteNotification(notification);
 
         user.DeleteNotificationId(notification.Id);
         

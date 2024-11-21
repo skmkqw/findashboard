@@ -86,7 +86,7 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         
         inviteReceiver.AddTeamId(team.Id);
         
-        _notificationRepository.DeleteTeamInviteNotification(invite);
+        _notificationRepository.DeleteNotification(invite);
         
         inviteReceiver.DeleteNotificationId(invite.Id);
         

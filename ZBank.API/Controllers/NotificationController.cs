@@ -68,6 +68,6 @@ public class NotificationController : ApiController
         
         _logger.LogInformation("Successfully deleted notification with id: {NotificationId}", notificationId);
         
-        return Ok(new DeleteNotificationResponse($"Successfully marked notification with id '{notificationId}' as read"));
+        return Ok(new DeleteNotificationResponse($"Successfully deleted notification with id '{notificationId}'"));
     }
 }

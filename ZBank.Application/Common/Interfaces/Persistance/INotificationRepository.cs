@@ -15,7 +15,5 @@ public interface INotificationRepository
     
     void AddNotification(Notification notification);
     
-    void DeleteTeamInviteNotification(TeamInviteNotification teamInviteNotification);
-    
-    void DeleteInformationNotification(InformationNotification informationNotification);
+    void DeleteNotification(Notification notification);
 }

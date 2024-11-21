@@ -83,7 +83,7 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
             return Errors.Team.MemberAlreadyExists(inviteReceiver.Email);
         }
         
-        _notificationRepository.DeleteTeamInviteNotification(invite);
+        _notificationRepository.DeleteNotification(invite);
         
         inviteReceiver.DeleteNotificationId(invite.Id);
         
