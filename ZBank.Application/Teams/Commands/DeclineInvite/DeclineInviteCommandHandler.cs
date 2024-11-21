@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Teams.Commands.AcceptInvite;
 using ZBank.Domain.Common.Errors;
+using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.Factories;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.UserAggregate;
@@ -39,7 +40,7 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
     {
         _logger.LogInformation("Handling team invite declination. Invite id: {InviteId}", request.NotificationId.Value);
         
-        var invite = await _notificationRepository.FindTeamInviteNotificationById(request.NotificationId);
+        var invite = await _notificationRepository.FindNotificationById<TeamInviteNotification>(request.NotificationId);
 
         if (invite is null)
         {

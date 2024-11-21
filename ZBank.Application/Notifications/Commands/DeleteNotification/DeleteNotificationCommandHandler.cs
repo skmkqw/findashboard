@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.Common.Errors;
+using ZBank.Domain.NotificationAggregate;
 
 namespace ZBank.Application.Notifications.Commands.DeleteNotification;
 
@@ -39,7 +40,7 @@ public class DeleteNotificationCommandHandler : IRequestHandler<DeleteNotificati
             return Errors.User.IdNotFound(request.UserId);
         }
         
-        var notification = await _notificationRepository.FindInformationNotificationById(request.NotificationId);
+        var notification = await _notificationRepository.FindNotificationById<InformationNotification>(request.NotificationId);
 
         if (notification is null)
         {

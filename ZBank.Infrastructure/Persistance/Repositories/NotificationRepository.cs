@@ -11,6 +11,11 @@ public class NotificationRepository : INotificationRepository
 { 
     private readonly ZBankDbContext _dbContext;
     
+    public NotificationRepository(ZBankDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+    
     public async Task<List<Notification>> FindUserNotifications(UserId userId)
     {
         return await _dbContext.Notifications
@@ -18,27 +23,15 @@ public class NotificationRepository : INotificationRepository
             .ToListAsync();
     }
 
-    public async Task<TeamInviteNotification?> FindTeamInviteNotificationById(NotificationId notificationId)
+    public async Task<T?> FindNotificationById<T>(NotificationId id) where T : Notification
     {
-        return await _dbContext.Notifications.OfType<TeamInviteNotification>()
-            .FirstOrDefaultAsync(x => x.Id == notificationId);
+        return await _dbContext.Notifications.OfType<T>().FirstOrDefaultAsync(n => n.Id == id);
     }
 
     public async Task<TeamInviteNotification?> FindTeamInviteNotification(UserId receiverId, TeamId teamId)
     {
         return await _dbContext.Notifications.OfType<TeamInviteNotification>()
             .FirstOrDefaultAsync(n => n.NotificationReceiverId == receiverId && n.TeamId == teamId);
-    }
-    
-    public async Task<InformationNotification?> FindInformationNotificationById(NotificationId notificationId)
-    {
-        return await _dbContext.Notifications.OfType<InformationNotification>()
-            .FirstOrDefaultAsync(x => x.Id == notificationId);
-    }
-    
-    public NotificationRepository(ZBankDbContext dbContext)
-    {
-        _dbContext = dbContext;
     }
 
     public void AddTeamInviteNotification(TeamInviteNotification teamInviteNotification)
