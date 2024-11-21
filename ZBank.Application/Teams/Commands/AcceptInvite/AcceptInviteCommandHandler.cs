@@ -92,6 +92,8 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         SendInviteAcceptedNotification(inviteSender, inviteReceiver, team);
         _logger.LogInformation("'InviteAccepted' notification sent");
         
+        SendTeamJoinedNotification(inviteReceiver, team);
+        _logger.LogInformation("'TeamJoined' notification sent");
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         _logger.LogInformation("Successfully accepted team invite");
@@ -106,5 +108,14 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         _notificationRepository.AddInformationalNotification(notification);
         
         inviteSender.AddNotificationId(notification.Id);
+    }
+    
+    private void SendTeamJoinedNotification(User inviteReceiver, Team team)
+    {
+        var notification = NotificationFactory.CreateTeamJoinedNotification(inviteReceiver, team);
+        
+        _notificationRepository.AddInformationalNotification(notification);
+        
+        inviteReceiver.AddNotificationId(notification.Id);
     }
 }
