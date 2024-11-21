@@ -26,13 +26,13 @@ public class GetUserNotificationsQueryHandler : IRequestHandler<GetUserNotificat
 
     public async Task<ErrorOr<Dictionary<string, List<Notification>>>> Handle(GetUserNotificationsQuery request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Processing get notifications query for user with id: {UserId}", request.UserId);
+        _logger.LogInformation("Processing get notifications query for user with id: {UserId}", request.UserId.Value);
         
         var user = await _userRepository.FindByIdAsync(request.UserId);
 
         if (user is null)
         {
-            _logger.LogInformation("User with ID: {Id} not found", request.UserId);
+            _logger.LogInformation("User with ID: {Id} not found", request.UserId.Value);
             return Errors.User.IdNotFound(request.UserId);
         }
         

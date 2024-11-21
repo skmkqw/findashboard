@@ -35,13 +35,13 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
 
     public async Task<ErrorOr<Team>> Handle(CreateTeamCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Handling team creation for: {OwnerId}", request.OwnerId);
+        _logger.LogInformation("Handling team creation for: {OwnerId}", request.OwnerId.Value);
 
         var owner = await _userRepository.FindByIdAsync(request.OwnerId);
 
         if (owner is null)
         {
-            _logger.LogInformation("Team owner with id: {Id} not found", request.OwnerId);
+            _logger.LogInformation("Team owner with id: {Id} not found", request.OwnerId.Value);
             return Errors.User.IdNotFound(request.OwnerId);
         }
         

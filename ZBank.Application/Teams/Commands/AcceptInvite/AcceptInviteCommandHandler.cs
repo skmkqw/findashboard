@@ -43,7 +43,7 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         if (invite is null)
         {
             _logger.LogInformation("Team invite with id: {Id} not found", request.NotificationId.Value);
-            return Errors.Notification.TeamInvite.TeamInviteNotFound(request.NotificationId);
+            return Errors.Notification.TeamInvite.NotFound(request.NotificationId);
         }
         
         var inviteReceiver = await _userRepository.FindByIdAsync(request.UserId);
@@ -63,7 +63,7 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
 
         if (invite.NotificationReceiverId != inviteReceiver.Id)
         {
-            _logger.LogInformation("User with id: {Id} hasn't accepted invite since his not the receiver", invite.Id.Value);
+            _logger.LogInformation("User with id: {Id} can't accept invite since he is not the receiver", invite.Id.Value);
             return Errors.Notification.TeamInvite.AccessDenied;
         }
         

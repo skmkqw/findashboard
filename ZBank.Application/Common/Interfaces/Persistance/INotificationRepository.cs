@@ -9,7 +9,10 @@ public interface INotificationRepository
 {
     Task<List<Notification>> FindUserNotifications(UserId userId);
     Task<TeamInviteNotification?> FindTeamInviteNotificationById(NotificationId notificationId);
+    
     Task<TeamInviteNotification?> FindTeamInviteNotification(UserId receiverId, TeamId teamId);
+    
+    Task<InformationNotification?> FindInformationNotificationById(NotificationId notificationId);
 
     void AddTeamInviteNotification(TeamInviteNotification teamInviteNotification);
     

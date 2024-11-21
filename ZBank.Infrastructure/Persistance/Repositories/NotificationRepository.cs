@@ -30,6 +30,12 @@ public class NotificationRepository : INotificationRepository
             .FirstOrDefaultAsync(n => n.NotificationReceiverId == receiverId && n.TeamId == teamId);
     }
     
+    public async Task<InformationNotification?> FindInformationNotificationById(NotificationId notificationId)
+    {
+        return await _dbContext.Notifications.OfType<InformationNotification>()
+            .FirstOrDefaultAsync(x => x.Id == notificationId);
+    }
+    
     public NotificationRepository(ZBankDbContext dbContext)
     {
         _dbContext = dbContext;
