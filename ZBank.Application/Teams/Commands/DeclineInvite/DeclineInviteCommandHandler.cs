@@ -44,7 +44,7 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
         if (invite is null)
         {
             _logger.LogInformation("Team invite with id: {Id} not found", request.NotificationId.Value);
-            return Errors.Notification.TeamInvite.TeamInviteNotFound(request.NotificationId);
+            return Errors.Notification.TeamInvite.NotFound(request.NotificationId);
         }
         
         var inviteReceiver = await _userRepository.FindByIdAsync(request.UserId);
