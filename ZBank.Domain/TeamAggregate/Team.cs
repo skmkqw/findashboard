@@ -6,29 +6,15 @@ using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Domain.TeamAggregate;
 
-public class Team : AggregateRoot<TeamId>
+public class Team : TeamBase
 { 
-    public string Name { get; private set;  }
-
-    public string? Description { get; private set; }
-    
-    public IReadOnlyList<UserId> UserIds => _userIds.AsReadOnly();
-    
-    public IReadOnlyList<ProjectId> ProjectIds => _projectIds.AsReadOnly();
-    
-    public IReadOnlyList<ActivityId> ActivityIds => _activityIds.AsReadOnly();
-    
     private readonly List<UserId> _userIds;
-    
-    private readonly List<ProjectId> _projectIds = new();
-    
-    private readonly List<ActivityId> _activityIds = new();
 
-    private Team(TeamId id, string name, string? description, List<UserId> userIds) : base(id)
+    public IReadOnlyList<UserId> UserIds => _userIds.AsReadOnly();
+
+    private Team(TeamId id, string name, string? description, List<UserId> userIds) 
+        : base(id, name, description)
     {
-        Id = TeamId.CreateUnique();
-        Name = name;
-        Description = description;
         _userIds = userIds;
     }
 
@@ -37,23 +23,17 @@ public class Team : AggregateRoot<TeamId>
         return new Team(TeamId.CreateUnique(), name, description, userIds);
     }
 
-    public void Update(string name, string description)
-    {
-        Name = name;
-        Description = description;
-    }
+    public override void AddProject(ProjectId projectId) => _projectIds.Add(projectId);
+
+    public override void DeleteProject(ProjectId projectId) => _projectIds.Remove(projectId);
+
+    public override void AddActivity(ActivityId activityId) => _activityIds.Add(activityId);
+
+    public override void DeleteActivity(ActivityId activityId) => _activityIds.Remove(activityId);
 
     public void AddUserId(UserId userId) => _userIds.Add(userId);
 
     public void DeleteUserId(UserId userId) => _userIds.Remove(userId);
-
-    public void AddProject(ProjectId projectId) => _projectIds.Add(projectId);
-
-    public void DeleteProject(ProjectId projectId) => _projectIds.Remove(projectId);
-
-    public void AddActivity(ActivityId activityId) => _activityIds.Add(activityId);
-
-    public void DeleteActivity(ActivityId activityId) => _activityIds.Remove(activityId);
     
 #pragma warning disable CS8618
     private Team()
