@@ -8,6 +8,13 @@ public class PersonalSpaceConfigurations : IEntityTypeConfiguration<PersonalSpac
 {
     public void Configure(EntityTypeBuilder<PersonalSpace> builder)
     {
+        ConfigurePersonalSpacesTable(builder);
+        ConfigureProjectIdsTable(builder);
+        ConfigureActivityIdsTable(builder);
+    }
+
+    private void ConfigurePersonalSpacesTable(EntityTypeBuilder<PersonalSpace> builder)
+    {
         builder.ToTable("PersonalSpaces");
         
         //PK
@@ -30,5 +37,51 @@ public class PersonalSpaceConfigurations : IEntityTypeConfiguration<PersonalSpac
         //OwnerId
         builder.Property(x => x.OwnerId)
             .ValueGeneratedNever();
+    }
+    
+    private void ConfigureProjectIdsTable(EntityTypeBuilder<PersonalSpace> builder)
+    {
+        builder.OwnsMany(r => r.ProjectIds, pib =>
+        {
+            pib.ToTable("PersonalProjectIds");
+            
+            //FK
+            pib.WithOwner().HasForeignKey("PersonalSpaceId");
+            
+            //PK
+            pib.HasKey("Id");
+            
+            //ID
+            pib.Property(d => d.Value)
+                .ValueGeneratedNever()
+                .HasColumnName("ProjectId");
+
+        });
+        
+        builder.Metadata.FindNavigation(nameof(Team.ProjectIds))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+    
+    private void ConfigureActivityIdsTable(EntityTypeBuilder<PersonalSpace> builder)
+    {
+        builder.OwnsMany(r => r.ActivityIds, aib =>
+        {
+            aib.ToTable("PersonalActivityIds");
+            
+            //FK
+            aib.WithOwner().HasForeignKey("PersonalSpaceId");
+            
+            //PK
+            aib.HasKey("Id");
+            
+            //ID
+            aib.Property(d => d.Value)
+                .ValueGeneratedNever()
+                .HasColumnName("ActivityId");
+
+        });
+        
+        builder.Metadata.FindNavigation(nameof(Team.ActivityIds))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }
