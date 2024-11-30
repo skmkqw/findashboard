@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ZBank.Domain.ActivityAggregate;
 using ZBank.Domain.Common.Attributes;
+using ZBank.Domain.Common.Models;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.ProfileAggregate;
 using ZBank.Domain.ProjectAggregate;

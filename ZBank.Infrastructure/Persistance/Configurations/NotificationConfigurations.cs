@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ZBank.Domain.Common.Models;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
