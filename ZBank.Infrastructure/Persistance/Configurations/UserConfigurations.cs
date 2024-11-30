@@ -44,6 +44,14 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
         builder.Property(x => x.Password)
             .IsRequired()
             .HasMaxLength(100);
+        
+        //PersonalSpaceId
+        builder.Property(x => x.PersonalSpaceId)
+            .HasColumnName("PersonalSpaceId")
+            .IsRequired(false);
+        
+        builder.Metadata.FindNavigation(nameof(User.PersonalSpaceId))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
     
     private void ConfigureTeamIdsTable(EntityTypeBuilder<User> builder)
