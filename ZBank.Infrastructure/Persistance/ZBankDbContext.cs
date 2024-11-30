@@ -22,6 +22,8 @@ public class ZBankDbContext : DbContext
     
     public DbSet<Project> Projects { get; set; }
     
+    public DbSet<PersonalSpace> PersonalSpaces { get; set; }
+    
     public DbSet<Team> Teams { get; set; }
     
     public DbSet<Wallet> Wallets { get; set; }
