@@ -53,7 +53,7 @@ namespace ZBank.Infrastructure.Migrations
                     b.ToTable("Activities", (string)null);
                 });
 
-            modelBuilder.Entity("ZBank.Domain.NotificationAggregate.Notification", b =>
+            modelBuilder.Entity("ZBank.Domain.Common.Models.Notification", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -136,6 +136,34 @@ namespace ZBank.Infrastructure.Migrations
                     b.ToTable("Projects", (string)null);
                 });
 
+            modelBuilder.Entity("ZBank.Domain.TeamAggregate.PersonalSpace", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PersonalSpaces", (string)null);
+                });
+
             modelBuilder.Entity("ZBank.Domain.TeamAggregate.Team", b =>
                 {
                     b.Property<Guid>("Id")
@@ -189,6 +217,10 @@ namespace ZBank.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<Guid?>("PersonalSpaceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("PersonalSpaceId");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -226,14 +258,14 @@ namespace ZBank.Infrastructure.Migrations
 
             modelBuilder.Entity("ZBank.Domain.NotificationAggregate.InformationNotification", b =>
                 {
-                    b.HasBaseType("ZBank.Domain.NotificationAggregate.Notification");
+                    b.HasBaseType("ZBank.Domain.Common.Models.Notification");
 
                     b.HasDiscriminator().HasValue("Information");
                 });
 
             modelBuilder.Entity("ZBank.Domain.NotificationAggregate.TeamInviteNotification", b =>
                 {
-                    b.HasBaseType("ZBank.Domain.NotificationAggregate.Notification");
+                    b.HasBaseType("ZBank.Domain.Common.Models.Notification");
 
                     b.Property<Guid>("TeamId")
                         .HasColumnType("uuid");
@@ -280,7 +312,7 @@ namespace ZBank.Infrastructure.Migrations
                     b.Navigation("ActivityLogs");
                 });
 
-            modelBuilder.Entity("ZBank.Domain.NotificationAggregate.Notification", b =>
+            modelBuilder.Entity("ZBank.Domain.Common.Models.Notification", b =>
                 {
                     b.OwnsOne("ZBank.Domain.NotificationAggregate.ValueObjects.NotificationSender", "NotificationSender", b1 =>
                         {
@@ -337,6 +369,63 @@ namespace ZBank.Infrastructure.Migrations
                         });
 
                     b.Navigation("WalletIds");
+                });
+
+            modelBuilder.Entity("ZBank.Domain.TeamAggregate.PersonalSpace", b =>
+                {
+                    b.OwnsMany("ZBank.Domain.ActivityAggregate.ValueObjects.ActivityId", "ActivityIds", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("PersonalSpaceId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("Value")
+                                .HasColumnType("uuid")
+                                .HasColumnName("ActivityId");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("PersonalSpaceId");
+
+                            b1.ToTable("PersonalActivityIds", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("PersonalSpaceId");
+                        });
+
+                    b.OwnsMany("ZBank.Domain.ProjectAggregate.ValueObjects.ProjectId", "ProjectIds", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("PersonalSpaceId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("Value")
+                                .HasColumnType("uuid")
+                                .HasColumnName("ProjectId");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("PersonalSpaceId");
+
+                            b1.ToTable("PersonalProjectIds", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("PersonalSpaceId");
+                        });
+
+                    b.Navigation("ActivityIds");
+
+                    b.Navigation("ProjectIds");
                 });
 
             modelBuilder.Entity("ZBank.Domain.TeamAggregate.Team", b =>
