@@ -36,19 +36,19 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
 
     public async Task<ErrorOr<PersonalSpace>> Handle(CreateSpaceCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Handling creating space command for user with id: {UserId}", request.OwnerId);
+        _logger.LogInformation("Handling creating space command for user with id: {UserId}", request.OwnerId.Value);
         
         var owner = await _userRepository.FindByIdAsync(request.OwnerId);
 
         if (owner is null)
         {
-            _logger.LogInformation("User with id: {UserId} not found or does not exist", request.OwnerId);
+            _logger.LogInformation("User with id: {UserId} not found or does not exist", request.OwnerId.Value);
             return Errors.User.IdNotFound(request.OwnerId);
         }
 
         if (owner.PersonalSpaceId is not null)
         {
-            _logger.LogInformation("User with id: {UserId} already has a personal space", owner.PersonalSpaceId);
+            _logger.LogInformation("User with id: {UserId} already has a personal space", owner.Id.Value);
             return Errors.PersonalSpace.IsAlreadySet;
         }
         
