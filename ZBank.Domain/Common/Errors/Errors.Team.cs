@@ -29,7 +29,7 @@ public static partial class Errors
             code: "PersonalSpace.IsAlreadySet",
             description: "Personal space id is already set and it cannot be changed");
         
-        public static Error IsNotSet => Error.Conflict(
+        public static Error IsNotSet => Error.NotFound(
             code: "PersonalSpace.IsNotSet",
             description: "Personal space id is not set");
     }
