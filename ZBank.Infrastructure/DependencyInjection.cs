@@ -35,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ISpaceRepository, SpaceRepository>();
         services.AddScoped<ITeamRepository, TeamRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         return services;
