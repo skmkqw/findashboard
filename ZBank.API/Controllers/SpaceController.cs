@@ -2,7 +2,9 @@ using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ZBank.Application.Spaces.Commands.CreateSpace;
+using ZBank.Application.Spaces.Queries.GetSpace;
 using ZBank.Contracts.Spaces.CreateSpace;
+using ZBank.Contracts.Spaces.GetSpace;
 
 namespace ZBank.API.Controllers;
 
@@ -18,6 +20,29 @@ public class SpaceController : ApiController
         _mapper = mapper;
         _mediator = mediator;
         _logger = logger;
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        var ownerId = GetUserId();
+        if (!ownerId.HasValue)
+        {
+            return UnauthorizedUserIdProblem();
+        }
+        
+        var query = _mapper.Map<GetSpaceQuery>(ownerId);
+
+        var getPersonalSpaceResult = await _mediator.Send(query);
+
+        if (getPersonalSpaceResult.IsError)
+        {
+            _logger.LogInformation("Failed to fetch personal space for: {OwnerId}.\nErrors: {Errors}", ownerId, getPersonalSpaceResult.Errors);
+            return Problem(getPersonalSpaceResult.Errors);
+        }
+        
+        _logger.LogInformation("Successfully fetched personal space with id: {Id}", getPersonalSpaceResult.Value.Id.Value);
+        return Ok(_mapper.Map<GetSpaceResponse>(getPersonalSpaceResult.Value));
     }
     
     [HttpPost]
