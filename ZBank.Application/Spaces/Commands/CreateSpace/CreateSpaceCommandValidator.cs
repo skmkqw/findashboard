@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace ZBank.Application.Users.Commands.CreateSpace;
+namespace ZBank.Application.Spaces.Commands.CreateSpace;
 
 public class CreateSpaceCommandValidator : AbstractValidator<CreateSpaceCommand>
 {

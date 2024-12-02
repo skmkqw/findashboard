@@ -1,7 +1,7 @@
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ZBank.Application.Users.Commands.CreateSpace;
+using ZBank.Application.Spaces.Commands.CreateSpace;
 using ZBank.Contracts.Spaces.CreateSpace;
 
 namespace ZBank.API.Controllers;

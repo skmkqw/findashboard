@@ -7,7 +7,7 @@ using ZBank.Domain.NotificationAggregate.Factories;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.UserAggregate;
 
-namespace ZBank.Application.Users.Commands.CreateSpace;
+namespace ZBank.Application.Spaces.Commands.CreateSpace;
 
 public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, ErrorOr<PersonalSpace>>
 {
@@ -59,6 +59,7 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
         );
         
         _spaceRepository.Add(space);
+        owner.AssignPersonalSpaceId(space.Id);
         
         SendSpaceCreatedRepository(owner, space);
         _logger.LogInformation("'SpaceCreated' notification sent");
