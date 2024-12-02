@@ -28,5 +28,9 @@ public static partial class Errors
         public static Error IsAlreadySet => Error.Conflict(
             code: "PersonalSpace.IsAlreadySet",
             description: "Personal space id is already set and it cannot be changed");
+        
+        public static Error IsNotSet => Error.Conflict(
+            code: "PersonalSpace.IsNotSet",
+            description: "Personal space id is not set");
     }
 }
