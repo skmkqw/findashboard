@@ -59,6 +59,7 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
         );
         
         _spaceRepository.Add(space);
+        owner.AssignPersonalSpaceId(space.Id);
         
         SendSpaceCreatedRepository(owner, space);
         _logger.LogInformation("'SpaceCreated' notification sent");
