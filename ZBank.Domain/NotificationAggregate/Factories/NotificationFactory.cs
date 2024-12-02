@@ -13,13 +13,23 @@ public static class NotificationFactory
         return new InformationNotification(NotificationId.CreateUnique(), notificationSender, receiverId, content);
     }
     
+    public static InformationNotification CreateSpaceCreatedNotification(User spaceOwner, PersonalSpace space)
+    {
+        return new InformationNotification(
+            id: NotificationId.CreateUnique(),
+            notificationSender: NotificationSender.Create(spaceOwner.Id, string.Join(" ", spaceOwner.FirstName, spaceOwner.LastName)),
+            receiverId: spaceOwner.Id,
+            content: $"Your personal space with name: {space.Name} is created successfully"
+        );
+    }
+    
     public static InformationNotification CreateTeamCreatedNotification(User teamCreator, Team team)
     {
         return new InformationNotification(
             id: NotificationId.CreateUnique(),
             notificationSender: NotificationSender.Create(teamCreator.Id, string.Join(" ", teamCreator.FirstName, teamCreator.LastName)),
             receiverId: teamCreator.Id,
-            content: $"Team '{team.Name}' is created successfully'"
+            content: $"Team '{team.Name}' is created successfully"
         );
     }
     
