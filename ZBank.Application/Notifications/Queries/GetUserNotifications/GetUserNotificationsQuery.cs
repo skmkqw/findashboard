@@ -1,5 +1,6 @@
 using ErrorOr;
 using MediatR;
+using ZBank.Domain.Common.Models;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.UserAggregate.ValueObjects;
 

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ZBank.Application.Common.Interfaces.Persistance;
+using ZBank.Domain.Common.Models;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.TeamAggregate.ValueObjects;

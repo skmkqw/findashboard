@@ -18,4 +18,19 @@ public static partial class Errors
             code: "Team.MemberAlreadyExists", 
             description: $"A user with email '{email}' is already a team member");
     }
+    
+    public static class PersonalSpace
+    {
+        public static Error NotFound => Error.NotFound(
+            code: "PersonalSpace.NotFound",
+            description: "Personal space not found or doesn't exist");
+
+        public static Error IsAlreadySet => Error.Conflict(
+            code: "PersonalSpace.IsAlreadySet",
+            description: "Personal space id is already set and it cannot be changed");
+        
+        public static Error IsNotSet => Error.NotFound(
+            code: "PersonalSpace.IsNotSet",
+            description: "Personal space id is not set");
+    }
 }

@@ -1,8 +1,7 @@
-using ZBank.Domain.Common.Models;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
-namespace ZBank.Domain.NotificationAggregate;
+namespace ZBank.Domain.Common.Models;
 
 public abstract class Notification : AggregateRoot<NotificationId>
 {

@@ -15,12 +15,16 @@ public sealed class User : AggregateRoot<UserId>
     public string Email { get; }
 
     public string Password { get; }
+
+    public TeamId? PersonalSpaceId => _personalSpaceId;
     
     public IReadOnlyList<TeamId> TeamIds => _teamIds.AsReadOnly();
     
     public IReadOnlyList<ProfileId> ProfileIds => _profileIds.AsReadOnly();
     
     public IReadOnlyList<NotificationId> NotificationIds => _notificationIds.AsReadOnly();
+    
+    private TeamId? _personalSpaceId;
     
     private readonly List<TeamId> _teamIds = new();
     
@@ -59,6 +63,8 @@ public sealed class User : AggregateRoot<UserId>
         FirstName = firstName;
         LastName = lastName;
     }
+
+    public void AssignPersonalSpaceId(TeamId personalSpaceId) => _personalSpaceId = personalSpaceId;
 
     public void AddTeamId(TeamId teamId) => _teamIds.Add(teamId);
 

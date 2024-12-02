@@ -1,3 +1,4 @@
+using ZBank.Domain.Common.Models;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
