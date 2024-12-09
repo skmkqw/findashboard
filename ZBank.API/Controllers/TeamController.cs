@@ -1,13 +1,17 @@
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using ZBank.API.Hubs;
 using ZBank.Application.Teams.Commands.AcceptInvite;
 using ZBank.Application.Teams.Commands.CreateTeam;
 using ZBank.Application.Teams.Commands.DeclineInvite;
 using ZBank.Application.Teams.Commands.SendInvite;
+using ZBank.Contracts.Notifications.GetUserNotifications;
 using ZBank.Contracts.Teams.AcceptOrDeclinveInvite;
 using ZBank.Contracts.Teams.CreateTeam;
 using ZBank.Contracts.Teams.SendInvite;
+using ZBank.Domain.NotificationAggregate;
 
 namespace ZBank.API.Controllers;
 
@@ -17,12 +21,17 @@ public class TeamController : ApiController
     private readonly IMapper _mapper;
     private readonly IMediator _mediator;
     private readonly ILogger<TeamController> _logger;
+    private readonly IHubContext<NotificationHub, INotificationClient> _notificationHubContext;
 
-    public TeamController(IMapper mapper, IMediator mediator, ILogger<TeamController> logger)
+    public TeamController(IMapper mapper,
+        IMediator mediator,
+        ILogger<TeamController> logger,
+        IHubContext<NotificationHub, INotificationClient> notificationHubContext)
     {
         _mapper = mapper;
         _mediator = mediator;
         _logger = logger;
+        _notificationHubContext = notificationHubContext;
     }
 
     [HttpPost]
@@ -44,8 +53,12 @@ public class TeamController : ApiController
             return Problem(createTeamResult.Errors);
         }
         
-        _logger.LogInformation("Successfully created team with id: {Id}", createTeamResult.Value.Id.Value);
-        return Ok(_mapper.Map<CreateTeamResponse>(createTeamResult.Value));
+        _logger.LogInformation("Successfully created team with id: {Id}", createTeamResult.Value.Result.Id.Value);
+
+        await SendInformationNotification(createTeamResult.Value.Notification);
+        _logger.LogInformation("Successfully sent 'TeamCreated' notification");
+        
+        return Ok(_mapper.Map<CreateTeamResponse>(createTeamResult.Value.Result));
     }
 
     [HttpPost("invites/send")]
@@ -118,5 +131,10 @@ public class TeamController : ApiController
         _logger.LogInformation("Successfully declined team invite for receiver with id: {ReceiverId}. Invite id: {InviteId}.", receiverId, inviteId);
         
         return Ok(new AcceptOrDeclineInviteResponse($"Successfully declined team invite for receiver with id: {receiverId}."));
+    }
+    
+    private async Task SendInformationNotification(InformationNotification notification)
+    {
+        await _notificationHubContext.Clients.All.ReceiveInformationNotification(_mapper.Map<InformationNotificationResponse>(notification));
     }
 }

@@ -2,14 +2,16 @@ using ErrorOr;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
+using ZBank.Application.Common.Models;
 using ZBank.Domain.Common.Errors;
+using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.Factories;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Teams.Commands.CreateTeam;
 
-public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, ErrorOr<Team>>
+public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, ErrorOr<WithNotificationResult<Team, InformationNotification>>>
 {
     private readonly ILogger<CreateTeamCommandHandler> _logger;
     
@@ -24,7 +26,7 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
         IUnitOfWork unitOfWork,
         ITeamRepository teamRepository,
         ILogger<CreateTeamCommandHandler> logger,
-        INotificationRepository notificationRepository)
+        INotificationRepository notificationRepository) 
     {
         _userRepository = userRepository;
         _unitOfWork = unitOfWork;
@@ -33,7 +35,7 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
         _notificationRepository = notificationRepository;
     }
 
-    public async Task<ErrorOr<Team>> Handle(CreateTeamCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<WithNotificationResult<Team, InformationNotification>>> Handle(CreateTeamCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling team creation for: {OwnerId}", request.OwnerId.Value);
 
@@ -53,21 +55,23 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
         
         _teamRepository.Add(team);
         
-        SendTeamCreatedNotification(owner, team);
-        _logger.LogInformation("'TeamCreated' notification sent");
+        var teamCreatedNotification = CreateTeamCreatedNotification(owner, team);
+        _logger.LogInformation("'TeamCreated' notification created");
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         _logger.LogInformation("Successfully created a team.");
-        return team;
+        return new WithNotificationResult<Team, InformationNotification>(team, teamCreatedNotification);
     }
     
-    private void SendTeamCreatedNotification(User teamCreator, Team team)
+    private InformationNotification CreateTeamCreatedNotification(User teamCreator, Team team)
     {
         var notification = NotificationFactory.CreateTeamCreatedNotification(teamCreator, team);
         
         _notificationRepository.AddNotification(notification);
         
         teamCreator.AddNotificationId(notification.Id);
+        
+        return notification;
     }
 }
