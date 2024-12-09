@@ -1,6 +1,6 @@
 using ZBank.API;
+using ZBank.API.Hubs;
 using ZBank.Application;
-using ZBank.Application.Hubs;
 using ZBank.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
