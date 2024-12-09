@@ -8,6 +8,7 @@ public static class DependencyInjection
     {
         services.AddControllers();
         services.AddMappers();
+        services.AddSignalR();
         
         services.AddCors(options =>
         {
