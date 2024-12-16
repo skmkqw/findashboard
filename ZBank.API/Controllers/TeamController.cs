@@ -107,6 +107,9 @@ public class TeamController : ApiController
             return Problem(acceptInviteResult.Errors);
         }
         
+        await _notificationSender.SendInformationNotification(acceptInviteResult.Value.Notification);
+        _logger.LogInformation("Successfully sent 'InviteAccepted' notification");
+        
         _logger.LogInformation("Successfully accepted team invite for receiver with id: {ReceiverId}. Invite id: {InviteId}.", receiverId, inviteId);
         
         return Ok(new AcceptOrDeclineInviteResponse($"Successfully accepted team invite for receiver with id: {receiverId}."));
