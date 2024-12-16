@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using ZBank.API.Hubs;
+using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Application.Teams.Commands.AcceptInvite;
 using ZBank.Application.Teams.Commands.CreateTeam;
 using ZBank.Application.Teams.Commands.DeclineInvite;
@@ -21,17 +22,20 @@ public class TeamController : ApiController
     private readonly IMapper _mapper;
     private readonly IMediator _mediator;
     private readonly ILogger<TeamController> _logger;
+    private readonly IUserConnectionManager _connectionManager;
     private readonly IHubContext<NotificationHub, INotificationClient> _notificationHubContext;
 
     public TeamController(IMapper mapper,
         IMediator mediator,
         ILogger<TeamController> logger,
+        IUserConnectionManager connectionManager,
         IHubContext<NotificationHub, INotificationClient> notificationHubContext)
     {
         _mapper = mapper;
         _mediator = mediator;
         _logger = logger;
         _notificationHubContext = notificationHubContext;
+        _connectionManager = connectionManager;
     }
 
     [HttpPost]
@@ -135,6 +139,16 @@ public class TeamController : ApiController
     
     private async Task SendInformationNotification(InformationNotification notification)
     {
-        await _notificationHubContext.Clients.All.ReceiveInformationNotification(_mapper.Map<InformationNotificationResponse>(notification));
+        var receiverId = notification.NotificationReceiverId;
+        var connections = _connectionManager.GetConnections(receiverId);
+
+        if (connections != null)
+        {
+            foreach (var connectionId in connections)
+            {
+                await _notificationHubContext.Clients.Client(connectionId)
+                    .ReceiveInformationNotification(_mapper.Map<InformationNotificationResponse>(notification));
+            }
+        }
     }
 }
