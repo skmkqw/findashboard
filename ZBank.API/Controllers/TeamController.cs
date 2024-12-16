@@ -134,6 +134,9 @@ public class TeamController : ApiController
             return Problem(declineInviteResult.Errors);
         }
         
+        await _notificationSender.SendInformationNotification(declineInviteResult.Value.Notification);
+        _logger.LogInformation("Successfully sent 'InviteDeclined' notification");
+        
         _logger.LogInformation("Successfully declined team invite for receiver with id: {ReceiverId}. Invite id: {InviteId}.", receiverId, inviteId);
         
         return Ok(new AcceptOrDeclineInviteResponse($"Successfully declined team invite for receiver with id: {receiverId}."));

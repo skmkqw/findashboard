@@ -2,6 +2,7 @@ using ErrorOr;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
+using ZBank.Application.Common.Models;
 using ZBank.Application.Teams.Commands.AcceptInvite;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.NotificationAggregate;
@@ -11,7 +12,7 @@ using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Teams.Commands.DeclineInvite;
 
-public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand, ErrorOr<Unit>>
+public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand, ErrorOr<WithNotificationResult<Unit, InformationNotification>>>
 {
     private readonly IUserRepository _userRepository;
     
@@ -36,7 +37,7 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
         _logger = logger;
     }
 
-    public async Task<ErrorOr<Unit>> Handle(DeclineInviteCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<WithNotificationResult<Unit, InformationNotification>>> Handle(DeclineInviteCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling team invite declination. Invite id: {InviteId}", request.NotificationId.Value);
         
@@ -87,22 +88,24 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
         
         inviteReceiver.DeleteNotificationId(invite.Id);
         
-        SendInviteDeclinedNotification(inviteSender, inviteReceiver, team);
-        _logger.LogInformation("'InviteDeclined' notification sent");
+        var inviteDeclinedNotification = CreateInviteDeclinedNotification(inviteSender, inviteReceiver, team);
+        _logger.LogInformation("'InviteDeclined' notification created");
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         _logger.LogInformation("Successfully declined team invite");
         
-        return Unit.Value;
+        return new WithNotificationResult<Unit, InformationNotification>(Unit.Value, inviteDeclinedNotification);
     }
     
-    private void SendInviteDeclinedNotification(User inviteSender, User inviteReceiver, Team team)
+    private InformationNotification CreateInviteDeclinedNotification(User inviteSender, User inviteReceiver, Team team)
     {
         var notification = NotificationFactory.CreateTemInviteDeclinedNotification(inviteSender, inviteReceiver, team);
         
         _notificationRepository.AddNotification(notification);
         
         inviteSender.AddNotificationId(notification.Id);
+        
+        return notification;
     }
 }
