@@ -23,6 +23,7 @@ public static class DependencyInjection
         services.AddAuth(configuration);
         
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
         
         services.AddPersistence();
         return services;
