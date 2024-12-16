@@ -10,9 +10,9 @@ public class NotificationSender<T> : INotificationSender where T : Hub<INotifica
 {
     private readonly IUserConnectionManager _connectionManager;
 
-    private readonly IHubContext<NotificationHub, INotificationClient> _notificationHubContext;
+    private readonly IHubContext<T, INotificationClient> _notificationHubContext;
 
-    public NotificationSender(IUserConnectionManager connectionManager, IHubContext<NotificationHub, INotificationClient> notificationHubContext)
+    public NotificationSender(IUserConnectionManager connectionManager, IHubContext<T, INotificationClient> notificationHubContext)
     {
         _connectionManager = connectionManager;
         _notificationHubContext = notificationHubContext;
