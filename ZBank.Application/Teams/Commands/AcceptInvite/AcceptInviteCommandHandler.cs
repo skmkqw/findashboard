@@ -94,10 +94,6 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         var inviteAcceptedNotification = CreateInviteAcceptedNotification(inviteSender, inviteReceiver, team);
         _logger.LogInformation("'InviteAccepted' notification created");
         
-        //TODO: Modify WithNotificationResult to include multiple notifications 
-        var teamJoinedNotification = CreateTeamJoinedNotification(inviteReceiver, team);
-        _logger.LogInformation("'TeamJoined' notification created");
-        
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Successfully accepted team invite");
         
@@ -111,17 +107,6 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         _notificationRepository.AddNotification(notification);
         
         inviteSender.AddNotificationId(notification.Id);
-        
-        return notification;
-    }
-    
-    private InformationNotification CreateTeamJoinedNotification(User inviteReceiver, Team team)
-    {
-        var notification = NotificationFactory.CreateTeamJoinedNotification(inviteReceiver, team);
-        
-        _notificationRepository.AddNotification(notification);
-        
-        inviteReceiver.AddNotificationId(notification.Id);
         
         return notification;
     }
