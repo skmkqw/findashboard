@@ -39,4 +39,19 @@ public class NotificationSender<T> : INotificationSender where T : Hub<INotifica
             }
         }
     }
+
+    public async Task SendTeamInviteNotification(TeamInviteNotification notification)
+    {
+        var receiverId = notification.NotificationReceiverId;
+        var connections = _connectionManager.GetConnections(receiverId);
+
+        if (connections != null)
+        {
+            foreach (var connectionId in connections)
+            {
+                await _notificationHubContext.Clients.Client(connectionId)
+                    .ReceiveTeamInviteNotification(_mapper.Map<TeamInviteNotificationResponse>(notification));
+            }
+        }
+    }
 }

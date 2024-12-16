@@ -5,4 +5,6 @@ namespace ZBank.API.Interfaces;
 public interface INotificationSender
 {
     Task SendInformationNotification(InformationNotification notification);
+    
+    Task SendTeamInviteNotification(TeamInviteNotification notification);
 }
