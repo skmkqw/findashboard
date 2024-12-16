@@ -2,14 +2,16 @@ using ErrorOr;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
+using ZBank.Application.Common.Models;
 using ZBank.Domain.Common.Errors;
+using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.Factories;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Spaces.Commands.CreateSpace;
 
-public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, ErrorOr<PersonalSpace>>
+public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, ErrorOr<WithNotificationResult<PersonalSpace, InformationNotification>>>
 {
     private readonly IUserRepository _userRepository;
     
@@ -34,7 +36,7 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<ErrorOr<PersonalSpace>> Handle(CreateSpaceCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<WithNotificationResult<PersonalSpace, InformationNotification>>> Handle(CreateSpaceCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling creating space command for user with id: {UserId}", request.OwnerId.Value);
         
@@ -61,21 +63,23 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
         _spaceRepository.Add(space);
         owner.AssignPersonalSpaceId(space.Id);
         
-        SendSpaceCreatedRepository(owner, space);
-        _logger.LogInformation("'SpaceCreated' notification sent");
+        var spaceCreatedNotification = CreateSpaceCreatedRepository(owner, space);
+        _logger.LogInformation("'SpaceCreated' notification created");
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Successfully created personal space");
 
-        return space;
+        return new WithNotificationResult<PersonalSpace, InformationNotification>(space, spaceCreatedNotification);
     }
 
-    private void SendSpaceCreatedRepository(User owner, PersonalSpace space)
+    private InformationNotification CreateSpaceCreatedRepository(User owner, PersonalSpace space)
     {
         var spaceCreatedNotification = NotificationFactory.CreateSpaceCreatedNotification(owner, space);
         
         owner.AddNotificationId(spaceCreatedNotification.Id);
         
         _notificationRepository.AddNotification(spaceCreatedNotification);
+        
+        return spaceCreatedNotification;
     }
 }

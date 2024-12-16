@@ -2,6 +2,7 @@ using ErrorOr;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
+using ZBank.Application.Common.Models;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.Factories;
@@ -10,7 +11,7 @@ using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Teams.Commands.AcceptInvite;
 
-public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, ErrorOr<Unit>>
+public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, ErrorOr<WithNotificationResult<Unit, InformationNotification>>>
 {
     private readonly IUserRepository _userRepository;
     
@@ -35,7 +36,7 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         _logger = logger;
     }
 
-    public async Task<ErrorOr<Unit>> Handle(AcceptInviteCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<WithNotificationResult<Unit, InformationNotification>>> Handle(AcceptInviteCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling team invite acceptation. Invite id: {InviteId}", request.NotificationId.Value);
         
@@ -90,33 +91,23 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         
         inviteReceiver.DeleteNotificationId(invite.Id);
         
-        SendInviteAcceptedNotification(inviteSender, inviteReceiver, team);
-        _logger.LogInformation("'InviteAccepted' notification sent");
+        var inviteAcceptedNotification = CreateInviteAcceptedNotification(inviteSender, inviteReceiver, team);
+        _logger.LogInformation("'InviteAccepted' notification created");
         
-        SendTeamJoinedNotification(inviteReceiver, team);
-        _logger.LogInformation("'TeamJoined' notification sent");
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
         _logger.LogInformation("Successfully accepted team invite");
         
-        return Unit.Value;
+        return new WithNotificationResult<Unit, InformationNotification>(Unit.Value, inviteAcceptedNotification);
     }
     
-    private void SendInviteAcceptedNotification(User inviteSender, User inviteReceiver, Team team)
+    private InformationNotification CreateInviteAcceptedNotification(User inviteSender, User inviteReceiver, Team team)
     {
         var notification = NotificationFactory.CreateTemInviteAcceptedNotification(inviteSender, inviteReceiver, team);
         
         _notificationRepository.AddNotification(notification);
         
         inviteSender.AddNotificationId(notification.Id);
-    }
-    
-    private void SendTeamJoinedNotification(User inviteReceiver, Team team)
-    {
-        var notification = NotificationFactory.CreateTeamJoinedNotification(inviteReceiver, team);
         
-        _notificationRepository.AddNotification(notification);
-        
-        inviteReceiver.AddNotificationId(notification.Id);
+        return notification;
     }
 }

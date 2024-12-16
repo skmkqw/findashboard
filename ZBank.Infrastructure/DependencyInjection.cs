@@ -23,6 +23,7 @@ public static class DependencyInjection
         services.AddAuth(configuration);
         
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
         
         services.AddPersistence();
         return services;
@@ -67,7 +68,7 @@ public static class DependencyInjection
                     ValidAudience = jwtSettings.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
                 };
-
+                
                 options.Events = new JwtBearerEvents
                 {
                     OnMessageReceived = context =>

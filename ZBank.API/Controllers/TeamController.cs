@@ -1,6 +1,7 @@
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ZBank.API.Interfaces;
 using ZBank.Application.Teams.Commands.AcceptInvite;
 using ZBank.Application.Teams.Commands.CreateTeam;
 using ZBank.Application.Teams.Commands.DeclineInvite;
@@ -17,12 +18,18 @@ public class TeamController : ApiController
     private readonly IMapper _mapper;
     private readonly IMediator _mediator;
     private readonly ILogger<TeamController> _logger;
+    private readonly INotificationSender _notificationSender;
 
-    public TeamController(IMapper mapper, IMediator mediator, ILogger<TeamController> logger)
+    public TeamController(
+        IMapper mapper,
+        IMediator mediator,
+        ILogger<TeamController> logger,
+        INotificationSender notificationSender)
     {
         _mapper = mapper;
         _mediator = mediator;
         _logger = logger;
+        _notificationSender = notificationSender;
     }
 
     [HttpPost]
@@ -44,8 +51,12 @@ public class TeamController : ApiController
             return Problem(createTeamResult.Errors);
         }
         
-        _logger.LogInformation("Successfully created team with id: {Id}", createTeamResult.Value.Id.Value);
-        return Ok(_mapper.Map<CreateTeamResponse>(createTeamResult.Value));
+        _logger.LogInformation("Successfully created team with id: {Id}", createTeamResult.Value.Result.Id.Value);
+
+        await _notificationSender.SendInformationNotification(createTeamResult.Value.Notification);
+        _logger.LogInformation("Successfully sent 'TeamCreated' notification");
+        
+        return Ok(_mapper.Map<CreateTeamResponse>(createTeamResult.Value.Result));
     }
 
     [HttpPost("invites/send")]
@@ -67,7 +78,12 @@ public class TeamController : ApiController
             return Problem(sendInviteResult.Errors);
         }
         
+        await _notificationSender.SendTeamInviteNotification(sendInviteResult.Value.Result);
         _logger.LogInformation("Successfully sent team request from {SenderId} to {ReceiverEmail}.", senderId, request.ReceiverEmail);
+
+        
+        await _notificationSender.SendInformationNotification(sendInviteResult.Value.Notification);
+        _logger.LogInformation("Successfully sent 'InviteSent' notification");
         
         return Ok(new SendInviteResponse($"Successfully sent team join request to {request.ReceiverEmail}."));
     }
@@ -90,6 +106,9 @@ public class TeamController : ApiController
             _logger.LogInformation("Failed to accept team invite {ReceiverId}. Invite id: {InviteId}. Errors: {Errors}", receiverId, inviteId, acceptInviteResult.Errors);   
             return Problem(acceptInviteResult.Errors);
         }
+        
+        await _notificationSender.SendInformationNotification(acceptInviteResult.Value.Notification);
+        _logger.LogInformation("Successfully sent 'InviteAccepted' notification");
         
         _logger.LogInformation("Successfully accepted team invite for receiver with id: {ReceiverId}. Invite id: {InviteId}.", receiverId, inviteId);
         
@@ -114,6 +133,9 @@ public class TeamController : ApiController
             _logger.LogInformation("Failed to decline team invite {ReceiverId}. Invite id: {InviteId}. Errors: {Errors}", receiverId, inviteId, declineInviteResult.Errors);   
             return Problem(declineInviteResult.Errors);
         }
+        
+        await _notificationSender.SendInformationNotification(declineInviteResult.Value.Notification);
+        _logger.LogInformation("Successfully sent 'InviteDeclined' notification");
         
         _logger.LogInformation("Successfully declined team invite for receiver with id: {ReceiverId}. Invite id: {InviteId}.", receiverId, inviteId);
         

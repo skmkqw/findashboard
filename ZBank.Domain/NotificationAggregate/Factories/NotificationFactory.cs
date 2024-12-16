@@ -53,16 +53,6 @@ public static class NotificationFactory
         );
     }
     
-    public static InformationNotification CreateTeamJoinedNotification(User inviteReceiver, Team team)
-    {
-        return new InformationNotification(
-            id: NotificationId.CreateUnique(),
-            notificationSender: NotificationSender.Create(inviteReceiver.Id, string.Join(" ", inviteReceiver.FirstName, inviteReceiver.LastName)),
-            receiverId: inviteReceiver.Id,
-            content: $"You have joined {team.Name}"
-        );
-    }
-    
     public static InformationNotification CreateTemInviteDeclinedNotification(User inviteSender, User inviteReceiver, Team team)
     {
         return new InformationNotification(

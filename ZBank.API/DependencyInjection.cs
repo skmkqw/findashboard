@@ -1,4 +1,7 @@
+using ZBank.API.Hubs;
+using ZBank.API.Interfaces;
 using ZBank.API.Mapping;
+using ZBank.API.Services.Notifications;
 
 namespace ZBank.API;
 
@@ -8,6 +11,7 @@ public static class DependencyInjection
     {
         services.AddControllers();
         services.AddMappers();
+        services.AddSignalR();
         
         services.AddCors(options =>
         {
@@ -19,6 +23,8 @@ public static class DependencyInjection
                     .AllowCredentials();
             });
         });
+
+        services.AddScoped<INotificationSender, NotificationSender<NotificationHub>>();
         
         return services;
     }
