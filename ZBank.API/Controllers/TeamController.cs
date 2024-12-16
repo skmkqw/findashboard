@@ -78,7 +78,12 @@ public class TeamController : ApiController
             return Problem(sendInviteResult.Errors);
         }
         
+        await _notificationSender.SendTeamInviteNotification(sendInviteResult.Value.Result);
         _logger.LogInformation("Successfully sent team request from {SenderId} to {ReceiverEmail}.", senderId, request.ReceiverEmail);
+
+        
+        await _notificationSender.SendInformationNotification(sendInviteResult.Value.Notification);
+        _logger.LogInformation("Successfully sent 'InviteSent' notification");
         
         return Ok(new SendInviteResponse($"Successfully sent team join request to {request.ReceiverEmail}."));
     }

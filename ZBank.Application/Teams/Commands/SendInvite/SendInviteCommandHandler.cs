@@ -2,7 +2,9 @@ using ErrorOr;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
+using ZBank.Application.Common.Models;
 using ZBank.Domain.Common.Errors;
+using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.Factories;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.TeamAggregate;
@@ -10,7 +12,7 @@ using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Teams.Commands.SendInvite;
 
-public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, ErrorOr<Unit>>
+public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, ErrorOr<WithNotificationResult<TeamInviteNotification, InformationNotification>>>
 {
     private readonly ILogger<SendInviteCommandHandler> _logger;
     
@@ -35,7 +37,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<ErrorOr<Unit>> Handle(SendInviteCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<WithNotificationResult<TeamInviteNotification, InformationNotification>>> Handle(SendInviteCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling team invite creation from {SenderId} to {ReceiverEmail}. Team id: {TeamId}", request.SenderId.Value, request.ReceiverEmail, request.TeamId.Value);
         
@@ -96,23 +98,25 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
         
         receiver.AddNotificationId(teamInvite.Id);
         
-        SendInviteCreatedNotification(sender, receiver, team);
-        _logger.LogInformation("'InviteCreated' notification sent");
+        var inviteCreatedNotification = CreateInviteCreatedNotification(sender, receiver, team);
+        _logger.LogInformation("'InviteSent' notification created");
 
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         _logger.LogInformation("Successfully created and sent team invite");
         
-        return Unit.Value;
+        return new WithNotificationResult<TeamInviteNotification, InformationNotification>(teamInvite, inviteCreatedNotification);
     }
 
-    private void SendInviteCreatedNotification(User inviteSender, User inviteReceiver, Team team)
+    private InformationNotification CreateInviteCreatedNotification(User inviteSender, User inviteReceiver, Team team)
     {
         var notification = NotificationFactory.CreateTemInviteSentNotification(inviteSender, inviteReceiver, team);
         
         _notificationRepository.AddNotification(notification);
         
         inviteSender.AddNotificationId(notification.Id);
+        
+        return notification;
     }
 }
