@@ -1,5 +1,6 @@
 using ZBank.Domain.Common.Models;
 using ZBank.Domain.ProfileAggregate.ValueObjects;
+using ZBank.Domain.WalletAggregate.Entities;
 using ZBank.Domain.WalletAggregate.ValueObjects;
 
 namespace ZBank.Domain.WalletAggregate;
@@ -7,12 +8,16 @@ namespace ZBank.Domain.WalletAggregate;
 public class Wallet : AggregateRoot<WalletId>
 {
     public string Address { get; private set; }
+
+    public WalletType Type { get; private set; } = WalletType.EVM;
+
+    public ProfileId? ProfileId { get; }
     
-    public WalletType Type { get; private set; }
+    public IReadOnlyList<Balance> Balances => _balances.AsReadOnly();
 
-    public ProfileId ProfileId { get; }
-
-    private Wallet(WalletId id, string address, WalletType type, ProfileId profileId) : base(id)
+    private readonly List<Balance> _balances = new();
+    
+    private Wallet(WalletId id, string address, WalletType type, ProfileId? profileId = null) : base(id)
     {
         Address = address;
         Type = type;
@@ -29,6 +34,10 @@ public class Wallet : AggregateRoot<WalletId>
         Address = address;
         Type = type;
     }
+    
+    public void AddBalance(Balance balance) => _balances.Add(balance);
+    
+    public void DeleteBalance(Balance balance) => _balances.Remove(balance);
     
 #pragma warning disable CS8618
     private Wallet()
