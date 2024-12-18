@@ -11,13 +11,13 @@ public class Wallet : AggregateRoot<WalletId>
 
     public WalletType Type { get; private set; } = WalletType.EVM;
 
-    public ProfileId? ProfileId { get; }
+    public ProfileId ProfileId { get; }
     
     public IReadOnlyList<Balance> Balances => _balances.AsReadOnly();
 
     private readonly List<Balance> _balances = new();
     
-    private Wallet(WalletId id, string address, WalletType type, ProfileId? profileId = null) : base(id)
+    private Wallet(WalletId id, string address, WalletType type, ProfileId profileId) : base(id)
     {
         Address = address;
         Type = type;
