@@ -242,7 +242,7 @@ namespace ZBank.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ProfileId")
+                    b.Property<Guid?>("ProfileId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Type")
@@ -594,6 +594,35 @@ namespace ZBank.Infrastructure.Migrations
                     b.Navigation("ProfileIds");
 
                     b.Navigation("TeamIds");
+                });
+
+            modelBuilder.Entity("ZBank.Domain.WalletAggregate.Wallet", b =>
+                {
+                    b.OwnsMany("ZBank.Domain.WalletAggregate.Entities.Balance", "Balances", b1 =>
+                        {
+                            b1.Property<Guid>("WalletId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid");
+
+                            b1.Property<decimal>("Amount")
+                                .HasColumnType("numeric");
+
+                            b1.Property<string>("Symbol")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("character varying(10)");
+
+                            b1.HasKey("WalletId", "Id");
+
+                            b1.ToTable("WalletBalances", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("WalletId");
+                        });
+
+                    b.Navigation("Balances");
                 });
 #pragma warning restore 612, 618
         }
