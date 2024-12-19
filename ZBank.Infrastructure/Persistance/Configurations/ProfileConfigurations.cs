@@ -27,6 +27,10 @@ public class ProfileConfigurations : IEntityTypeConfiguration<Profile>
         builder.Property(x => x.OwnerId)
             .ValueGeneratedNever();
         
+        //TeamId
+        builder.Property(x => x.TeamId)
+            .ValueGeneratedNever();
+        
         //Name
         builder.Property(x => x.Name)
             .IsRequired()
