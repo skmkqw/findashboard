@@ -1,5 +1,6 @@
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.ProfileAggregate;
+using ZBank.Domain.ProfileAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Infrastructure.Persistance.Repositories;
@@ -13,7 +14,7 @@ public class ProfileRepository : IProfileRepository
         _dbContext = dbContext;
     }
     
-    public async Task<Profile?> GetByIdAsync(UserId id)
+    public async Task<Profile?> GetByIdAsync(ProfileId id)
     {
         return await _dbContext.Profiles.FindAsync(id); 
     }
