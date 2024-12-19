@@ -13,8 +13,8 @@ public class CreateWalletCommandValidator : AbstractValidator<CreateWalletComman
         RuleFor(x => x.Type)
             .NotEmpty().WithMessage("Type is required");
         
-        RuleFor(x => x.UserId.Value)
-            .NotEmpty().WithMessage("User ID is required");
+        RuleFor(x => x.OwnerId.Value)
+            .NotEmpty().WithMessage("Owner ID is required");
         
         RuleFor(x => x.ProfileId.Value)
             .NotEmpty().WithMessage("Profile ID is required");
