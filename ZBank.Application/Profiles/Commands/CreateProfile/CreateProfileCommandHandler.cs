@@ -70,6 +70,10 @@ public class CreateProfileCommandHandler : IRequestHandler<CreateProfileCommand,
                 return Errors.PersonalSpace.IsNotSet;
             }
         }
+        else if (teamOrSpace is null && owner.PersonalSpaceId is null)
+        {
+            return Errors.Team.NotFound;
+        }
 
         if (teamOrSpace is Team team && !team.UserIds.Contains(owner.Id))
         {

@@ -49,6 +49,6 @@ public class ProfileController : ApiController
         _logger.LogInformation("Successfully sent 'ProfileCreated' notification");
         
         _logger.LogInformation("Successfully created profile with id: {Id}", createProfileResult.Value.Result.Id.Value);
-        return Ok(_mapper.Map<CreateProfileResponse>(createProfileResult.Value));
+        return Ok(_mapper.Map<CreateProfileResponse>(createProfileResult.Value.Result));
     }
 }
