@@ -1,4 +1,5 @@
 using ZBank.Domain.ActivityAggregate.ValueObjects;
+using ZBank.Domain.ProfileAggregate.ValueObjects;
 using ZBank.Domain.ProjectAggregate.ValueObjects;
 using ZBank.Domain.TeamAggregate.ValueObjects;
 
@@ -9,10 +10,14 @@ public abstract class TeamBase : AggregateRoot<TeamId>
     public string Name { get; protected set; }
 
     public string? Description { get; protected set; }
+    
+    public IReadOnlyList<ProfileId> ProfileIds => _profileIds.AsReadOnly();
 
     public IReadOnlyList<ProjectId> ProjectIds => _projectIds.AsReadOnly();
 
     public IReadOnlyList<ActivityId> ActivityIds => _activityIds.AsReadOnly();
+    
+    protected readonly List<ProfileId> _profileIds = new();
 
     protected readonly List<ProjectId> _projectIds = new();
     
@@ -24,6 +29,10 @@ public abstract class TeamBase : AggregateRoot<TeamId>
         Name = name;
         Description = description;
     }
+    
+    public abstract void AddProfile(ProfileId profileId);
+
+    public abstract void DeleteProfile(ProfileId profileId);
     
     public abstract void AddProject(ProjectId projectId);
 

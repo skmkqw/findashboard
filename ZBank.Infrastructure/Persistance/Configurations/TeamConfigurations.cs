@@ -11,6 +11,7 @@ public class TeamConfigurations : IEntityTypeConfiguration<Team>
         ConfigureTeamsTable(builder);
         ConfigureUserIdsTable(builder);
         ConfigureProjectIdsTable(builder);
+        ConfigureProfileIdsTable(builder);
         ConfigureActivityIdsTable(builder);
     }
 
@@ -56,6 +57,29 @@ public class TeamConfigurations : IEntityTypeConfiguration<Team>
         });
         
         builder.Metadata.FindNavigation(nameof(Team.UserIds))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+    
+    private void ConfigureProfileIdsTable(EntityTypeBuilder<Team> builder)
+    {
+        builder.OwnsMany(r => r.ProfileIds, pib =>
+        {
+            pib.ToTable("ProfileIds");
+            
+            //FK
+            pib.WithOwner().HasForeignKey("TeamId");
+            
+            //PK
+            pib.HasKey("Id");
+            
+            //ID
+            pib.Property(d => d.Value)
+                .ValueGeneratedNever()
+                .HasColumnName("ProfileId");
+
+        });
+        
+        builder.Metadata.FindNavigation(nameof(Team.ProfileIds))!
             .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
     
