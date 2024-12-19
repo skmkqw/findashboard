@@ -104,6 +104,9 @@ namespace ZBank.Infrastructure.Migrations
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -242,7 +245,7 @@ namespace ZBank.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("ProfileId")
+                    b.Property<Guid>("ProfileId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Type")

@@ -39,6 +39,9 @@ public static class DependencyInjection
         services.AddScoped<ISpaceRepository, SpaceRepository>();
         services.AddScoped<ITeamRepository, TeamRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IWalletRepository, WalletRepository>();
+        services.AddScoped<IProfileRepository, ProfileRepository>();
+        
         return services;
     }
 
