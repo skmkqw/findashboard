@@ -13,6 +13,7 @@ using ZBank.Infrastructure.Authentication;
 using ZBank.Infrastructure.Persistance;
 using ZBank.Infrastructure.Persistance.Repositories;
 using ZBank.Infrastructure.Services;
+using ZBank.Infrastructure.Services.Background;
 
 namespace ZBank.Infrastructure;
 
@@ -24,6 +25,8 @@ public static class DependencyInjection
         
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
+
+        services.AddHostedService<CurrencyService>();
         
         services.AddPersistence();
         return services;
@@ -41,7 +44,7 @@ public static class DependencyInjection
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IWalletRepository, WalletRepository>();
         services.AddScoped<IProfileRepository, ProfileRepository>();
-        
+        services.AddScoped<ICurrencyRepository, CurrencyRepository>();
         return services;
     }
 
