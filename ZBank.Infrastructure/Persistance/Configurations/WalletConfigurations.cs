@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ZBank.Domain.CurrencyAggregate.ValueObjects;
 using ZBank.Domain.WalletAggregate;
 using ZBank.Domain.WalletAggregate.ValueObjects;
 
@@ -51,8 +52,12 @@ public class WalletConfigurations : IEntityTypeConfiguration<Wallet>
                     value => BalanceId.Create(value));
             
             //Symbol
-            bb.Property(x => x.Symbol)
-                .HasMaxLength(10);
+            bb.Property(x => x.CurrencyId)
+                .IsRequired()
+                .ValueGeneratedNever()
+                .HasConversion(
+                    id => id.Value,
+                    value => CurrencyId.Create(value));
         });
         
         builder.Metadata.FindNavigation(nameof(Wallet.Balances))!
