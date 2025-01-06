@@ -88,6 +88,29 @@ namespace ZBank.Infrastructure.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("ZBank.Domain.CurrencyAggregate.Currency", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Currencies", (string)null);
+                });
+
             modelBuilder.Entity("ZBank.Domain.ProfileAggregate.Profile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -666,10 +689,8 @@ namespace ZBank.Infrastructure.Migrations
                             b1.Property<decimal>("Amount")
                                 .HasColumnType("numeric");
 
-                            b1.Property<string>("Symbol")
-                                .IsRequired()
-                                .HasMaxLength(10)
-                                .HasColumnType("character varying(10)");
+                            b1.Property<Guid>("CurrencyId")
+                                .HasColumnType("uuid");
 
                             b1.HasKey("WalletId", "Id");
 
