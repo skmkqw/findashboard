@@ -19,6 +19,11 @@ public class Currency : AggregateRoot<CurrencyId>
     {
         return new Currency(CurrencyId.CreateUnique(), symbol, price);
     }
+
+    public void UpdatePrice(decimal price)
+    {
+        Price = price;
+    }
     
 #pragma warning disable CS8618
     private Currency()

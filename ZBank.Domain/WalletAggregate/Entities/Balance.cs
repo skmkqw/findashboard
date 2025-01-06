@@ -21,7 +21,7 @@ public class Balance : Entity<BalanceId>
         return new Balance(BalanceId.CreateUnique(), symbol, amount);
     }
 
-    public void ChangeAmount(decimal amount)
+    public void UpdateAmount(decimal amount)
     {
         Amount = amount;
     }
