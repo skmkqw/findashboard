@@ -2,9 +2,9 @@ using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ZBank.API.Interfaces;
-using ZBank.Application.Profiles.Commands.CreateProfile;
+using ZBank.Application.Wallets.Commands.AddBalance;
 using ZBank.Application.Wallets.Commands.CreateWallet;
-using ZBank.Contracts.Profiles.CreateProfile;
+using ZBank.Contracts.Wallets.AddBalance;
 using ZBank.Contracts.Wallets.CreateWallet;
 
 namespace ZBank.API.Controllers;
@@ -52,5 +52,31 @@ public class WalletController : ApiController
         
         _logger.LogInformation("Successfully created wallet with id: {Id}", createWalletResult.Value.Result.Id.Value);
         return Ok(_mapper.Map<CreateWalletResponse>(createWalletResult.Value.Result));
+    }
+
+    [HttpPost("balances")]
+    public async Task<IActionResult> CreateBalance([FromBody] AddBalanceRequest request)
+    {
+        var ownerId = GetUserId();
+        if (!ownerId.HasValue)
+        {
+            return UnauthorizedUserIdProblem();
+        }
+        
+        var command = _mapper.Map<AddBalanceCommand>((request, ownerId));
+        
+        var addBalanceResult = await _mediator.Send(command);
+        
+        if (addBalanceResult.IsError)
+        {
+            _logger.LogInformation("Failed to create balance for: {WalletId}.\nErrors: {Errors}", request.WalletId, addBalanceResult.Errors);
+            return Problem(addBalanceResult.Errors);
+        }
+        
+        await _notificationSender.SendInformationNotification(addBalanceResult.Value.Notification);
+        _logger.LogInformation("Successfully sent 'BalanceAdded' notification");
+        
+        _logger.LogInformation("Successfully created balance with id: {Id}", addBalanceResult.Value.Result.Id.Value);
+        return Ok(_mapper.Map<AddBalanceResponse>(addBalanceResult.Value.Result));
     }
 }
