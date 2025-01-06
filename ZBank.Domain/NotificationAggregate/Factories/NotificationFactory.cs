@@ -5,6 +5,7 @@ using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate;
 using ZBank.Domain.UserAggregate.ValueObjects;
 using ZBank.Domain.WalletAggregate;
+using ZBank.Domain.WalletAggregate.Entities;
 
 namespace ZBank.Domain.NotificationAggregate.Factories;
 
@@ -91,5 +92,15 @@ public static class NotificationFactory
                 string.Join(" ", walletCreator.FirstName, walletCreator.LastName)),
             receiverId: walletCreator.Id,
             content: $"Wallet '{wallet.Address}' is created successfully");
+    }
+    
+    public static InformationNotification CreateBalanceAddedNotification(User balanceCreator, Balance balance, string walletAddress)
+    {
+        return new InformationNotification(
+            id: NotificationId.CreateUnique(),
+            notificationSender: NotificationSender.Create(balanceCreator.Id,
+                string.Join(" ", balanceCreator.FirstName, balanceCreator.LastName)),
+            receiverId: balanceCreator.Id,
+            content: $"Balance for wallet '{walletAddress}' is created successfully");
     }
 }
