@@ -10,7 +10,12 @@ using ZBank.Domain.CurrencyAggregate;
 namespace ZBank.Infrastructure.Services.Background;
 public class CurrencyService : BackgroundService
 {
+    private readonly string _url = "https://www.okx.com/api/v5/market/tickers?instType=SPOT";
+    
+    private readonly int _refreshIntervalMilliseconds = 200000;
+    
     private readonly ILogger<CurrencyService> _logger;
+    
     private readonly IServiceScopeFactory _scopeFactory;
 
     public CurrencyService(ILogger<CurrencyService> logger, IServiceScopeFactory scopeFactory)
@@ -47,7 +52,7 @@ public class CurrencyService : BackgroundService
                 _logger.LogError($"An error occurred in CurrencyService: {ex.Message}");
             }
 
-            await Task.Delay(20000, stoppingToken);
+            await Task.Delay(_refreshIntervalMilliseconds, stoppingToken);
         }
     }
 
@@ -70,9 +75,7 @@ public class CurrencyService : BackgroundService
 
     private async Task<string?> FetchDataFromApi()
     {
-        string url = "https://www.okx.com/api/v5/market/tickers?instType=SPOT";
-
-        var client = new RestClient(url);
+        var client = new RestClient(_url);
         var request = new RestRequest();
 
         try
