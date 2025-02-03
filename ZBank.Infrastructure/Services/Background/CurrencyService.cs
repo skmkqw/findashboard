@@ -8,14 +8,14 @@ using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.CurrencyAggregate;
 
 namespace ZBank.Infrastructure.Services.Background;
+
 public class CurrencyService : BackgroundService
 {
     private readonly string _url = "https://www.okx.com/api/v5/market/tickers?instType=SPOT";
     
-    private readonly int _refreshIntervalMilliseconds = 200000;
+    private readonly TimeSpan _refreshInterval = TimeSpan.FromMinutes(1);
     
     private readonly ILogger<CurrencyService> _logger;
-    
     private readonly IServiceScopeFactory _scopeFactory;
 
     public CurrencyService(ILogger<CurrencyService> logger, IServiceScopeFactory scopeFactory)
@@ -26,51 +26,59 @@ public class CurrencyService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            _logger.LogInformation($"Executing CurrencyService at {DateTime.UtcNow}");
+        using PeriodicTimer timer = new(_refreshInterval);
 
+        while (await timer.WaitForNextTickAsync(stoppingToken))
+        {
             try
             {
-                using var scope = _scopeFactory.CreateScope();
-                var currencyRepository = scope.ServiceProvider.GetRequiredService<ICurrencyRepository>();
-                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-
-                var currencies = await GetAllCurrencies();
-
-                if (currencies is not null)
-                {
-                    await UpdateCurrencies(currencies, currencyRepository, unitOfWork);
-                }
-                else
-                {
-                    _logger.LogWarning("No currencies found. Check previous logs for more details.");
-                }
+                await UpdateCurrenciesInBulk();
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occurred in CurrencyService: {ex.Message}");
+                _logger.LogError(ex, "An error occurred while updating currencies");
             }
-
-            await Task.Delay(_refreshIntervalMilliseconds, stoppingToken);
         }
     }
 
-    private async Task<List<Currency>?> GetAllCurrencies()
+    private async Task UpdateCurrenciesInBulk()
     {
-        _logger.LogInformation("Getting all currencies");
-        
-        var responseContent = await FetchDataFromApi();
-        if (responseContent == null)
+        _logger.LogInformation($"Updating currencies at {DateTime.UtcNow}");
+
+        var currencies = await FetchAndParseCurrencies();
+        if (currencies == null || !currencies.Any())
         {
-            _logger.LogWarning("Failed to fetch currencies from the API.");
+            _logger.LogWarning("No currencies fetched. Skipping update.");
+            return;
+        }
+
+        using var scope = _scopeFactory.CreateScope();
+        var currencyRepository = scope.ServiceProvider.GetRequiredService<ICurrencyRepository>();
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        try
+        {
+            await currencyRepository.ReplaceAllCurrenciesAsync(currencies);
+            await unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation($"Successfully updated {currencies.Count} currencies");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update currencies in bulk");
+            throw;
+        }
+    }
+
+    private async Task<List<Currency>?> FetchAndParseCurrencies()
+    {
+        var responseContent = await FetchDataFromApi();
+        if (string.IsNullOrEmpty(responseContent))
+        {
             return null;
         }
 
-        var currencies = ParseCurrencies(responseContent);
-        _logger.LogInformation($"Successfully parsed {currencies.Count} currencies.");
-
-        return currencies;
+        return ParseCurrencies(responseContent);
     }
 
     private async Task<string?> FetchDataFromApi()
@@ -80,80 +88,43 @@ public class CurrencyService : BackgroundService
 
         try
         {
-            var response = await client.GetAsync(request);
+            var response = await client.ExecuteGetAsync(request);
 
-            if (response is { IsSuccessful: true, StatusCode: System.Net.HttpStatusCode.OK })
-            {
-                _logger.LogInformation("Successfully retrieved data from the API.");
-                return response.Content;
-            }
-
-            _logger.LogWarning($"Failed to fetch data. Status: {response.StatusCode}");
-            return null;
+            return response.IsSuccessful && response.StatusCode == System.Net.HttpStatusCode.OK 
+                ? response.Content 
+                : null;
         }
         catch (Exception ex)
         {
-            _logger.LogError($"An error occurred while fetching data from the API. Error: {ex.Message}");
+            _logger.LogError(ex, "Error fetching currency data from API");
             return null;
         }
     }
 
     private List<Currency> ParseCurrencies(string jsonResponse)
     {
-        List<Currency> currencies = new();
-        var parsedResponse = JObject.Parse(jsonResponse);
-        var tickers = parsedResponse["data"];
-
-        foreach (var ticker in tickers!)
+        try
         {
-            string instrument = ticker["instId"]!.ToString();
+            var parsedResponse = JObject.Parse(jsonResponse);
+            var tickers = parsedResponse["data"];
 
-            if (IsValidInstrument(instrument))
-            {
-                decimal price = decimal.Parse(ticker["last"]!.ToString(), CultureInfo.InvariantCulture);
-                string symbol = instrument.Split('-')[0];
-
-                var currency = Currency.Create(symbol, price);
-                currencies.Add(currency);
-            }
+            return tickers?
+                .Where(ticker => IsValidInstrument(ticker["instId"]!.ToString()))
+                .Select(ticker => Currency.Create(
+                    ticker["instId"]!.ToString().Replace('-', '/'),
+                    decimal.Parse(ticker["last"]!.ToString(), CultureInfo.InvariantCulture)
+                ))
+                .ToList() ?? new List<Currency>();
         }
-
-        return currencies;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error parsing currencies from JSON");
+            return new List<Currency>();
+        }
     }
 
     private bool IsValidInstrument(string instrument)
     {
         return instrument.EndsWith("-USDT") || instrument.EndsWith("-USDC");
-    }
-
-    private async Task UpdateCurrencies(
-        List<Currency> currencies,
-        ICurrencyRepository currencyRepository,
-        IUnitOfWork unitOfWork)
-    {
-        _logger.LogInformation("Updating currencies...");
-
-        var existingCurrencies = await currencyRepository.GetAllCurrencies();
-        var existingCurrencyMap = existingCurrencies.ToDictionary(x => x.Symbol, x => x);
-
-        foreach (var newCurrency in currencies)
-        {
-            if (existingCurrencyMap.TryGetValue(newCurrency.Symbol, out var existingCurrency))
-            {
-                if (existingCurrency.Price != newCurrency.Price)
-                {
-                    existingCurrency.UpdatePrice(newCurrency.Price);
-                    currencyRepository.UpdateCurrency(existingCurrency);
-                }
-            }
-            else
-            {
-                currencyRepository.AddCurrency(newCurrency);
-            }
-        }
-
-        await unitOfWork.SaveChangesAsync();
-
-        _logger.LogInformation("Currencies updated successfully.");
     }
 }
