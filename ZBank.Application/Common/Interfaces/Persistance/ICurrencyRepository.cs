@@ -8,11 +8,9 @@ public interface ICurrencyRepository
     Task<List<Currency>> GetAllCurrencies();
     
     Task<Currency?> GetCurrencyById(CurrencyId id);
+
+    Task ReplaceAllCurrenciesAsync(List<Currency> newCurrencies);
     
     Task<Currency?> GetCurrencyBySymbol(string symbol);
-    
-    void AddCurrency(Currency currency);
-    
-    void UpdateCurrency(Currency currency);
 
 }

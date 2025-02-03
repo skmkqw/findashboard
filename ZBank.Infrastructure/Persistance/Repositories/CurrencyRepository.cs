@@ -1,3 +1,4 @@
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.CurrencyAggregate;
@@ -37,5 +38,21 @@ public class CurrencyRepository : ICurrencyRepository
     public void UpdateCurrency(Currency currency)
     {
         _dbContext.Currencies.Update(currency);
+    }
+    
+    public async Task ReplaceAllCurrenciesAsync(List<Currency> newCurrencies)
+    {
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
+        await _dbContext.Currencies
+            .ExecuteDeleteAsync();
+
+        await _dbContext.BulkInsertAsync(newCurrencies, options => 
+        {
+            options.BatchSize = 500;
+            options.IncludeGraph = true;
+        });
+
+        await transaction.CommitAsync();
     }
 }
