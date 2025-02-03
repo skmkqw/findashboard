@@ -1,5 +1,6 @@
 using ZBank.Domain.ActivityAggregate.ValueObjects;
 using ZBank.Domain.Common.Models;
+using ZBank.Domain.ProfileAggregate.ValueObjects;
 using ZBank.Domain.ProjectAggregate.ValueObjects;
 using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
@@ -22,6 +23,10 @@ public class Team : TeamBase
     {
         return new Team(TeamId.CreateUnique(), name, description, userIds);
     }
+
+    public override void AddProfile(ProfileId profileId) => _profileIds.Add(profileId);
+
+    public override void DeleteProfile(ProfileId profileId) => _profileIds.Remove(profileId);
 
     public override void AddProject(ProjectId projectId) => _projectIds.Add(projectId);
 

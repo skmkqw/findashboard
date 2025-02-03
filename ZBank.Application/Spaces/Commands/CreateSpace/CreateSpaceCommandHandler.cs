@@ -63,7 +63,7 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
         _spaceRepository.Add(space);
         owner.AssignPersonalSpaceId(space.Id);
         
-        var spaceCreatedNotification = CreateSpaceCreatedRepository(owner, space);
+        var spaceCreatedNotification = CreateSpaceCreatedNotification(owner, space);
         _logger.LogInformation("'SpaceCreated' notification created");
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -72,7 +72,7 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
         return new WithNotificationResult<PersonalSpace, InformationNotification>(space, spaceCreatedNotification);
     }
 
-    private InformationNotification CreateSpaceCreatedRepository(User owner, PersonalSpace space)
+    private InformationNotification CreateSpaceCreatedNotification(User owner, PersonalSpace space)
     {
         var spaceCreatedNotification = NotificationFactory.CreateSpaceCreatedNotification(owner, space);
         

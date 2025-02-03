@@ -17,6 +17,10 @@ public static partial class Errors
         public static Error MemberAlreadyExists(string email) => Error.Conflict(
             code: "Team.MemberAlreadyExists", 
             description: $"A user with email '{email}' is already a team member");
+        
+        public static Error AccessDenied => Error.Unauthorized(
+            code: "Team.AccessDenied", 
+            description: "You are not allowed to modify this team or its resources");
     }
     
     public static class PersonalSpace

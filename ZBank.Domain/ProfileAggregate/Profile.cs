@@ -1,5 +1,6 @@
 using ZBank.Domain.Common.Models;
 using ZBank.Domain.ProfileAggregate.ValueObjects;
+using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
 using ZBank.Domain.WalletAggregate.ValueObjects;
 
@@ -7,7 +8,9 @@ namespace ZBank.Domain.ProfileAggregate;
 
 public class Profile : AggregateRoot<ProfileId>
 {
-    public string Name { get; private set;  }
+    public string Name { get; private set; }
+    
+    public TeamId TeamId { get; }
     
     public UserId OwnerId { get; }
     
@@ -15,15 +18,16 @@ public class Profile : AggregateRoot<ProfileId>
     
     private readonly List<WalletId> _walletIds = new();
 
-    private Profile(ProfileId id, string name, UserId ownerId) : base(id)
+    private Profile(ProfileId id, string name, UserId ownerId, TeamId teamId) : base(id)
     {
         Name = name;
         OwnerId = ownerId;
+        TeamId = teamId;
     }
 
-    public static Profile Create(string name, UserId ownerId)
+    public static Profile Create(string name, UserId ownerId, TeamId teamId)
     {
-        return new Profile(ProfileId.CreateUnique(), name, ownerId);
+        return new Profile(ProfileId.CreateUnique(), name, ownerId, teamId);
     }
     
     public void Update(string name)

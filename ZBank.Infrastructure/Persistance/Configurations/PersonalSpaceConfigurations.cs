@@ -10,6 +10,7 @@ public class PersonalSpaceConfigurations : IEntityTypeConfiguration<PersonalSpac
     {
         ConfigurePersonalSpacesTable(builder);
         ConfigureProjectIdsTable(builder);
+        ConfigureProfileIdsTable(builder);
         ConfigureActivityIdsTable(builder);
     }
 
@@ -58,7 +59,30 @@ public class PersonalSpaceConfigurations : IEntityTypeConfiguration<PersonalSpac
 
         });
         
-        builder.Metadata.FindNavigation(nameof(Team.ProjectIds))!
+        builder.Metadata.FindNavigation(nameof(PersonalSpace.ProjectIds))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+    }
+    
+    private void ConfigureProfileIdsTable(EntityTypeBuilder<PersonalSpace> builder)
+    {
+        builder.OwnsMany(r => r.ProfileIds, pib =>
+        {
+            pib.ToTable("PersonalProfileIds");
+            
+            //FK
+            pib.WithOwner().HasForeignKey("PersonalSpaceId");
+            
+            //PK
+            pib.HasKey("Id");
+            
+            //ID
+            pib.Property(d => d.Value)
+                .ValueGeneratedNever()
+                .HasColumnName("ProfileId");
+
+        });
+        
+        builder.Metadata.FindNavigation(nameof(PersonalSpace.ProfileIds))!
             .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
     
@@ -81,7 +105,7 @@ public class PersonalSpaceConfigurations : IEntityTypeConfiguration<PersonalSpac
 
         });
         
-        builder.Metadata.FindNavigation(nameof(Team.ActivityIds))!
+        builder.Metadata.FindNavigation(nameof(PersonalSpace.ActivityIds))!
             .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

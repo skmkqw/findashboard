@@ -88,6 +88,29 @@ namespace ZBank.Infrastructure.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("ZBank.Domain.CurrencyAggregate.Currency", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Currencies", (string)null);
+                });
+
             modelBuilder.Entity("ZBank.Domain.ProfileAggregate.Profile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -102,6 +125,9 @@ namespace ZBank.Infrastructure.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TeamId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdatedDateTime")
@@ -398,6 +424,31 @@ namespace ZBank.Infrastructure.Migrations
                                 .HasForeignKey("PersonalSpaceId");
                         });
 
+                    b.OwnsMany("ZBank.Domain.ProfileAggregate.ValueObjects.ProfileId", "ProfileIds", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("PersonalSpaceId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("Value")
+                                .HasColumnType("uuid")
+                                .HasColumnName("ProfileId");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("PersonalSpaceId");
+
+                            b1.ToTable("PersonalProfileIds", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("PersonalSpaceId");
+                        });
+
                     b.OwnsMany("ZBank.Domain.ProjectAggregate.ValueObjects.ProjectId", "ProjectIds", b1 =>
                         {
                             b1.Property<int>("Id")
@@ -425,6 +476,8 @@ namespace ZBank.Infrastructure.Migrations
 
                     b.Navigation("ActivityIds");
 
+                    b.Navigation("ProfileIds");
+
                     b.Navigation("ProjectIds");
                 });
 
@@ -450,6 +503,31 @@ namespace ZBank.Infrastructure.Migrations
                             b1.HasIndex("TeamId");
 
                             b1.ToTable("TeamActivityIds", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("TeamId");
+                        });
+
+                    b.OwnsMany("ZBank.Domain.ProfileAggregate.ValueObjects.ProfileId", "ProfileIds", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("TeamId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("Value")
+                                .HasColumnType("uuid")
+                                .HasColumnName("ProfileId");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("TeamId");
+
+                            b1.ToTable("ProfileIds", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("TeamId");
@@ -507,6 +585,8 @@ namespace ZBank.Infrastructure.Migrations
 
                     b.Navigation("ActivityIds");
 
+                    b.Navigation("ProfileIds");
+
                     b.Navigation("ProjectIds");
 
                     b.Navigation("UserIds");
@@ -539,31 +619,6 @@ namespace ZBank.Infrastructure.Migrations
                                 .HasForeignKey("UserId");
                         });
 
-                    b.OwnsMany("ZBank.Domain.ProfileAggregate.ValueObjects.ProfileId", "ProfileIds", b1 =>
-                        {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
-
-                            b1.Property<Guid>("UserId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<Guid>("Value")
-                                .HasColumnType("uuid")
-                                .HasColumnName("ProfileId");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("UserId");
-
-                            b1.ToTable("UserProfileIds", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
                     b.OwnsMany("ZBank.Domain.TeamAggregate.ValueObjects.TeamId", "TeamIds", b1 =>
                         {
                             b1.Property<int>("Id")
@@ -589,11 +644,63 @@ namespace ZBank.Infrastructure.Migrations
                                 .HasForeignKey("UserId");
                         });
 
+                    b.OwnsMany("ZBank.Domain.ProfileAggregate.ValueObjects.ProfileId", "ProfileIds", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("Value")
+                                .HasColumnType("uuid")
+                                .HasColumnName("ProfileId");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("UserId");
+
+                            b1.ToTable("UserProfileIds", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
                     b.Navigation("NotificationIds");
 
                     b.Navigation("ProfileIds");
 
                     b.Navigation("TeamIds");
+                });
+
+            modelBuilder.Entity("ZBank.Domain.WalletAggregate.Wallet", b =>
+                {
+                    b.OwnsMany("ZBank.Domain.WalletAggregate.Entities.Balance", "Balances", b1 =>
+                        {
+                            b1.Property<Guid>("WalletId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid");
+
+                            b1.Property<decimal>("Amount")
+                                .HasColumnType("numeric");
+
+                            b1.Property<Guid>("CurrencyId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("WalletId", "Id");
+
+                            b1.ToTable("WalletBalances", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("WalletId");
+                        });
+
+                    b.Navigation("Balances");
                 });
 #pragma warning restore 612, 618
         }
