@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>ZBank.API</RootNamespace>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,5 +25,5 @@
       <ProjectReference Include="..\ZBank.Contracts\ZBank.Contracts.csproj" />
       <ProjectReference Include="..\ZBank.Infrastructure\ZBank.Infrastructure.csproj" />
     </ItemGroup>
-
+    
 </Project>
