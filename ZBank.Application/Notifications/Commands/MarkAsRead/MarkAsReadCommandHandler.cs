@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.NotificationAggregate;
+using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Notifications.Commands.MarkAsRead;
 
@@ -11,19 +12,16 @@ public class MarkAsReadCommandHandler : IRequestHandler<MarkAsReadCommand, Error
 {
     private readonly INotificationRepository _notificationRepository;
 
-    private readonly IUserRepository _userRepository;
     
     private readonly IUnitOfWork _unitOfWork;
     
     private readonly ILogger<MarkAsReadCommandHandler> _logger;
 
     public MarkAsReadCommandHandler(INotificationRepository notificationRepository,
-        IUserRepository userRepository,
         IUnitOfWork unitOfWork,
         ILogger<MarkAsReadCommandHandler> logger)
     {
         _notificationRepository = notificationRepository;
-        _userRepository = userRepository;
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
@@ -32,25 +30,39 @@ public class MarkAsReadCommandHandler : IRequestHandler<MarkAsReadCommand, Error
     {
         _logger.LogInformation("Processing mark notification as read command for user with id: {UserId} and notification with id: {NotificationId}", request.UserId.Value, request.NotificationId.Value);
         
-        var user = await _userRepository.FindByIdAsync(request.UserId);
-
-        if (user is null)
-        {
-            _logger.LogInformation("User with ID: {Id} not found", request.UserId.Value);
-            return Errors.User.IdNotFound(request.UserId);
-        }
+        var notificationWithReceiver = await _notificationRepository.FindNotificationWithReceiverById<InformationNotification>(request.NotificationId);
         
-        var notification = await _notificationRepository.FindNotificationById<InformationNotification>(request.NotificationId);
-
-        if (notification is null)
+        if (notificationWithReceiver == null)
         {
-            _logger.LogInformation("Notification with ID: {Id} not found", request.UserId.Value);
+            _logger.LogInformation("Notification with ID: {Id} not found", request.NotificationId.Value);
             return Errors.Notification.InformationNotification.NotFound(request.NotificationId);
         }
+        
+        var (notification, _) = notificationWithReceiver.GetEntities();
 
-        if (notification.NotificationReceiverId != user.Id)
+        if (ValidateMarkAsRead(request, notification) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
+        
+        await MarkNotificationReadAsync(notification, cancellationToken);
+        
+        _logger.LogInformation("Notification with id: {NotificationId} has been marked as read", notification.Id.Value);
+        return Unit.Value;
+    }
+    
+    private Task MarkNotificationReadAsync(InformationNotification notification, CancellationToken cancellationToken)
+    {
+        notification.MarkAsRead();
+
+        return _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    private ErrorOr<Success> ValidateMarkAsRead(
+        MarkAsReadCommand request,
+        InformationNotification notification)
+    {
+        if (notification.CanBeModifiedBy(request.UserId))
         {
-            _logger.LogInformation("User with id: {Id} can't modify this notification since he is not the receiver", user.Id.Value);
+            _logger.LogInformation("User with id: {Id} can't modify this notification since he is not the receiver", request.UserId.Value);
             return Errors.Notification.InformationNotification.AccessDenied;
         }
         
@@ -60,11 +72,6 @@ public class MarkAsReadCommandHandler : IRequestHandler<MarkAsReadCommand, Error
             return Errors.Notification.InformationNotification.IsAlreadyRead(notification.Id);
         }
         
-        notification.MarkAsRead();
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        _logger.LogInformation("Notification with id: {NotificationId} has been marked as read", notification.Id.Value);
-        return Unit.Value;
+        return Result.Success;
     }
 }
