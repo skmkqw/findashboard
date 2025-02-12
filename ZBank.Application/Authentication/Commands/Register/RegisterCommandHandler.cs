@@ -35,12 +35,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
     {
         _logger.LogInformation("Handling registration for email: {Email}", request.Email);
         
-        var validationResult = await ValidateRegistrationAsync(request);
-
-        if (validationResult.IsError)
-        {
+        if (await ValidateRegistrationAsync(request) is var validationResult && validationResult.IsError)
             return validationResult.Errors;
-        }
         
         var registerUserResult = await RegisterUserAsync(request, cancellationToken);
 

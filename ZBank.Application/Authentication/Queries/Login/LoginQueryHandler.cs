@@ -40,14 +40,10 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<Authenticat
             return Errors.Authentication.InvalidCredentials;
         }
         
-        var validationResult = ValidateLogin(request, user);
-
-        if (validationResult.IsError)
-        {
+        if (ValidateLogin(request, user) is var validationResult && validationResult.IsError)
             return validationResult.Errors;
-        }
         
-        var loginUserResult = LoginUser(user!);
+        var loginUserResult = LoginUser(user);
 
         _logger.LogInformation("Login successful for email: {Email}", request.Email);
         return loginUserResult;
