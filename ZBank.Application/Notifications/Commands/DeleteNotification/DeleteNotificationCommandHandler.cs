@@ -64,7 +64,7 @@ public class DeleteNotificationCommandHandler : IRequestHandler<DeleteNotificati
         DeleteNotificationCommand request,
         InformationNotification notification)
     {
-        if (notification.CanBeModifiedBy(request.UserId))
+        if (!notification.CanBeModifiedBy(request.UserId))
         {
             _logger.LogInformation("User with id: {Id} can't modify this notification since he is not the receiver", request.UserId.Value);
             return Errors.Notification.InformationNotification.AccessDenied;
