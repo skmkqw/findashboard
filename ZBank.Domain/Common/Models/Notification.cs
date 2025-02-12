@@ -26,7 +26,7 @@ public abstract class Notification : AggregateRoot<NotificationId>
     
     public void MarkAsRead() => IsRead = true;
     
-    public bool CanBeDeletedBy(UserId userId) => NotificationReceiverId == userId;
+    public bool CanBeModifiedBy(UserId userId) => NotificationReceiverId == userId;
     
 #pragma warning disable CS8618
     protected Notification()
