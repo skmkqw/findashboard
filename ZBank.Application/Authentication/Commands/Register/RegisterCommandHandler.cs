@@ -34,13 +34,22 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
     public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling registration for email: {Email}", request.Email);
+        
+        var validationResult = await ValidateRegistrationAsync(request);
 
-        if (await _userRepository.FindByEmailAsync(request.Email) is not null)
+        if (validationResult.IsError)
         {
-            _logger.LogInformation("Duplicate email found: {Email}", request.Email);
-            return Errors.User.DuplicateEmail;
+            return validationResult.Errors;
         }
+        
+        var registerUserResult = await RegisterUserAsync(request, cancellationToken);
 
+        _logger.LogInformation("User registered successfully: {Email}", request.Email);
+        return registerUserResult;
+    }
+
+    private async Task<AuthenticationResult> RegisterUserAsync(RegisterCommand request, CancellationToken cancellationToken)
+    {
         string hashedPassword = _passwordHasher.HashPassword(request.Password);
         var user = User.Create(request.FirstName, request.LastName, request.Email, hashedPassword);
 
@@ -48,8 +57,18 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
         _userRepository.Add(user);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("User registered successfully: {Email}", request.Email);
+        
         return new AuthenticationResult(user, token);
+    }
+
+    private async Task<ErrorOr<Success>> ValidateRegistrationAsync(RegisterCommand request)
+    {
+        if (await _userRepository.FindByEmailAsync(request.Email) is not null)
+        {
+            _logger.LogInformation("Duplicate email found: {Email}", request.Email);
+            return Errors.User.DuplicateEmail;
+        }
+        
+        return Result.Success;
     }
 }
