@@ -57,6 +57,7 @@ public class NotificationRepository : INotificationRepository
     {
         return await _dbContext.Notifications
             .Where(n => n.NotificationReceiverId == userId)
+            .AsNoTracking()
             .ToListAsync();
     }
 
