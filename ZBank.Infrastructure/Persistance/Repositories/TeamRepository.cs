@@ -13,13 +13,23 @@ public class TeamRepository : ITeamRepository
         _dbContext = dbContext;
     }
 
-    public async Task<Team?> GetByIdAsync(TeamId id)
+    public async Task<Team?> GetTeamByIdAsync(TeamId id)
     {
         return await _dbContext.Teams.FindAsync(id);
     }
+    
+    public async Task<PersonalSpace?> GetByIdSpaceAsync(TeamId id)
+    {
+        return await _dbContext.PersonalSpaces.FindAsync(id);
+    }
 
-    public void Add(Team team)
+    public void AddTeam(Team team)
     {
         _dbContext.Teams.Add(team);
+    }
+
+    public void AddSpace(PersonalSpace space)
+    {
+        _dbContext.PersonalSpaces.Add(space);
     }
 }

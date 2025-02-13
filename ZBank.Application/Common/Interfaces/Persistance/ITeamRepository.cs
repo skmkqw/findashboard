@@ -5,6 +5,11 @@ namespace ZBank.Application.Common.Interfaces.Persistance;
 
 public interface ITeamRepository
 {
-    Task<Team?> GetByIdAsync(TeamId id);
-    void Add(Team team);
+    Task<Team?> GetTeamByIdAsync(TeamId id);
+    
+    Task<PersonalSpace?> GetByIdSpaceAsync(TeamId id);
+
+    void AddTeam(Team team);
+    
+    void AddSpace(PersonalSpace space);
 }
