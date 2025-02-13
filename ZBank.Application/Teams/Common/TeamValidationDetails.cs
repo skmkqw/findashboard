@@ -2,6 +2,7 @@ using ZBank.Domain.Common.Models;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate;
+using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Application.Teams.Common;
 
@@ -22,6 +23,8 @@ public record TeamValidationDetails
     public bool HasAccess => !IsTeam || ((_teamOrSpace as Team)?.UserIds.Contains(_member.Id) ?? false);
     
     public TeamId TeamId => _teamOrSpace.Id;
+    
+    public UserId MemberId => _member.Id;
     
     public (TeamBase Team, User Member) GetEntities() => (_teamOrSpace, _member);
 }
