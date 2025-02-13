@@ -43,7 +43,7 @@ public class GetSpaceQueryHandler : IRequestHandler<GetSpaceQuery, ErrorOr<Perso
             return Errors.PersonalSpace.IsNotSet;
         }
         
-        var space = await _teamRepository.GetByIdSpaceAsync(owner.PersonalSpaceId);
+        var space = await _teamRepository.GetSpaceByIdAsync(owner.PersonalSpaceId);
         _logger.LogInformation("Successfully fetched personal space");
 
         return space!;
