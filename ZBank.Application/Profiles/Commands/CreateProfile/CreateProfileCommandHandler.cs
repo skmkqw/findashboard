@@ -95,7 +95,7 @@ public class CreateProfileCommandHandler : IRequestHandler<CreateProfileCommand,
 
     private ErrorOr<Success> ValidateCreateProfile(TeamValidationDetails teamValidationDetails)
     {
-        if (teamValidationDetails.HasAccess)
+        if (!teamValidationDetails.HasAccess)
         {
             _logger.LogInformation("Access to team with Id: {TeamId} was denied to user with Id: {UserId}", teamValidationDetails.TeamId.Value, teamValidationDetails.TeamId.Value);
             return Errors.Team.AccessDenied;
