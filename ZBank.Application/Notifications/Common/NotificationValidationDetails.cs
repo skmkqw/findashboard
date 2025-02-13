@@ -11,13 +11,13 @@ public enum UserRoles
     Receiver
 } 
 
-public class NotificationWithUserDetails<T> where T : Notification
+public class NotificationValidationDetails<T> where T : Notification
 {
     private readonly T _notification;
     
     private readonly User _user;
     
-    public NotificationWithUserDetails(T notification, User user, UserRoles role)
+    public NotificationValidationDetails(T notification, User user, UserRoles role)
     {
         _notification = notification;
         _user = user;

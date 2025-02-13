@@ -23,7 +23,7 @@ public class NotificationRepository : INotificationRepository
         return await _dbContext.Notifications.OfType<T>().FirstOrDefaultAsync(n => n.Id == id);
     }
 
-    public async Task<NotificationWithUserDetails<T>?> FindNotificationWithSenderById<T>(NotificationId notificationId) where T : Notification
+    public async Task<NotificationValidationDetails<T>?> FindNotificationWithSenderById<T>(NotificationId notificationId) where T : Notification
     {
         var query = _dbContext.Notifications
             .OfType<T>()
@@ -32,13 +32,13 @@ public class NotificationRepository : INotificationRepository
                 _dbContext.Users,
                 notification => notification.NotificationSender.SenderId,
                 user => user.Id,
-                (notification, user) => new NotificationWithUserDetails<T>(notification, user, UserRoles.Sender)
+                (notification, user) => new NotificationValidationDetails<T>(notification, user, UserRoles.Sender)
             );
 
         return await query.FirstOrDefaultAsync();
     }
 
-    public async Task<NotificationWithUserDetails<T>?> FindNotificationWithReceiverById<T>(NotificationId notificationId) where T : Notification
+    public async Task<NotificationValidationDetails<T>?> FindNotificationWithReceiverById<T>(NotificationId notificationId) where T : Notification
     {
         var query = _dbContext.Notifications
             .OfType<T>()
@@ -47,7 +47,7 @@ public class NotificationRepository : INotificationRepository
                 _dbContext.Users,
                 notification => notification.NotificationReceiverId,
                 user => user.Id,
-                (notification, user) => new NotificationWithUserDetails<T>(notification, user, UserRoles.Receiver)
+                (notification, user) => new NotificationValidationDetails<T>(notification, user, UserRoles.Receiver)
             );
 
         return await query.FirstOrDefaultAsync();

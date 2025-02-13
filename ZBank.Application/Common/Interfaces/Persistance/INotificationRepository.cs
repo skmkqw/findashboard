@@ -11,9 +11,9 @@ public interface INotificationRepository
 {
     Task<T?> FindNotificationById<T>(NotificationId id) where T : Notification;
     
-    Task<NotificationWithUserDetails<T>?> FindNotificationWithSenderById<T>(NotificationId notificationId) where T : Notification;
+    Task<NotificationValidationDetails<T>?> FindNotificationWithSenderById<T>(NotificationId notificationId) where T : Notification;
     
-    Task<NotificationWithUserDetails<T>?> FindNotificationWithReceiverById<T>(NotificationId notificationId) where T : Notification;
+    Task<NotificationValidationDetails<T>?> FindNotificationWithReceiverById<T>(NotificationId notificationId) where T : Notification;
     
     Task<List<Notification>> FindUserNotifications(UserId userId);
     
