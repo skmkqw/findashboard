@@ -20,7 +20,12 @@ public record TeamValidationDetails
 
     public bool IsTeam => _teamOrSpace is Team;
     
-    public bool HasAccess => !IsTeam || ((_teamOrSpace as Team)?.UserIds.Contains(_member.Id) ?? false);
+    public bool HasAccess => _teamOrSpace switch
+    {
+        PersonalSpace space => space.OwnerId == _member.Id,
+        Team team => team.UserIds.Contains(_member.Id),
+        _ => false
+    };
     
     public TeamId TeamId => _teamOrSpace.Id;
     
