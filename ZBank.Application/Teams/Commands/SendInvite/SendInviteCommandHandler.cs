@@ -59,7 +59,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
             return Errors.User.EmailNotFound(request.ReceiverEmail);
         }
         
-        var team = await _teamRepository.GetByIdAsync(request.TeamId);
+        var team = await _teamRepository.GetTeamByIdAsync(request.TeamId);
 
         if (team is null)
         {

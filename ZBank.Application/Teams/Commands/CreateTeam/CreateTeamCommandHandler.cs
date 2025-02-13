@@ -53,7 +53,7 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
             userIds: [owner.Id]
         );
         
-        _teamRepository.Add(team);
+        _teamRepository.AddTeam(team);
         
         var teamCreatedNotification = CreateTeamCreatedNotification(owner, team);
         _logger.LogInformation("'TeamCreated' notification created");

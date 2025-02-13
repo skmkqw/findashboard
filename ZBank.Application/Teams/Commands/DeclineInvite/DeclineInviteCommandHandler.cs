@@ -70,7 +70,7 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
             return Errors.Notification.TeamInvite.AccessDenied;
         }
         
-        var team = await _teamRepository.GetByIdAsync(invite.TeamId);
+        var team = await _teamRepository.GetTeamByIdAsync(invite.TeamId);
 
         if (team is null)
         {

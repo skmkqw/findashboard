@@ -15,7 +15,7 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
 {
     private readonly IUserRepository _userRepository;
     
-    private readonly ISpaceRepository _spaceRepository;
+    private readonly ITeamRepository _teamRepository;
     
     private readonly INotificationRepository _notificationRepository;
     
@@ -24,13 +24,13 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateSpaceCommandHandler(IUserRepository userRepository,
-        ISpaceRepository spaceRepository,
+        ITeamRepository teamRepository,
         INotificationRepository notificationRepository,
         ILogger<CreateSpaceCommandHandler> logger,
         IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
-        _spaceRepository = spaceRepository;
+        _teamRepository = teamRepository;
         _notificationRepository = notificationRepository;
         _logger = logger;
         _unitOfWork = unitOfWork;
@@ -60,7 +60,7 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
             ownerId: request.OwnerId
         );
         
-        _spaceRepository.Add(space);
+        _teamRepository.AddSpace(space);
         owner.AssignPersonalSpaceId(space.Id);
         
         var spaceCreatedNotification = CreateSpaceCreatedNotification(owner, space);

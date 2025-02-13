@@ -12,16 +12,16 @@ public class GetSpaceQueryHandler : IRequestHandler<GetSpaceQuery, ErrorOr<Perso
 {
     private readonly IUserRepository _userRepository;
     
-    private readonly ISpaceRepository _spaceRepository;
+    private readonly ITeamRepository _teamRepository;
     
     private readonly ILogger<CreateSpaceCommandHandler> _logger;
 
     public GetSpaceQueryHandler(IUserRepository userRepository,
-        ISpaceRepository spaceRepository,
+        ITeamRepository teamRepository,
         ILogger<CreateSpaceCommandHandler> logger)
     {
         _userRepository = userRepository;
-        _spaceRepository = spaceRepository;
+        _teamRepository = teamRepository;
         _logger = logger;
     }
 
@@ -43,7 +43,7 @@ public class GetSpaceQueryHandler : IRequestHandler<GetSpaceQuery, ErrorOr<Perso
             return Errors.PersonalSpace.IsNotSet;
         }
         
-        var space = await _spaceRepository.GetByIdAsync(owner.PersonalSpaceId);
+        var space = await _teamRepository.GetByIdSpaceAsync(owner.PersonalSpaceId);
         _logger.LogInformation("Successfully fetched personal space");
 
         return space!;
