@@ -1,5 +1,6 @@
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Teams.Common;
+using ZBank.Domain.Common.Models;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate;
@@ -27,10 +28,10 @@ public class TeamRepository : ITeamRepository
 
     public async Task<TeamValidationDetails?> GetTeamValidationDetailsAsync(TeamId teamId, User member)
     {
-        if (member.PersonalSpaceId is { } spaceId && spaceId == teamId)
-            return await GetSpaceByIdAsync(spaceId) is { } space ? new TeamValidationDetails(space, member) : null;
+        TeamBase? teamOrSpace = await _dbContext.Teams.FindAsync(teamId) as TeamBase 
+                                ?? await GetSpaceByIdAsync(teamId);
 
-        return await GetTeamByIdAsync(teamId) is { } team ? new TeamValidationDetails(team, member) : null;
+        return teamOrSpace is not null ? new TeamValidationDetails(teamOrSpace, member) : null;
     }
 
     public void AddTeam(Team team)
