@@ -46,7 +46,20 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
             _logger.LogInformation("Team owner with id: {Id} not found", request.OwnerId.Value);
             return Errors.User.IdNotFound(request.OwnerId);
         }
+
+        var team = CreateTeam(request, owner);
+        _logger.LogInformation("Team created");
         
+        var teamCreatedNotification = CreateTeamCreatedNotification(owner, team);
+        _logger.LogInformation("'TeamCreated' notification created");
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        return new WithNotificationResult<Team, InformationNotification>(team, teamCreatedNotification);
+    }
+
+    private Team CreateTeam(CreateTeamCommand request, User owner)
+    {
         var team = Team.Create(
             name: request.Name,
             description: request.Description,
@@ -55,13 +68,7 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
         
         _teamRepository.AddTeam(team);
         
-        var teamCreatedNotification = CreateTeamCreatedNotification(owner, team);
-        _logger.LogInformation("'TeamCreated' notification created");
-        
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        _logger.LogInformation("Successfully created a team.");
-        return new WithNotificationResult<Team, InformationNotification>(team, teamCreatedNotification);
+        return team;
     }
     
     private InformationNotification CreateTeamCreatedNotification(User teamCreator, Team team)
