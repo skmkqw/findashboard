@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Models;
+using ZBank.Application.Common.Models.Validation;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.Factories;
@@ -48,58 +49,91 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
             return Errors.Notification.TeamInvite.NotFound(request.NotificationId);
         }
         
-        var inviteReceiver = await _userRepository.FindByIdAsync(request.UserId);
-        var inviteSender = await _userRepository.FindByIdAsync(invite.NotificationSender.SenderId);
+        var (senderResult, receiverResult) = await FindSenderAndReceiverAsync(invite);
+        if (senderResult.IsError) return senderResult.Errors;
+        if (receiverResult.IsError) return receiverResult.Errors;
 
-        if (inviteReceiver is null)
+        var sender = senderResult.Value;
+        var receiver = receiverResult.Value;
+        
+        var teamValidationDetails = await _teamRepository.GetTeamValidationDetailsAsync(invite.TeamId, receiver);
+        
+        if (teamValidationDetails is null)
         {
-            _logger.LogInformation("User with id: {Id} not found", request.UserId.Value);
-            return Errors.User.IdNotFound(request.UserId);
+            _logger.LogInformation("Team with id: {TeamId} not found", invite.TeamId.Value);
+            return Errors.Team.NotFound;
         }
+        
+        var acceptInviteValidationResult = ValidateAcceptInvite(invite, receiver, teamValidationDetails);
+        
+        if (acceptInviteValidationResult.IsError)
+            return acceptInviteValidationResult.Errors;
+        
+        var team = teamValidationDetails.GetTeamOrSpace() as Team;
+        
+        AcceptInvite(invite, receiver, team);
+        _logger.LogInformation("Successfully accepted team invite");
 
-        if (inviteSender is null)
+        var inviteAcceptedNotification = CreateInviteAcceptedNotification(sender, receiver, team);
+        _logger.LogInformation("'InviteAccepted' notification created");
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        return new WithNotificationResult<Unit, InformationNotification>(Unit.Value, inviteAcceptedNotification);
+    }
+    
+    private void AcceptInvite(TeamInviteNotification invite, User receiver, Team team)
+    {
+        team.AddUserId(receiver.Id);
+        
+        receiver.AddTeamId(team.Id);
+        
+        _notificationRepository.DeleteNotification(invite);
+        
+        receiver.DeleteNotificationId(invite.Id);
+    }
+
+    private ErrorOr<Success> ValidateAcceptInvite(TeamInviteNotification invite, User receiver, TeamValidationDetails teamValidationDetails)
+    {
+        if (!teamValidationDetails.IsTeam)
         {
-            _logger.LogInformation("User with id: {Id} not found", request.UserId.Value);
-            return Errors.User.IdNotFound(request.UserId);
+            _logger.LogInformation("Blocked attempt to accept invite to personal space with Id: {PersonalSpaceId}", invite.TeamId);
+            return Errors.PersonalSpace.InvalidOperation;
         }
-
-        if (invite.NotificationReceiverId != inviteReceiver.Id)
+        
+        if (invite.NotificationReceiverId != receiver.Id)
         {
             _logger.LogInformation("User with id: {Id} can't accept invite since he is not the receiver", invite.Id.Value);
             return Errors.Notification.TeamInvite.AccessDenied;
         }
         
-        var team = await _teamRepository.GetTeamByIdAsync(invite.TeamId);
-
-        if (team is null)
+        if (teamValidationDetails.HasAccess)
         {
-            _logger.LogInformation("Team with id: {TeamId} not found", invite.TeamId.Value);
-            return Errors.Team.NotFound;
-        }
-
-        if (team.UserIds.Contains(inviteReceiver.Id))
-        {
-            _logger.LogInformation("User with id: {ReceiverId} is already a member of this team", inviteReceiver.Id.Value);
-            return Errors.Team.MemberAlreadyExists(inviteReceiver.Email);
+            _logger.LogInformation("User with id: {ReceiverId} is already a member of this team", receiver.Id.Value);
+            return Errors.Team.MemberAlreadyExists(receiver.Email);
         }
         
-        team.AddUserId(inviteReceiver.Id);
-        
-        inviteReceiver.AddTeamId(team.Id);
-        
-        _notificationRepository.DeleteNotification(invite);
-        
-        inviteReceiver.DeleteNotificationId(invite.Id);
-        
-        var inviteAcceptedNotification = CreateInviteAcceptedNotification(inviteSender, inviteReceiver, team);
-        _logger.LogInformation("'InviteAccepted' notification created");
-        
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Successfully accepted team invite");
-        
-        return new WithNotificationResult<Unit, InformationNotification>(Unit.Value, inviteAcceptedNotification);
+        return Result.Success;
     }
     
+    private async Task<(ErrorOr<User> Sender, ErrorOr<User> Receiver)> FindSenderAndReceiverAsync(TeamInviteNotification invite)
+    {
+        var sender = await _userRepository.FindByIdAsync(invite.NotificationSenderId);
+        if (sender is null)
+        {
+            _logger.LogInformation("Notification sender with ID: {Id} not found", invite.NotificationSenderId.Value);
+            return (Errors.User.IdNotFound(invite.NotificationSenderId), new ErrorOr<User>());
+        }
+
+        var receiver = await _userRepository.FindByIdAsync(invite.NotificationSenderId);
+        if (receiver is null)
+        {
+            _logger.LogInformation("Notification receiver with ID: {Id} not found", invite.NotificationSenderId.Value);
+            return (Errors.User.IdNotFound(invite.NotificationSenderId), new ErrorOr<User>());
+        }
+
+        return (sender, receiver);
+    }
     private InformationNotification CreateInviteAcceptedNotification(User inviteSender, User inviteReceiver, Team team)
     {
         var notification = NotificationFactory.CreateTemInviteAcceptedNotification(inviteSender, inviteReceiver, team);
