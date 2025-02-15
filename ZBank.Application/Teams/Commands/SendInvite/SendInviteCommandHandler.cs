@@ -43,7 +43,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
     {
         _logger.LogInformation("Handling team invite creation from {SenderId} to {ReceiverEmail}. Team id: {TeamId}", request.SenderId.Value, request.ReceiverEmail, request.TeamId.Value);
         
-        var (senderResult, receiverResult) = await FindUsersAsync(request);
+        var (senderResult, receiverResult) = await FindSenderAndReceiverAsync(request);
         if (senderResult.IsError) return senderResult.Errors;
         if (receiverResult.IsError) return receiverResult.Errors;
 
@@ -76,19 +76,19 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
         return new WithNotificationResult<TeamInviteNotification, InformationNotification>(teamInvite, inviteCreatedNotification);
     }
     
-    private async Task<(ErrorOr<User> Sender, ErrorOr<User> Receiver)> FindUsersAsync(SendInviteCommand request)
+    private async Task<(ErrorOr<User> Sender, ErrorOr<User> Receiver)> FindSenderAndReceiverAsync(SendInviteCommand request)
     {
         var sender = await _userRepository.FindByIdAsync(request.SenderId);
         if (sender is null)
         {
-            _logger.LogInformation("User with ID: {Id} not found", request.SenderId.Value);
+            _logger.LogInformation("Notification sender with ID: {Id} not found", request.SenderId.Value);
             return (Errors.User.IdNotFound(request.SenderId), new ErrorOr<User>());
         }
 
         var receiver = await _userRepository.FindByEmailAsync(request.ReceiverEmail);
         if (receiver is null)
         {
-            _logger.LogInformation("User with email: {Email} not found", request.ReceiverEmail);
+            _logger.LogInformation("Notification receiver with email: {Email} not found", request.ReceiverEmail);
             return (new ErrorOr<User>(), Errors.User.EmailNotFound(request.ReceiverEmail));
         }
 
