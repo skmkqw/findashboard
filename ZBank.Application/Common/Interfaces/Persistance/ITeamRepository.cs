@@ -1,4 +1,4 @@
-using ZBank.Application.Teams.Common;
+using ZBank.Application.Common.Models.Validation;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate;

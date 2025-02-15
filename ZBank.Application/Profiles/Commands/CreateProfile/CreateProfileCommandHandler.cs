@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Models;
-using ZBank.Application.Teams.Common;
+using ZBank.Application.Common.Models.Validation;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.Common.Models;
 using ZBank.Domain.NotificationAggregate;

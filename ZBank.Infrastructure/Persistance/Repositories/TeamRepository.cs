@@ -1,5 +1,5 @@
 using ZBank.Application.Common.Interfaces.Persistance;
-using ZBank.Application.Teams.Common;
+using ZBank.Application.Common.Models.Validation;
 using ZBank.Domain.Common.Models;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.TeamAggregate.ValueObjects;

@@ -4,7 +4,7 @@ using ZBank.Domain.TeamAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
-namespace ZBank.Application.Teams.Common;
+namespace ZBank.Application.Common.Models.Validation;
 
 public record TeamValidationDetails
 {

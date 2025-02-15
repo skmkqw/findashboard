@@ -2,7 +2,6 @@ using ErrorOr;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
-using ZBank.Application.Notifications.Common;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.UserAggregate;

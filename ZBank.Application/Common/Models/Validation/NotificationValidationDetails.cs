@@ -3,7 +3,7 @@ using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
-namespace ZBank.Application.Notifications.Common;
+namespace ZBank.Application.Common.Models.Validation;
 
 public enum UserRoles
 {
