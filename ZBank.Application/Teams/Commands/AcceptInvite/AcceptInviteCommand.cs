@@ -7,4 +7,4 @@ using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Application.Teams.Commands.AcceptInvite;
 
-public record AcceptInviteCommand(UserId UserId, NotificationId NotificationId) : IRequest<ErrorOr<WithNotificationResult<Unit, InformationNotification>>>;
+public record AcceptInviteCommand(UserId UserId, NotificationId NotificationId) : IRequest<ErrorOr<WithNotificationResult<Success, InformationNotification>>>;

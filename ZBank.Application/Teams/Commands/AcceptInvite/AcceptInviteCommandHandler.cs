@@ -12,7 +12,7 @@ using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Teams.Commands.AcceptInvite;
 
-public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, ErrorOr<WithNotificationResult<Unit, InformationNotification>>>
+public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, ErrorOr<WithNotificationResult<Success, InformationNotification>>>
 {
     private readonly IUserRepository _userRepository;
     
@@ -37,7 +37,7 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         _logger = logger;
     }
 
-    public async Task<ErrorOr<WithNotificationResult<Unit, InformationNotification>>> Handle(AcceptInviteCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<WithNotificationResult<Success, InformationNotification>>> Handle(AcceptInviteCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling team invite acceptation. Invite id: {InviteId}", request.NotificationId.Value);
         
@@ -79,7 +79,7 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return new WithNotificationResult<Unit, InformationNotification>(Unit.Value, inviteAcceptedNotification);
+        return new WithNotificationResult<Success, InformationNotification>(Result.Success, inviteAcceptedNotification);
     }
     
     private void AcceptInvite(TeamInviteNotification invite, User receiver, Team team)
