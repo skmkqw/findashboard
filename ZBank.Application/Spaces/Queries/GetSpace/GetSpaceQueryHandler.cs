@@ -5,6 +5,7 @@ using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Spaces.Commands.CreateSpace;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.TeamAggregate;
+using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Spaces.Queries.GetSpace;
 
@@ -37,15 +38,25 @@ public class GetSpaceQueryHandler : IRequestHandler<GetSpaceQuery, ErrorOr<Perso
             return Errors.User.IdNotFound(request.OwnerId);
         }
 
-        if (owner.PersonalSpaceId is null)
-        {
-            _logger.LogInformation("User with id: {UserId} has no personal space", owner.Id.Value);
-            return Errors.PersonalSpace.IsNotSet;
-        }
+        var getSpaceValidationResult = ValidateGetSpace(owner);
+
+        if (getSpaceValidationResult.IsError)
+            return getSpaceValidationResult.Errors;
         
-        var space = await _teamRepository.GetSpaceByIdAsync(owner.PersonalSpaceId);
+        var space = await _teamRepository.GetSpaceByIdAsync(owner.PersonalSpaceId!);
         _logger.LogInformation("Successfully fetched personal space");
 
         return space!;
+    }
+
+    private ErrorOr<Success> ValidateGetSpace(User spaceOwner)
+    {
+        if (spaceOwner.PersonalSpaceId is null)
+        {
+            _logger.LogInformation("User with id: {UserId} has no personal space", spaceOwner.Id.Value);
+            return Errors.PersonalSpace.IsNotSet;
+        }
+
+        return Result.Success;
     }
 }
