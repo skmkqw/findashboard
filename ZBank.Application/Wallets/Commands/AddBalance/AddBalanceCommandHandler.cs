@@ -3,10 +3,14 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Models;
+using ZBank.Application.Common.Models.Validation;
 using ZBank.Domain.Common.Errors;
+using ZBank.Domain.CurrencyAggregate;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.Factories;
 using ZBank.Domain.UserAggregate;
+using ZBank.Domain.UserAggregate.ValueObjects;
+using ZBank.Domain.WalletAggregate;
 using ZBank.Domain.WalletAggregate.Entities;
 
 namespace ZBank.Application.Wallets.Commands.AddBalance;
@@ -15,8 +19,6 @@ public class AddBalanceCommandHandler : IRequestHandler<AddBalanceCommand, Error
 {
     private readonly IUserRepository _userRepository;
     
-    private readonly IProfileRepository _profileRepository;
-        
     private readonly IWalletRepository _walletRepository;
     
     private readonly ICurrencyRepository _currencyRepository;
@@ -28,7 +30,6 @@ public class AddBalanceCommandHandler : IRequestHandler<AddBalanceCommand, Error
     private readonly ILogger<AddBalanceCommandHandler> _logger;
 
     public AddBalanceCommandHandler(IUserRepository userRepository,
-        IProfileRepository profileRepository,
         IWalletRepository walletRepository,
         INotificationRepository notificationRepository,
         ICurrencyRepository currencyRepository,
@@ -36,7 +37,6 @@ public class AddBalanceCommandHandler : IRequestHandler<AddBalanceCommand, Error
         ILogger<AddBalanceCommandHandler> logger)
     {
         _userRepository = userRepository;
-        _profileRepository = profileRepository;
         _walletRepository = walletRepository;
         _notificationRepository = notificationRepository;
         _unitOfWork = unitOfWork;
@@ -55,26 +55,6 @@ public class AddBalanceCommandHandler : IRequestHandler<AddBalanceCommand, Error
             return Errors.User.IdNotFound(request.UserId);
         }
         
-        var wallet = await _walletRepository.GetById(request.WalletId);
-        if (wallet is null)
-        {
-            _logger.LogInformation("Wallet with id: {Id} not found", request.WalletId.Value);
-            return Errors.Wallet.NotFound;
-        }
-        
-        var profile = await _profileRepository.GetByIdAsync(wallet.ProfileId);
-        if (profile is null)
-        {
-            _logger.LogInformation("Profile with id: {Id} not found for wallet creation", wallet.ProfileId.Value);
-            return Errors.Profile.NotFound;
-        }
-
-        if (profile.OwnerId != owner.Id)
-        {
-            _logger.LogInformation("User with id: {Id} is not the owner of profile with id: {ProfileId}", owner.Id.Value, profile.Id.Value);
-            return Errors.Profile.AccessDenied;
-        }
-        
         var currency = await _currencyRepository.GetCurrencyById(request.CurrencyId);
         if (currency is null)
         {
@@ -82,17 +62,49 @@ public class AddBalanceCommandHandler : IRequestHandler<AddBalanceCommand, Error
             return Errors.Currency.NotFound;
         }
         
-        var balance = Balance.Create(currency.Id, request.Amount);
+        var walletValidationDetails = await _walletRepository.GetWalletValidationDetails(request.WalletId);
+
+        if (walletValidationDetails is null)
+        {
+            _logger.LogInformation("Wallet with id: {Id} not found", request.WalletId.Value);
+            return Errors.Wallet.NotFound;
+        }
+
+        var wallet = walletValidationDetails.GetWallet();
         
-        wallet.AddBalance(balance);
+        var validateAddBalanceResult = ValidateAddBalance(walletValidationDetails, owner.Id);
+        if (validateAddBalanceResult.IsError)
+            return validateAddBalanceResult.Errors;
+
+        var balance = AddBalance(wallet, currency, request.Amount);
+        _logger.LogInformation("Successfully created a balance.");
         
         var walletCreatedNotification = CreateBalanceAddedNotification(owner, balance, wallet.Address);
         _logger.LogInformation("'BalanceAdded' notification created");
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        _logger.LogInformation("Successfully created a balance.");
         return new WithNotificationResult<Balance, InformationNotification>(balance, walletCreatedNotification);
+    }
+
+    private ErrorOr<Success> ValidateAddBalance(WalletValidationDetails walletValidationDetails, UserId ownerId)
+    {
+        if (!walletValidationDetails.HasAccess(ownerId))
+        {
+            _logger.LogInformation("User with id: {Id} is not the owner of profile with id: {ProfileId}", ownerId.Value, walletValidationDetails.ProfileId.Value);
+            return Errors.Profile.AccessDenied;
+        }
+
+        return Result.Success;
+    }
+
+    private Balance AddBalance(Wallet wallet, Currency currency, decimal amount)
+    {
+        var balance = Balance.Create(currency.Id, amount);
+        
+        wallet.AddBalance(balance);
+
+        return balance;
     }
     
     private InformationNotification CreateBalanceAddedNotification(User balanceCreator, Balance balance, string walletAddress)
