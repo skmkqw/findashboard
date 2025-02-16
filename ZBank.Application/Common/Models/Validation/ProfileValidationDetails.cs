@@ -18,8 +18,6 @@ public class ProfileValidationDetails
         _owner = owner;
     }
     
-    public bool HasAccess => _profile.OwnerId == _owner.Id;
-    
     public TeamId TeamId => _profile.TeamId;
     
     public ProfileId ProfileId => _profile.Id;
