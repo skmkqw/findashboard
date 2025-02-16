@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using ZBank.Application.Common.Interfaces.Persistance;
+using ZBank.Application.Common.Models.Validation;
 using ZBank.Domain.WalletAggregate;
 using ZBank.Domain.WalletAggregate.ValueObjects;
 
@@ -13,9 +15,23 @@ public class WalletRepository : IWalletRepository
         _dbContext = dbContext;
     }
 
-    public async Task<Wallet?> GetById(WalletId id)
+    public async Task<Wallet?> GetById(WalletId walletId)
     {
-        return await _dbContext.Wallets.FindAsync(id);
+        return await _dbContext.Wallets.FindAsync(walletId);
+    }
+
+    public async Task<WalletValidationDetails?> GetWalletValidationDetails(WalletId walletId)
+    {
+        var query = _dbContext.Wallets
+            .Where(wallet => wallet.Id == walletId)
+            .Join(
+                _dbContext.Profiles,
+                wallet => wallet.ProfileId,
+                profile => profile.Id,
+                (wallet, user) => new WalletValidationDetails(wallet, user)
+            );
+
+        return await query.FirstOrDefaultAsync();
     }
 
     public void Add(Wallet wallet)
