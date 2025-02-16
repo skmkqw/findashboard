@@ -59,12 +59,10 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
         }
         
         var teamOrSpace = teamValidationDetails.GetTeamOrSpace();
-        
-        var sendInviteValidationDetails = await ValidateSendInviteAsync(request, teamValidationDetails, receiver);
-        
-        if (sendInviteValidationDetails.IsError)
-            return sendInviteValidationDetails.Errors;
 
+        if (await ValidateSendInviteAsync(request, teamValidationDetails, receiver) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
+        
         var teamInvite = SendInvite(request, teamOrSpace as Team, sender, receiver);
         _logger.LogInformation("Successfully created team invite");
 

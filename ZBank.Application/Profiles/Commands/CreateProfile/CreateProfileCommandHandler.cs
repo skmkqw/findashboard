@@ -63,11 +63,9 @@ public class CreateProfileCommandHandler : IRequestHandler<CreateProfileCommand,
         }
         
         (TeamBase teamOrSpace, _) = teamValidationDetails.GetEntities();
-
-        var createProfileValidationResult = ValidateCreateProfile(teamValidationDetails);
         
-        if (createProfileValidationResult.IsError)
-            return createProfileValidationResult.Errors;
+        if (ValidateCreateProfile(teamValidationDetails) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
         
         var profile = CreateProfile(request, member, teamOrSpace);
         _logger.LogInformation("Successfully created a profile.");

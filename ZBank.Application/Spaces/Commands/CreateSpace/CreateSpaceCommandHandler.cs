@@ -47,11 +47,9 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
             _logger.LogInformation("User with id: {UserId} not found or does not exist", request.OwnerId.Value);
             return Errors.User.IdNotFound(request.OwnerId);
         }
-
-        var createSpaceValidationResult = ValidateCreateSpace(owner);
-
-        if (createSpaceValidationResult.IsError)
-            return createSpaceValidationResult.Errors;
+        
+        if (ValidateCreateSpace(owner) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
         
         var space = CreatePersonalSpace(request, owner);
         _logger.LogInformation("Successfully created personal space");

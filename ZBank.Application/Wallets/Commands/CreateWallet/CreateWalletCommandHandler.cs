@@ -52,11 +52,9 @@ public class CreateWalletCommandHandler : IRequestHandler<CreateWalletCommand, E
         }
         
         var (profile, owner) = profileValidationDetails.GetEntities();
-
-        var createWalletValidationResult = ValidateCreateWallet(request, profileValidationDetails);
-
-        if (createWalletValidationResult.IsError)
-            return createWalletValidationResult.Errors;
+        
+        if (ValidateCreateWallet(request, profileValidationDetails) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
         
         var wallet = CreateWallet(request, Enum.Parse<WalletType>(request.Type), profile);
         _logger.LogInformation("Successfully created a wallet.");

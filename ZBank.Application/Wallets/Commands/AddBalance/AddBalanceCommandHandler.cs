@@ -72,9 +72,8 @@ public class AddBalanceCommandHandler : IRequestHandler<AddBalanceCommand, Error
 
         var wallet = walletValidationDetails.GetWallet();
         
-        var validateAddBalanceResult = ValidateAddBalance(walletValidationDetails, owner.Id);
-        if (validateAddBalanceResult.IsError)
-            return validateAddBalanceResult.Errors;
+        if (ValidateAddBalance(walletValidationDetails, owner.Id) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
 
         var balance = AddBalance(wallet, currency, request.Amount);
         _logger.LogInformation("Successfully created a balance.");

@@ -65,10 +65,8 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
             return Errors.Team.NotFound;
         }
         
-        var declineInviteValidationResult = ValidateDeclineInvite(invite, receiver, teamValidationDetails);
-        
-        if (declineInviteValidationResult.IsError)
-            return declineInviteValidationResult.Errors;
+        if (ValidateDeclineInvite(invite, receiver, teamValidationDetails) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
         
         var team = teamValidationDetails.GetTeamOrSpace() as Team;
 

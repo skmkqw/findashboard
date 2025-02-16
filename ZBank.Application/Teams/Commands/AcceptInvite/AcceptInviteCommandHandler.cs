@@ -64,10 +64,8 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
             return Errors.Team.NotFound;
         }
         
-        var acceptInviteValidationResult = ValidateAcceptInvite(invite, receiver, teamValidationDetails);
-        
-        if (acceptInviteValidationResult.IsError)
-            return acceptInviteValidationResult.Errors;
+        if (ValidateAcceptInvite(invite, receiver, teamValidationDetails) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
         
         var team = teamValidationDetails.GetTeamOrSpace() as Team;
         

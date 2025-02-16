@@ -37,11 +37,9 @@ public class GetSpaceQueryHandler : IRequestHandler<GetSpaceQuery, ErrorOr<Perso
             _logger.LogInformation("User with id: {UserId} not found or does not exist", request.OwnerId.Value);
             return Errors.User.IdNotFound(request.OwnerId);
         }
-
-        var getSpaceValidationResult = ValidateGetSpace(owner);
-
-        if (getSpaceValidationResult.IsError)
-            return getSpaceValidationResult.Errors;
+        
+        if (ValidateGetSpace(owner) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
         
         var space = await _teamRepository.GetSpaceByIdAsync(owner.PersonalSpaceId!);
         _logger.LogInformation("Successfully fetched personal space");
