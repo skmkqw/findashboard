@@ -24,9 +24,9 @@ public class WalletValidationDetails
     
     public UserId OwnerId => _profile.OwnerId;
     
-    public bool HasAccess(UserId userId) => _wallet.ProfileId == _profile.Id && _profile.OwnerId == userId;
-    
-    public (Wallet Wallet, Profile Profile) GetEntities() => (_wallet, _profile);
-
     public Wallet GetWallet() => _wallet;
+
+    public (Wallet Wallet, Profile Profile) GetEntities() => (_wallet, _profile);
+    
+    public bool HasAccess(UserId userId) => _wallet.ProfileId == _profile.Id && _profile.OwnerId == userId;
 }

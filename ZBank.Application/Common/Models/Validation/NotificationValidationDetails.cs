@@ -25,10 +25,10 @@ public class NotificationValidationDetails<T> where T : Notification
     }
     
     public UserRoles Role { get; init; }
-
-    public NotificationId NotificationId => _notification.Id;
     
     public bool IsRead => _notification.IsRead;
+
+    public NotificationId NotificationId => _notification.Id;
     
     public UserId ReceiverId => _notification.NotificationReceiverId;
     

@@ -20,7 +20,7 @@ public class ProfileRepository : IProfileRepository
         return await _dbContext.Profiles.FindAsync(id); 
     }
 
-    public async Task<ProfileValidationDetails?> GetProfileWithOwnerAsync(ProfileId profileId)
+    public async Task<ProfileValidationDetails?> GetProfileValidationDetailsAsync(ProfileId profileId)
     {
         var query = _dbContext.Profiles
             .Where(profile => profile.Id == profileId)

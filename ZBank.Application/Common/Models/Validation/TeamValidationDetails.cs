@@ -27,18 +27,18 @@ public record TeamValidationDetails
         _ => false
     };
     
+    public TeamId TeamId => _teamOrSpace.Id;
+    
+    public UserId MemberId => _member.Id;
+    
+    public (TeamBase Team, User Member) GetEntities() => (_teamOrSpace, _member);
+    
+    public TeamBase GetTeamOrSpace() => _teamOrSpace;
+
     public bool MemberHasAccess(UserId memberId) => _teamOrSpace switch
     {
         PersonalSpace space => space.OwnerId == memberId,
         Team team => team.UserIds.Contains(memberId),
         _ => false
     };
-    
-    public TeamBase GetTeamOrSpace() => _teamOrSpace;
-    
-    public TeamId TeamId => _teamOrSpace.Id;
-    
-    public UserId MemberId => _member.Id;
-    
-    public (TeamBase Team, User Member) GetEntities() => (_teamOrSpace, _member);
 }

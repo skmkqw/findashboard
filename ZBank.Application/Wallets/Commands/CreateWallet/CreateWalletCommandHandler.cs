@@ -44,7 +44,7 @@ public class CreateWalletCommandHandler : IRequestHandler<CreateWalletCommand, E
     {
         _logger.LogInformation("Handling wallet creation for: {OwnerId} on profile id = {ProfileId}", request.OwnerId.Value, request.ProfileId.Value);
 
-        var profileValidationDetails = await _profileRepository.GetProfileWithOwnerAsync(request.ProfileId);
+        var profileValidationDetails = await _profileRepository.GetProfileValidationDetailsAsync(request.ProfileId);
         if (profileValidationDetails == null)
         {
             _logger.LogWarning("Profile with id {ProfileId} not found or does not exist", request.ProfileId);

@@ -8,7 +8,7 @@ public interface IProfileRepository
 {
     Task<Profile?> GetByIdAsync(ProfileId id);
     
-    Task<ProfileValidationDetails?> GetProfileWithOwnerAsync(ProfileId profileId);
+    Task<ProfileValidationDetails?> GetProfileValidationDetailsAsync(ProfileId profileId);
     
     void Add(Profile profile);
 }
