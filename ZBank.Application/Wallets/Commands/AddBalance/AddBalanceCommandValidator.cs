@@ -13,8 +13,8 @@ public class AddBalanceCommandValidator : AbstractValidator<AddBalanceCommand>
         RuleFor(x => x.UserId.Value)
             .NotEmpty().WithMessage("Currency Id cannot be empty");
 
-        RuleFor(x => x.CurrencyId.Value)
-            .NotEmpty().WithMessage("Currency Id cannot be empty");
+        RuleFor(x => x.Symbol)
+            .NotEmpty().WithMessage("Currency Symbol cannot be empty");
         
         RuleFor(x => x.WalletId.Value)
             .NotEmpty().WithMessage("Wallet Id cannot be empty");

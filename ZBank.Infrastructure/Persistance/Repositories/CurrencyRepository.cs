@@ -27,7 +27,7 @@ public class CurrencyRepository : ICurrencyRepository
 
     public async Task<Currency?> GetCurrencyBySymbol(string symbol)
     {
-        return await _dbContext.Currencies.FirstOrDefaultAsync(x => x.Symbol == symbol);
+        return await _dbContext.Currencies.FirstOrDefaultAsync(x => x.Symbol == symbol.ToUpper());
     }
 
     public void AddCurrency(Currency currency)
