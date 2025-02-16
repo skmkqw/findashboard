@@ -29,15 +29,15 @@ public class DeleteNotificationCommandHandler : IRequestHandler<DeleteNotificati
     {
         _logger.LogInformation("Processing deleting notification for notification with id: {NotificationId}", request.NotificationId.Value);
         
-        var notificationWithReceiver = await _notificationRepository.FindNotificationWithReceiverById<InformationNotification>(request.NotificationId);
+        var notificationValidationDetails = await _notificationRepository.FindNotificationWithReceiverById<InformationNotification>(request.NotificationId);
         
-        if (notificationWithReceiver == null)
+        if (notificationValidationDetails == null)
         {
             _logger.LogInformation("Notification with ID: {Id} not found", request.NotificationId.Value);
             return Errors.Notification.InformationNotification.NotFound(request.NotificationId);
         }
         
-        var (notification, receiver) = notificationWithReceiver.GetEntities();
+        var (notification, receiver) = notificationValidationDetails.GetEntities();
         
         if (ValidateNotificationDelete(request, notification) is var validationResult && validationResult.IsError)
             return validationResult.Errors;
