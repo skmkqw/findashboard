@@ -3,12 +3,12 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Models;
+using ZBank.Application.Common.Models.Validation;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.Common.Models;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.Factories;
 using ZBank.Domain.ProfileAggregate;
-using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Profiles.Commands.CreateProfile;
@@ -18,8 +18,6 @@ public class CreateProfileCommandHandler : IRequestHandler<CreateProfileCommand,
     private readonly IUserRepository _userRepository;
     
     private readonly ITeamRepository _teamRepository;
-    
-    private readonly ISpaceRepository _spaceRepository; 
     
     private readonly IProfileRepository _profileRepository;
     
@@ -32,7 +30,6 @@ public class CreateProfileCommandHandler : IRequestHandler<CreateProfileCommand,
     public CreateProfileCommandHandler(IUserRepository userRepository,
         ITeamRepository teamRepository,
         IProfileRepository profileRepository,
-        ISpaceRepository spaceRepository,
         INotificationRepository notificationRepository,
         IUnitOfWork unitOfWork,
         ILogger<CreateProfileCommandHandler> logger)
@@ -43,60 +40,66 @@ public class CreateProfileCommandHandler : IRequestHandler<CreateProfileCommand,
         _unitOfWork = unitOfWork;
         _logger = logger;
         _notificationRepository = notificationRepository;
-        _spaceRepository = spaceRepository;
     }
 
     public async Task<ErrorOr<WithNotificationResult<Profile, InformationNotification>>> Handle(CreateProfileCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling profile creation for: {OwnerId} and team id = {TeamId}", request.OwnerId.Value, request.TeamId.Value);
 
-        var owner = await _userRepository.FindByIdAsync(request.OwnerId);
+        var member = await _userRepository.FindByIdAsync(request.OwnerId);
 
-        if (owner is null)
+        if (member is null)
         {
             _logger.LogInformation("User with id: {Id} not found", request.OwnerId.Value);
             return Errors.User.IdNotFound(request.OwnerId);
         }
         
-        TeamBase? teamOrSpace = await _teamRepository.GetByIdAsync(request.TeamId);
+        var teamValidationDetails = await _teamRepository.GetTeamValidationDetailsAsync(request.TeamId, member);
 
-        if (teamOrSpace is null && owner.PersonalSpaceId is not null)
+        if (teamValidationDetails is null)
         {
-            teamOrSpace = await _spaceRepository.GetByIdAsync(owner.PersonalSpaceId);
-
-            if (teamOrSpace is null)
-            {
-                _logger.LogInformation("Neither a team nor personal space is available for user with id: {Id}", owner.Id.Value);
-                return Errors.PersonalSpace.IsNotSet;
-            }
-        }
-        else if (teamOrSpace is null && owner.PersonalSpaceId is null)
-        {
+            _logger.LogInformation("Team or personal space with id: {Id} not found", request.TeamId.Value);
             return Errors.Team.NotFound;
         }
+        
+        (TeamBase teamOrSpace, _) = teamValidationDetails.GetEntities();
+        
+        if (ValidateCreateProfile(teamValidationDetails) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
+        
+        var profile = CreateProfile(request, member, teamOrSpace);
+        _logger.LogInformation("Successfully created a profile.");
 
-        if (teamOrSpace is Team team && !team.UserIds.Contains(owner.Id))
-        {
-            _logger.LogInformation("User with id: {Id} is not a member of team with id: {TeamId}", owner.Id.Value, team.Id.Value);
-            return Errors.Team.AccessDenied;
-        }
-        
-        var profile = Profile.Create(request.Name, request.OwnerId, request.TeamId);
-        
-        owner.AddProfileId(profile.Id);
-        
-        teamOrSpace!.AddProfile(profile.Id);
-        
-        _profileRepository.Add(profile);
-        
-        var profileCreatedNotification = CreateProfileCreatedNotification(owner, profile);
+        var profileCreatedNotification = CreateProfileCreatedNotification(member, profile);
         _logger.LogInformation("'ProfileCreated' notification created");
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        _logger.LogInformation("Successfully created a profile.");
-
         return new WithNotificationResult<Profile, InformationNotification>(profile, profileCreatedNotification);
+    }
+
+    private Profile CreateProfile(CreateProfileCommand request, User owner, TeamBase team)
+    {
+        var profile = Profile.Create(request.Name, request.OwnerId, request.TeamId);
+        
+        owner.AddProfileId(profile.Id);
+        
+        team.AddProfile(profile.Id);
+        
+        _profileRepository.Add(profile);
+        
+        return profile;
+    }
+
+    private ErrorOr<Success> ValidateCreateProfile(TeamValidationDetails teamValidationDetails)
+    {
+        if (!teamValidationDetails.HasAccess)
+        {
+            _logger.LogInformation("Access to team with Id: {TeamId} was denied to user with Id: {UserId}", teamValidationDetails.TeamId.Value, teamValidationDetails.TeamId.Value);
+            return Errors.Team.AccessDenied;
+        }
+
+        return Result.Success;
     }
 
     private InformationNotification CreateProfileCreatedNotification(User profileCreator, Profile profile)

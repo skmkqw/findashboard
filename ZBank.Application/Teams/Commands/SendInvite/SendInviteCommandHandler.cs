@@ -3,7 +3,9 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Models;
+using ZBank.Application.Common.Models.Validation;
 using ZBank.Domain.Common.Errors;
+using ZBank.Domain.Common.Models;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.Factories;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
@@ -36,57 +38,96 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
         _notificationRepository = notificationRepository;
         _unitOfWork = unitOfWork;
     }
-
+    
     public async Task<ErrorOr<WithNotificationResult<TeamInviteNotification, InformationNotification>>> Handle(SendInviteCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling team invite creation from {SenderId} to {ReceiverEmail}. Team id: {TeamId}", request.SenderId.Value, request.ReceiverEmail, request.TeamId.Value);
         
-        var sender = await _userRepository.FindByIdAsync(request.SenderId);
+        var (senderResult, receiverResult) = await FindSenderAndReceiverAsync(request);
+        if (senderResult.IsError) return senderResult.Errors;
+        if (receiverResult.IsError) return receiverResult.Errors;
 
-        if (sender is null)
-        {
-            _logger.LogInformation("User with ID: {Id} not found", request.SenderId.Value);
-
-            return Errors.User.IdNotFound(request.SenderId);
-        }
+        var sender = senderResult.Value;
+        var receiver = receiverResult.Value;
         
-        var receiver = await _userRepository.FindByEmailAsync(request.ReceiverEmail);
+        var teamValidationDetails = await _teamRepository.GetTeamValidationDetailsAsync(request.TeamId, sender);
 
-        if (receiver is null)
-        {
-            _logger.LogInformation("User with email: {Email} not found", request.ReceiverEmail);
-
-            return Errors.User.EmailNotFound(request.ReceiverEmail);
-        }
-        
-        var team = await _teamRepository.GetByIdAsync(request.TeamId);
-
-        if (team is null)
+        if (teamValidationDetails is null)
         {
             _logger.LogInformation("Team with id: {TeamId} not found", request.TeamId.Value);
             return Errors.Team.NotFound;
         }
+        
+        var teamOrSpace = teamValidationDetails.GetTeamOrSpace();
 
-        if (!team.UserIds.Contains(sender.Id))
+        if (await ValidateSendInviteAsync(request, teamValidationDetails, receiver) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
+        
+        var teamInvite = SendInvite(request, teamOrSpace as Team, sender, receiver);
+        _logger.LogInformation("Successfully created team invite");
+
+        var inviteCreatedNotification = CreateInviteCreatedNotification(sender, receiver, teamOrSpace as Team);
+        _logger.LogInformation("'InviteSent' notification created");
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        return new WithNotificationResult<TeamInviteNotification, InformationNotification>(teamInvite, inviteCreatedNotification);
+    }
+    
+    private async Task<(ErrorOr<User> Sender, ErrorOr<User> Receiver)> FindSenderAndReceiverAsync(SendInviteCommand request)
+    {
+        var sender = await _userRepository.FindByIdAsync(request.SenderId);
+        if (sender is null)
         {
-            _logger.LogInformation("Sender with email: {SenderEmail} is not a team member", sender.Email);
-            return Errors.Team.MemberNotExists(sender.Email);
+            _logger.LogInformation("Notification sender with ID: {Id} not found", request.SenderId.Value);
+            return (Errors.User.IdNotFound(request.SenderId), new ErrorOr<User>());
         }
 
-        if (team.UserIds.Contains(receiver.Id))
+        var receiver = await _userRepository.FindByEmailAsync(request.ReceiverEmail);
+        if (receiver is null)
+        {
+            _logger.LogInformation("Notification receiver with email: {Email} not found", request.ReceiverEmail);
+            return (new ErrorOr<User>(), Errors.User.EmailNotFound(request.ReceiverEmail));
+        }
+
+        return (sender, receiver);
+    }
+
+    private async Task<ErrorOr<Success>> ValidateSendInviteAsync(SendInviteCommand request, TeamValidationDetails teamValidationDetails, User receiver)
+    {
+        (TeamBase teamOrSpace, User sender) = teamValidationDetails.GetEntities();
+        
+        if (!teamValidationDetails.IsTeam)
+        {
+            _logger.LogInformation("Blocked attempt to send invite to personal space with Id: {PersonalSpaceId}", request.TeamId);
+            return Errors.PersonalSpace.InvalidOperation;
+        }
+
+        if (!teamValidationDetails.MemberHasAccess(sender.Id))
+        {
+            _logger.LogInformation("Sender with email: {SenderEmail} is not a team member", sender.Email);
+            return Errors.Team.AccessDenied;
+        }
+
+        if (teamValidationDetails.MemberHasAccess(receiver.Id))
         {
             _logger.LogInformation("User with email: {Email} is already in team", request.ReceiverEmail);
             return Errors.Team.MemberAlreadyExists(receiver.Email);
         }
 
-        var existingInvite = await _notificationRepository.FindTeamInviteNotification(receiver.Id, team.Id);
+        var existingInvite = await _notificationRepository.FindTeamInviteNotification(receiver.Id, teamOrSpace.Id);
         
         if (existingInvite is not null && receiver.NotificationIds.Contains(existingInvite.Id))
         {
-            _logger.LogInformation("User with email: {ReceiverEmail} is already invited to team {TeamName}", receiver.Email, team.Name);
-            return Errors.Notification.TeamInvite.TeamInviteAlreadyExists(receiver.Email, team.Name);
+            _logger.LogInformation("User with email: {ReceiverEmail} is already invited to team {TeamName}", receiver.Email, teamOrSpace.Name);
+            return Errors.Notification.TeamInvite.TeamInviteAlreadyExists(receiver.Email, teamOrSpace.Name);
         }
-        
+
+        return Result.Success;
+    }
+
+    private TeamInviteNotification SendInvite(SendInviteCommand request, Team team, User sender, User receiver)
+    {
         var teamInvite = NotificationFactory.CreateTeamInviteNotification(
             notificationSender: NotificationSender.Create(request.SenderId, string.Join(" ", sender.FirstName, sender.LastName)),
             receiverId: receiver.Id,
@@ -98,15 +139,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
         
         receiver.AddNotificationId(teamInvite.Id);
         
-        var inviteCreatedNotification = CreateInviteCreatedNotification(sender, receiver, team);
-        _logger.LogInformation("'InviteSent' notification created");
-
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        _logger.LogInformation("Successfully created and sent team invite");
-        
-        return new WithNotificationResult<TeamInviteNotification, InformationNotification>(teamInvite, inviteCreatedNotification);
+        return teamInvite;
     }
 
     private InformationNotification CreateInviteCreatedNotification(User inviteSender, User inviteReceiver, Team team)

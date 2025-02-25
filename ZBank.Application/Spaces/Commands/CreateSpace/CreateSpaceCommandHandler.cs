@@ -15,7 +15,7 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
 {
     private readonly IUserRepository _userRepository;
     
-    private readonly ISpaceRepository _spaceRepository;
+    private readonly ITeamRepository _teamRepository;
     
     private readonly INotificationRepository _notificationRepository;
     
@@ -24,13 +24,13 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateSpaceCommandHandler(IUserRepository userRepository,
-        ISpaceRepository spaceRepository,
+        ITeamRepository teamRepository,
         INotificationRepository notificationRepository,
         ILogger<CreateSpaceCommandHandler> logger,
         IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
-        _spaceRepository = spaceRepository;
+        _teamRepository = teamRepository;
         _notificationRepository = notificationRepository;
         _logger = logger;
         _unitOfWork = unitOfWork;
@@ -47,29 +47,44 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
             _logger.LogInformation("User with id: {UserId} not found or does not exist", request.OwnerId.Value);
             return Errors.User.IdNotFound(request.OwnerId);
         }
-
-        if (owner.PersonalSpaceId is not null)
-        {
-            _logger.LogInformation("User with id: {UserId} already has a personal space", owner.Id.Value);
-            return Errors.PersonalSpace.IsAlreadySet;
-        }
         
+        if (ValidateCreateSpace(owner) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
+        
+        var space = CreatePersonalSpace(request, owner);
+        _logger.LogInformation("Successfully created personal space");
+        
+        var spaceCreatedNotification = CreateSpaceCreatedNotification(owner, space);
+        _logger.LogInformation("'SpaceCreated' notification created");
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return new WithNotificationResult<PersonalSpace, InformationNotification>(space, spaceCreatedNotification);
+    }
+
+    private PersonalSpace CreatePersonalSpace(CreateSpaceCommand request, User owner)
+    {
         var space = PersonalSpace.Create(
             name: request.Name, 
             description: "Personal space only for you",
             ownerId: request.OwnerId
         );
         
-        _spaceRepository.Add(space);
+        _teamRepository.AddSpace(space);
         owner.AssignPersonalSpaceId(space.Id);
         
-        var spaceCreatedNotification = CreateSpaceCreatedNotification(owner, space);
-        _logger.LogInformation("'SpaceCreated' notification created");
-        
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Successfully created personal space");
+        return space;
+    }
 
-        return new WithNotificationResult<PersonalSpace, InformationNotification>(space, spaceCreatedNotification);
+    private ErrorOr<Success> ValidateCreateSpace(User owner)
+    {
+        if (owner.PersonalSpaceId is not null)
+        {
+            _logger.LogInformation("User with id: {UserId} already has a personal space", owner.Id.Value);
+            return Errors.PersonalSpace.IsAlreadySet;
+        }
+
+        return Result.Success;
     }
 
     private InformationNotification CreateSpaceCreatedNotification(User owner, PersonalSpace space)

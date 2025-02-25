@@ -5,4 +5,4 @@ using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Application.Notifications.Commands.DeleteNotification;
 
-public record DeleteNotificationCommand(UserId UserId, NotificationId NotificationId) : IRequest<ErrorOr<Unit>>;
+public record DeleteNotificationCommand(UserId UserId, NotificationId NotificationId) : IRequest<ErrorOr<Success>>;

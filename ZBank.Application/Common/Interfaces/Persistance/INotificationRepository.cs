@@ -1,3 +1,4 @@
+using ZBank.Application.Common.Models.Validation;
 using ZBank.Domain.Common.Models;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
@@ -9,6 +10,10 @@ namespace ZBank.Application.Common.Interfaces.Persistance;
 public interface INotificationRepository
 {
     Task<T?> FindNotificationById<T>(NotificationId id) where T : Notification;
+    
+    Task<NotificationValidationDetails<T>?> FindNotificationWithSenderById<T>(NotificationId notificationId) where T : Notification;
+    
+    Task<NotificationValidationDetails<T>?> FindNotificationWithReceiverById<T>(NotificationId notificationId) where T : Notification;
     
     Task<List<Notification>> FindUserNotifications(UserId userId);
     

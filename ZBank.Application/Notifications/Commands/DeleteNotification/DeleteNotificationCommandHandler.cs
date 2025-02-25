@@ -4,53 +4,68 @@ using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.NotificationAggregate;
+using ZBank.Domain.UserAggregate;
 
 namespace ZBank.Application.Notifications.Commands.DeleteNotification;
 
-public class DeleteNotificationCommandHandler : IRequestHandler<DeleteNotificationCommand, ErrorOr<Unit>>
+public class DeleteNotificationCommandHandler : IRequestHandler<DeleteNotificationCommand, ErrorOr<Success>>
 {
     private readonly INotificationRepository _notificationRepository;
-
-    private readonly IUserRepository _userRepository;
     
     private readonly IUnitOfWork _unitOfWork;
     
     private readonly ILogger<DeleteNotificationCommandHandler> _logger;
 
     public DeleteNotificationCommandHandler(INotificationRepository notificationRepository,
-        IUserRepository userRepository,
         IUnitOfWork unitOfWork,
         ILogger<DeleteNotificationCommandHandler> logger)
     {
         _notificationRepository = notificationRepository;
-        _userRepository = userRepository;
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
     
-    public async Task<ErrorOr<Unit>> Handle(DeleteNotificationCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> Handle(DeleteNotificationCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Processing deleting notification for notification with id: {NotificationId}", request.NotificationId.Value);
         
-        var user = await _userRepository.FindByIdAsync(request.UserId);
-
-        if (user is null)
-        {
-            _logger.LogInformation("User with ID: {Id} not found", request.UserId.Value);
-            return Errors.User.IdNotFound(request.UserId);
-        }
+        var notificationValidationDetails = await _notificationRepository.FindNotificationWithReceiverById<InformationNotification>(request.NotificationId);
         
-        var notification = await _notificationRepository.FindNotificationById<InformationNotification>(request.NotificationId);
-
-        if (notification is null)
+        if (notificationValidationDetails == null)
         {
-            _logger.LogInformation("Notification with ID: {Id} not found", request.UserId.Value);
+            _logger.LogInformation("Notification with ID: {Id} not found", request.NotificationId.Value);
             return Errors.Notification.InformationNotification.NotFound(request.NotificationId);
         }
+        
+        var (notification, receiver) = notificationValidationDetails.GetEntities();
+        
+        if (ValidateNotificationDelete(request, notification) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
+        
+        await DeleteNotificationAsync(notification, receiver, cancellationToken);
+        
+        _logger.LogInformation("Notification with id: {NotificationId} has been deleted", notification.Id.Value);
+        return Result.Success;
+    }
 
-        if (notification.NotificationReceiverId != user.Id)
+    private Task DeleteNotificationAsync(
+        InformationNotification notification,
+        User receiver,
+        CancellationToken cancellationToken)
+    {
+        _notificationRepository.DeleteNotification(notification);
+        receiver.DeleteNotificationId(notification.Id);
+    
+        return _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    private ErrorOr<Success> ValidateNotificationDelete(
+        DeleteNotificationCommand request,
+        InformationNotification notification)
+    {
+        if (!notification.CanBeModifiedBy(request.UserId))
         {
-            _logger.LogInformation("User with id: {Id} can't modify this notification since he is not the receiver", user.Id.Value);
+            _logger.LogInformation("User with id: {Id} can't modify this notification since he is not the receiver", request.UserId.Value);
             return Errors.Notification.InformationNotification.AccessDenied;
         }
         
@@ -60,13 +75,6 @@ public class DeleteNotificationCommandHandler : IRequestHandler<DeleteNotificati
             return Errors.Notification.InformationNotification.IsNotRead(notification.Id);
         }
         
-        _notificationRepository.DeleteNotification(notification);
-
-        user.DeleteNotificationId(notification.Id);
-        
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        _logger.LogInformation("Notification with id: {NotificationId} has been deleted", notification.Id.Value);
-        return Unit.Value;
+        return Result.Success;
     }
 }

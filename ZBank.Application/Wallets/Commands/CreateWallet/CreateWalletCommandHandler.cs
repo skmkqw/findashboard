@@ -3,9 +3,11 @@ using ErrorOr;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Models;
+using ZBank.Application.Common.Models.Validation;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.NotificationAggregate;
 using ZBank.Domain.NotificationAggregate.Factories;
+using ZBank.Domain.ProfileAggregate;
 using ZBank.Domain.UserAggregate;
 using ZBank.Domain.WalletAggregate;
 using ZBank.Domain.WalletAggregate.ValueObjects;
@@ -14,8 +16,6 @@ namespace ZBank.Application.Wallets.Commands.CreateWallet;
 
 public class CreateWalletCommandHandler : IRequestHandler<CreateWalletCommand, ErrorOr<WithNotificationResult<Wallet, InformationNotification>>>
 {
-    private readonly IUserRepository _userRepository;
-    
     private readonly IProfileRepository _profileRepository;
         
     private readonly IWalletRepository _walletRepository;
@@ -26,14 +26,13 @@ public class CreateWalletCommandHandler : IRequestHandler<CreateWalletCommand, E
     
     private readonly ILogger<CreateWalletCommandHandler> _logger;
     
-    public CreateWalletCommandHandler(IUserRepository userRepository,
+    public CreateWalletCommandHandler(
         IUnitOfWork unitOfWork,
         IWalletRepository walletRepository,
         IProfileRepository profileRepository, 
         INotificationRepository notificationRepository,
         ILogger<CreateWalletCommandHandler> logger) 
     {
-        _userRepository = userRepository;
         _unitOfWork = unitOfWork;
         _walletRepository = walletRepository;
         _logger = logger;
@@ -45,33 +44,31 @@ public class CreateWalletCommandHandler : IRequestHandler<CreateWalletCommand, E
     {
         _logger.LogInformation("Handling wallet creation for: {OwnerId} on profile id = {ProfileId}", request.OwnerId.Value, request.ProfileId.Value);
 
-        var owner = await _userRepository.FindByIdAsync(request.OwnerId);
-
-        if (owner is null)
+        var profileValidationDetails = await _profileRepository.GetProfileValidationDetailsAsync(request.ProfileId);
+        if (profileValidationDetails == null)
         {
-            _logger.LogInformation("User with id: {Id} not found", request.OwnerId.Value);
-            return Errors.User.IdNotFound(request.OwnerId);
-        }
-        
-        var profile = await _profileRepository.GetByIdAsync(request.ProfileId);
-        if (profile is null)
-        {
-            _logger.LogInformation("Profile with id: {Id} not found for wallet creation", request.ProfileId.Value);
+            _logger.LogWarning("Profile with id {ProfileId} not found or does not exist", request.ProfileId);
             return Errors.Profile.NotFound;
         }
+        
+        var (profile, owner) = profileValidationDetails.GetEntities();
+        
+        if (ValidateCreateWallet(request, profileValidationDetails) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
+        
+        var wallet = CreateWallet(request, Enum.Parse<WalletType>(request.Type), profile);
+        _logger.LogInformation("Successfully created a wallet.");
+        
+        var walletCreatedNotification = CreateWalletCreatedNotification(owner, wallet);
+        _logger.LogInformation("'WalletCreated' notification created");
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        return new WithNotificationResult<Wallet, InformationNotification>(wallet, walletCreatedNotification);
+    }
 
-        if (profile.OwnerId != owner.Id)
-        {
-            _logger.LogInformation("User with id: {Id} is not the owner of profile with id: {ProfileId}", owner.Id.Value, profile.Id.Value);
-            return Errors.Profile.AccessDenied;
-        }
-
-        if (!Enum.TryParse<WalletType>(request.Type, ignoreCase: true, out var walletType))
-        {
-            _logger.LogInformation("Invalid wallet type: {Type} for wallet creation", request.Type);
-            return Errors.Wallet.InvalidType;
-        }
-
+    private Wallet CreateWallet(CreateWalletCommand request, WalletType walletType, Profile profile)
+    {
         var wallet = Wallet.Create(
             address: request.Address,
             type: walletType,
@@ -82,13 +79,24 @@ public class CreateWalletCommandHandler : IRequestHandler<CreateWalletCommand, E
         
         profile.AddWallet(wallet.Id);
         
-        var walletCreatedNotification = CreateWalletCreatedNotification(owner, wallet);
-        _logger.LogInformation("'WalletCreated' notification created");
+        return wallet;
+    }
+
+    private ErrorOr<Success> ValidateCreateWallet(CreateWalletCommand request, ProfileValidationDetails profileValidationDetails)
+    {
+        if (profileValidationDetails.OwnerId != request.OwnerId)
+        {
+            _logger.LogInformation("User with id: {Id} is not the owner of profile with id: {ProfileId}", profileValidationDetails.OwnerId.Value, profileValidationDetails.ProfileId.Value);
+            return Errors.Profile.AccessDenied;
+        }
+
+        if (!Enum.TryParse<WalletType>(request.Type, ignoreCase: true, out _))
+        {
+            _logger.LogInformation("Invalid wallet type: {Type} for wallet creation", request.Type);
+            return Errors.Wallet.InvalidType;
+        }
         
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        _logger.LogInformation("Successfully created a wallet.");
-        return new WithNotificationResult<Wallet, InformationNotification>(wallet, walletCreatedNotification);
+        return Result.Success;
     }
     
     private InformationNotification CreateWalletCreatedNotification(User walletCreator, Wallet wallet)

@@ -12,6 +12,8 @@ public abstract class Notification : AggregateRoot<NotificationId>
     public NotificationSender NotificationSender { get; }
     
     public UserId NotificationReceiverId { get; }
+
+    public UserId NotificationSenderId => NotificationSender.SenderId;
     
     protected Notification(NotificationId id,
         NotificationSender notificationSender,
@@ -25,6 +27,8 @@ public abstract class Notification : AggregateRoot<NotificationId>
     }
     
     public void MarkAsRead() => IsRead = true;
+    
+    public bool CanBeModifiedBy(UserId userId) => NotificationReceiverId == userId;
     
 #pragma warning disable CS8618
     protected Notification()

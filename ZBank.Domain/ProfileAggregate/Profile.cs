@@ -34,6 +34,8 @@ public class Profile : AggregateRoot<ProfileId>
     {
         Name = name;
     }
+    
+    public bool CanBeModifiedBy(UserId userId) => OwnerId == userId;
 
     public void AddWallet(WalletId walletId) => _walletIds.Add(walletId);
 

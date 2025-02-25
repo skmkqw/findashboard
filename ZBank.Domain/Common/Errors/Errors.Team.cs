@@ -36,5 +36,9 @@ public static partial class Errors
         public static Error IsNotSet => Error.NotFound(
             code: "PersonalSpace.IsNotSet",
             description: "Personal space id is not set");
+        
+        public static Error InvalidOperation => Error.NotFound(
+            code: "PersonalSpace.InvalidOperation",
+            description: "This operation is not allow on personal space");
     }
 }

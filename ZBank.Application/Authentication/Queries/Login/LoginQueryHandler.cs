@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using ZBank.Application.Authentication.Common;
 using ZBank.Application.Common.Interfaces.Persistance;
-using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Application.Common.Interfaces.Services.Authentication;
 using ZBank.Domain.Common.Errors;
 using ZBank.Domain.UserAggregate;
@@ -28,26 +27,43 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<Authenticat
         _passwordHasher = passwordHasher;
         _logger = logger;
     }
-
+    
     public async Task<ErrorOr<AuthenticationResult>> Handle(LoginQuery request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Login attempt started for email: {Email}", request.Email);
-
-        if (await _userRepository.FindByEmailAsync(request.Email) is not User user)
+        
+        var user = await _userRepository.FindByEmailAsync(request.Email);
+        
+        if (user is null)
         {
             _logger.LogInformation("Login failed: User not found for email: {Email}", request.Email);
             return Errors.Authentication.InvalidCredentials;
         }
+        
+        if (ValidateLogin(request, user) is var validationResult && validationResult.IsError)
+            return validationResult.Errors;
+        
+        var loginUserResult = LoginUser(user);
 
+        _logger.LogInformation("Login successful for email: {Email}", request.Email);
+        return loginUserResult;
+    }
+    
+    private AuthenticationResult LoginUser(User user)
+    {
+        var token = _tokenGenerator.GenerateJwtToken(user);
+        
+        return new AuthenticationResult(user, token);
+    }
+
+    private ErrorOr<Success> ValidateLogin(LoginQuery request, User user)
+    {
         if (!_passwordHasher.VerifyHashedPassword(user.Password, request.Password))
         {
             _logger.LogInformation("Login failed: Invalid password for email: {Email}", request.Email);
             return Errors.Authentication.InvalidCredentials;
         }
-
-        var token = _tokenGenerator.GenerateJwtToken(user);
-
-        _logger.LogInformation("Login successful for email: {Email}", request.Email);
-        return new AuthenticationResult(user, token);
+        
+        return Result.Success;
     }
 }
