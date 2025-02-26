@@ -12,8 +12,6 @@ public abstract class Notification : AggregateRoot<NotificationId>
     public NotificationSender NotificationSender { get; }
     
     public UserId NotificationReceiverId { get; }
-
-    public UserId NotificationSenderId => NotificationSender.SenderId;
     
     protected Notification(NotificationId id,
         NotificationSender notificationSender,
