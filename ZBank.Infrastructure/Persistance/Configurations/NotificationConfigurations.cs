@@ -23,7 +23,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         builder.HasDiscriminator<string>("NotificationType")
             .HasValue<InformationNotification>("Information")
             .HasValue<TeamInviteNotification>("TeamInvite");
-
+        
         //Common properties
         builder.Property(n => n.Content).IsRequired();
         builder.Property(n => n.IsRead).IsRequired();
@@ -31,7 +31,8 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         builder.OwnsOne(n => n.NotificationSender, nb =>
         {
             //SenderFullName
-            nb.Property(ns => ns.SenderFullName).HasColumnName("SenderFullName")
+            nb.Property(ns => ns.SenderFullName).
+                HasColumnName("SenderFullName")
                 .IsRequired()
                 .HasMaxLength(200);
             
