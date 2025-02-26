@@ -9,4 +9,4 @@ using ZBank.Domain.WalletAggregate.ValueObjects;
 
 namespace ZBank.Application.Wallets.Commands.AddBalance;
 
-public record AddBalanceCommand(UserId UserId, WalletId WalletId, string Symbol, decimal Amount) : IRequest<ErrorOr<WithNotificationResult<Balance, InformationNotification>>>;
+public record AddBalanceCommand(UserId UserId, WalletId WalletId, CurrencyId Symbol, decimal Amount) : IRequest<ErrorOr<WithNotificationResult<Balance, InformationNotification>>>;

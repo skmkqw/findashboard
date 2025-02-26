@@ -1,3 +1,3 @@
 namespace ZBank.Contracts.Wallets.AddBalance;
 
-public record AddBalanceResponse(Guid Id, Guid CurrencyId, decimal Amount);
+public record AddBalanceResponse(Guid Id, string CurrencySymbol, decimal Amount);
