@@ -10,16 +10,13 @@ public class CurrencyConfigurations : IEntityTypeConfiguration<Currency>
     {
         builder.ToTable("Currencies");
         
-        //PK
-        builder.HasKey(x => x.Id);
+        //PK (Symbol)
+        builder.HasKey(x => x.Id)
+            .HasName("Symbol");
 
         //ID
         builder.Property(x => x.Id)
             .ValueGeneratedNever();
-        
-        //Symbol
-        builder.Property(x => x.Symbol)
-            .IsRequired();
         
         //Price
         builder.Property(x => x.Price)
