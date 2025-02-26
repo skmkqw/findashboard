@@ -15,29 +15,9 @@ public class CurrencyRepository : ICurrencyRepository
         _dbContext = dbContext;
     }
 
-    public async Task<List<Currency>> GetAllCurrencies()
+    public async Task<Currency?> GetCurrencyBySymbol(CurrencyId symbol)
     {
-        return await _dbContext.Currencies.ToListAsync();
-    }
-
-    public async Task<Currency?> GetCurrencyById(CurrencyId id)
-    {
-        return await _dbContext.Currencies.FindAsync(id);
-    }
-
-    public async Task<Currency?> GetCurrencyBySymbol(string symbol)
-    {
-        return await _dbContext.Currencies.FirstOrDefaultAsync(x => x.Symbol == symbol.ToUpper());
-    }
-
-    public void AddCurrency(Currency currency)
-    {
-        _dbContext.Currencies.Add(currency);
-    }
-
-    public void UpdateCurrency(Currency currency)
-    {
-        _dbContext.Currencies.Update(currency);
+        return await _dbContext.Currencies.FindAsync(symbol);
     }
     
     public async Task ReplaceAllCurrenciesAsync(List<Currency> newCurrencies)

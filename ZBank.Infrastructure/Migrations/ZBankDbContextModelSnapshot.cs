@@ -90,8 +90,8 @@ namespace ZBank.Infrastructure.Migrations
 
             modelBuilder.Entity("ZBank.Domain.CurrencyAggregate.Currency", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDateTime")
                         .HasColumnType("timestamp with time zone");
@@ -99,14 +99,11 @@ namespace ZBank.Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("Symbol")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("Symbol");
 
                     b.ToTable("Currencies", (string)null);
                 });
@@ -689,8 +686,9 @@ namespace ZBank.Infrastructure.Migrations
                             b1.Property<decimal>("Amount")
                                 .HasColumnType("numeric");
 
-                            b1.Property<Guid>("CurrencyId")
-                                .HasColumnType("uuid");
+                            b1.Property<string>("CurrencyId")
+                                .IsRequired()
+                                .HasColumnType("text");
 
                             b1.HasKey("WalletId", "Id");
 

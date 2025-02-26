@@ -5,19 +5,17 @@ namespace ZBank.Domain.CurrencyAggregate;
 
 public class Currency : AggregateRoot<CurrencyId>
 {
-    public string Symbol { get; private set; }
-    
     public decimal Price { get; private set; }
 
-    private Currency(CurrencyId id, string symbol, decimal price) : base(id) 
+    private Currency(CurrencyId symbol, decimal price) : base(symbol) 
     {
-        Symbol = symbol;
+        Id = symbol;
         Price = price;
     }
 
     public static Currency Create(string symbol, decimal price)
     {
-        return new Currency(CurrencyId.CreateUnique(), symbol, price);
+        return new Currency(CurrencyId.Create(symbol), price);
     }
 
     public void UpdatePrice(decimal price)

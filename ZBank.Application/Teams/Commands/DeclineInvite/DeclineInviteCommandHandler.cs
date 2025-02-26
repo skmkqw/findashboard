@@ -113,18 +113,18 @@ public class DeclineInviteCommandHandler : IRequestHandler<DeclineInviteCommand,
     
     private async Task<(ErrorOr<User> Sender, ErrorOr<User> Receiver)> FindSenderAndReceiverAsync(TeamInviteNotification invite)
     {
-        var sender = await _userRepository.FindByIdAsync(invite.NotificationSenderId);
+        var sender = await _userRepository.FindByIdAsync(invite.NotificationSender.SenderId);
         if (sender is null)
         {
-            _logger.LogInformation("Notification sender with ID: {Id} not found", invite.NotificationSenderId.Value);
-            return (Errors.User.IdNotFound(invite.NotificationSenderId), new ErrorOr<User>());
+            _logger.LogInformation("Notification sender with ID: {Id} not found", invite.NotificationSender.SenderId.Value);
+            return (Errors.User.IdNotFound(invite.NotificationSender.SenderId), new ErrorOr<User>());
         }
 
-        var receiver = await _userRepository.FindByIdAsync(invite.NotificationSenderId);
+        var receiver = await _userRepository.FindByIdAsync(invite.NotificationSender.SenderId);
         if (receiver is null)
         {
-            _logger.LogInformation("Notification receiver with ID: {Id} not found", invite.NotificationSenderId.Value);
-            return (Errors.User.IdNotFound(invite.NotificationSenderId), new ErrorOr<User>());
+            _logger.LogInformation("Notification receiver with ID: {Id} not found", invite.NotificationSender.SenderId.Value);
+            return (Errors.User.IdNotFound(invite.NotificationSender.SenderId), new ErrorOr<User>());
         }
 
         return (sender, receiver);

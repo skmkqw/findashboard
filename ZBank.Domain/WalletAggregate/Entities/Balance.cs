@@ -6,7 +6,7 @@ namespace ZBank.Domain.WalletAggregate.Entities;
 
 public class Balance : Entity<BalanceId>
 {
-    public CurrencyId CurrencyId { get; init; }
+    public CurrencyId CurrencyId { get; }
 
     public decimal Amount { get; private set; }
 

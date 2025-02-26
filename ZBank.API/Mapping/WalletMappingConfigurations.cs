@@ -27,12 +27,12 @@ public class WalletMappingConfigurations : IRegister
 
         config.NewConfig<(AddBalanceRequest request, Guid? ownerId), AddBalanceCommand>()
             .Map(dest => dest.UserId, src => UserId.Create(src.ownerId!.Value))
-            .Map(dest => dest.CurrencyId, src => CurrencyId.Create(src.request.CurrencyId))
+            .Map(dest => dest.Symbol, src => CurrencyId.Create(src.request.Symbol.ToUpper()))
             .Map(dest => dest.WalletId, src => WalletId.Create(src.request.WalletId))
             .Map(dest => dest.Amount, src => src.request.Amount);
 
         config.NewConfig<Balance, AddBalanceResponse>()
             .Map(dest => dest.Id, src => src.Id.Value)
-            .Map(dest => dest.CurrencyId, src => src.CurrencyId.Value);
+            .Map(dest => dest.CurrencySymbol, src => src.CurrencyId.Value);
     }
 }

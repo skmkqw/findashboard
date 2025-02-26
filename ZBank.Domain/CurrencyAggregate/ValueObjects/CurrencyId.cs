@@ -5,21 +5,16 @@ using ZBank.Domain.Common.Models;
 namespace ZBank.Domain.CurrencyAggregate.ValueObjects;
 
 [EfCoreValueConverter(typeof(CurrencyIdValueConverter))]
-public class CurrencyId : ValueObject, IEntityId<CurrencyId, Guid>
+public class CurrencyId : ValueObject, IEntityId<CurrencyId, string>
 {
-    public Guid Value { get; }
+    public string Value { get; }
     
-    private CurrencyId(Guid value)
+    private CurrencyId(string value)
     {
         Value = value;
     }
-    
-    public static CurrencyId CreateUnique()
-    {
-        return new CurrencyId(Guid.NewGuid());
-    }
 
-    public static CurrencyId Create(Guid value)
+    public static CurrencyId Create(string value)
     {
         return new CurrencyId(value);
     }
@@ -29,7 +24,7 @@ public class CurrencyId : ValueObject, IEntityId<CurrencyId, Guid>
         yield return Value;
     }
     
-    public class CurrencyIdValueConverter : ValueConverter<CurrencyId, Guid>
+    public class CurrencyIdValueConverter : ValueConverter<CurrencyId, string>
     {
         public CurrencyIdValueConverter()
             : base(

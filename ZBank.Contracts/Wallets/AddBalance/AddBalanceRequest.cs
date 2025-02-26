@@ -1,3 +1,3 @@
 namespace ZBank.Contracts.Wallets.AddBalance;
 
-public record AddBalanceRequest(Guid WalletId, Guid CurrencyId, decimal Amount);
+public record AddBalanceRequest(Guid WalletId, string Symbol, decimal Amount);
