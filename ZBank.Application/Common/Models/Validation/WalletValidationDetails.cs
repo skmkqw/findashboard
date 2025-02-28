@@ -1,3 +1,4 @@
+using ZBank.Domain.CurrencyAggregate.ValueObjects;
 using ZBank.Domain.ProfileAggregate;
 using ZBank.Domain.ProfileAggregate.ValueObjects;
 using ZBank.Domain.UserAggregate.ValueObjects;
@@ -27,6 +28,8 @@ public class WalletValidationDetails
     public Wallet GetWallet() => _wallet;
 
     public (Wallet Wallet, Profile Profile) GetEntities() => (_wallet, _profile);
+
+    public IEnumerable<CurrencyId> GetHeldCurrencyNames => _wallet.Balances.Select(b => b.CurrencyId);
     
     public bool HasAccess(UserId userId) => _wallet.ProfileId == _profile.Id && _profile.OwnerId == userId;
 }
