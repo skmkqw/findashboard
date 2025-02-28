@@ -8,10 +8,17 @@ public static partial class Errors
     {
         public static Error NotFound => Error.NotFound(
             code: "Wallet.NotFound",
-            description: "Wallet not found or doesn't exist");
+            description: "Wallet not found or doesn't exist"
+        );
         
         public static Error InvalidType => Error.Validation(
             code: "Wallet.InvalidType", 
-            description: "Wrong wallet type.");
+            description: "Wrong wallet type."
+        );
+
+        public static Error DuplicateCurrency => Error.Conflict(
+            code: "Wallet.DuplicateCurrency",
+            description: "Wallet already has a balance with the same currency."
+        );
     }
 }

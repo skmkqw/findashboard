@@ -63,7 +63,7 @@ public class AddBalanceCommandHandler : IRequestHandler<AddBalanceCommand, Error
         }
         
         var walletValidationDetails = await _walletRepository.GetWalletValidationDetails(request.WalletId);
-
+        
         if (walletValidationDetails is null)
         {
             _logger.LogInformation("Wallet with id: {Id} not found", request.WalletId.Value);
@@ -72,7 +72,7 @@ public class AddBalanceCommandHandler : IRequestHandler<AddBalanceCommand, Error
 
         var wallet = walletValidationDetails.GetWallet();
         
-        if (ValidateAddBalance(walletValidationDetails, owner.Id) is var validationResult && validationResult.IsError)
+        if (ValidateAddBalance(walletValidationDetails, request) is var validationResult && validationResult.IsError)
             return validationResult.Errors;
 
         var balance = AddBalance(wallet, currency, request.Amount);
@@ -86,12 +86,18 @@ public class AddBalanceCommandHandler : IRequestHandler<AddBalanceCommand, Error
         return new WithNotificationResult<Balance, InformationNotification>(balance, walletCreatedNotification);
     }
 
-    private ErrorOr<Success> ValidateAddBalance(WalletValidationDetails walletValidationDetails, UserId ownerId)
+    private ErrorOr<Success> ValidateAddBalance(WalletValidationDetails walletValidationDetails, AddBalanceCommand request)
     {
-        if (!walletValidationDetails.HasAccess(ownerId))
+        if (!walletValidationDetails.HasAccess(request.UserId))
         {
-            _logger.LogInformation("User with id: {Id} is not the owner of profile with id: {ProfileId}", ownerId.Value, walletValidationDetails.ProfileId.Value);
+            _logger.LogInformation("User with id: {Id} is not the owner of profile with id: {ProfileId}", request.UserId.Value, walletValidationDetails.ProfileId.Value);
             return Errors.Profile.AccessDenied;
+        }
+        
+        if (walletValidationDetails.GetHeldCurrencyNames.Contains(request.Symbol))
+        {
+            _logger.LogInformation("Wallet with id: {WalletId} already has a balance with the same currency", walletValidationDetails.WalletId.Value);
+            return Errors.Wallet.DuplicateCurrency;
         }
 
         return Result.Success;
