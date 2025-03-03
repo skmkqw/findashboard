@@ -99,6 +99,9 @@ namespace ZBank.Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
+                    b.Property<decimal>("PriceChangeIn24Hours")
+                        .HasColumnType("numeric");
+
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone");
 
