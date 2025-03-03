@@ -111,8 +111,9 @@ public class CurrencyService : BackgroundService
             return tickers?
                 .Where(ticker => IsValidInstrument(ticker["instId"]!.ToString()))
                 .Select(ticker => Currency.Create(
-                    ticker["instId"]!.ToString().Replace('-', '/'),
-                    decimal.Parse(ticker["last"]!.ToString(), CultureInfo.InvariantCulture)
+                    symbol: ticker["instId"]!.ToString().Replace('-', '/'),
+                    price: decimal.Parse(ticker["last"]!.ToString(), CultureInfo.InvariantCulture),
+                    openPrice: decimal.Parse(ticker["open24h"]!.ToString(), CultureInfo.InvariantCulture)
                 ))
                 .ToList() ?? new List<Currency>();
         }
