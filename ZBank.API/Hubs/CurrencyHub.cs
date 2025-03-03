@@ -69,9 +69,29 @@ public class CurrencyHub : Hub<ICurrencyClient>
         }
     }
     
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _connectionManager.RemoveConnection(Context.ConnectionId);
-        return base.OnDisconnectedAsync(exception);
+        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId != null && Guid.TryParse(userId, out var validUserId))
+        {
+            var userIdObj = UserId.Create(validUserId);
+
+            _connectionManager.RemoveConnection(Context.ConnectionId);
+        
+            var remainingConnections = _connectionManager.GetConnections(userIdObj);
+
+            if (remainingConnections == null || remainingConnections.Count == 0)
+            {
+                var teamId = _connectionManager.GetActiveTeam(userIdObj);
+                if (teamId != null)
+                {
+                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"team-{teamId}");
+                    _connectionManager.RemoveActiveTeam(userIdObj);
+                }
+            }
+        }
+
+        await base.OnDisconnectedAsync(exception);
     }
 }
