@@ -27,6 +27,7 @@ public static class DependencyInjection
         services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
 
         services.AddHostedService<CurrencyUpdaterService>();
+        services.AddHostedService<CurrencyUpdateSenderService>();
         
         services.AddPersistence();
         return services;
