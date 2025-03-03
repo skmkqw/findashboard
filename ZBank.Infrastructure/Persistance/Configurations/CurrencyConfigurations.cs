@@ -21,5 +21,9 @@ public class CurrencyConfigurations : IEntityTypeConfiguration<Currency>
         //Price
         builder.Property(x => x.Price)
             .IsRequired();
+        
+        //PriceChangeIn24Hours
+        builder.Property(x => x.PriceChangeIn24Hours)
+            .IsRequired();
     }
 }
