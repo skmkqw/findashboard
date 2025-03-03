@@ -5,8 +5,10 @@ namespace ZBank.Application.Common.Interfaces.Persistance;
 
 public interface ICurrencyRepository
 {
+    Task<List<Currency>> GetAllCurrenciesAsync();
+    
     Task ReplaceAllCurrenciesAsync(List<Currency> newCurrencies);
     
-    Task<Currency?> GetCurrencyBySymbol(CurrencyId symbol);
+    Task<Currency?> GetCurrencyBySymbolAsync(CurrencyId symbol);
 
 }

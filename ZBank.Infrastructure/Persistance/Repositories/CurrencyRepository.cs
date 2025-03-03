@@ -15,11 +15,16 @@ public class CurrencyRepository : ICurrencyRepository
         _dbContext = dbContext;
     }
 
-    public async Task<Currency?> GetCurrencyBySymbol(CurrencyId symbol)
+    public async Task<Currency?> GetCurrencyBySymbolAsync(CurrencyId symbol)
     {
         return await _dbContext.Currencies.FindAsync(symbol);
     }
-    
+
+    public async Task<List<Currency>> GetAllCurrenciesAsync()
+    {
+        return await _dbContext.Currencies.ToListAsync();
+    }
+
     public async Task ReplaceAllCurrenciesAsync(List<Currency> newCurrencies)
     {
         await using var transaction = await _dbContext.Database.BeginTransactionAsync();
