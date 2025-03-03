@@ -1,6 +1,6 @@
 using ZBank.Domain.NotificationAggregate;
 
-namespace ZBank.API.Interfaces;
+namespace ZBank.Application.Common.Interfaces.Services.Notifications;
 
 public interface INotificationSender
 {

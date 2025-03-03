@@ -1,7 +1,7 @@
 using ZBank.API.Hubs;
-using ZBank.API.Interfaces;
 using ZBank.API.Mapping;
 using ZBank.API.Services.Notifications;
+using ZBank.Application.Common.Interfaces.Services.Notifications;
 
 namespace ZBank.API;
 

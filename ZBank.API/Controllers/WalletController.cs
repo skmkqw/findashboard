@@ -1,7 +1,7 @@
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ZBank.API.Interfaces;
+using ZBank.Application.Common.Interfaces.Services.Notifications;
 using ZBank.Application.Wallets.Commands.AddBalance;
 using ZBank.Application.Wallets.Commands.CreateWallet;
 using ZBank.Contracts.Wallets.AddBalance;
