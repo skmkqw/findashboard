@@ -9,16 +9,16 @@ using ZBank.Domain.CurrencyAggregate;
 
 namespace ZBank.Infrastructure.Services.Background;
 
-public class CurrencyService : BackgroundService
+public class CurrencyUpdaterService : BackgroundService
 {
     private readonly string _url = "https://www.okx.com/api/v5/market/tickers?instType=SPOT";
     
     private readonly TimeSpan _refreshInterval = TimeSpan.FromMinutes(1);
     
-    private readonly ILogger<CurrencyService> _logger;
+    private readonly ILogger<CurrencyUpdaterService> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
 
-    public CurrencyService(ILogger<CurrencyService> logger, IServiceScopeFactory scopeFactory)
+    public CurrencyUpdaterService(ILogger<CurrencyUpdaterService> logger, IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
         _scopeFactory = scopeFactory;
