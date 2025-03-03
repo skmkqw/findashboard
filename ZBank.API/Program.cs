@@ -26,6 +26,8 @@ var app = builder.Build();
     app.MapControllers();
     
     app.MapHub<NotificationHub>("/notification-hub");
+    
+    app.MapHub<CurrencyHub>("/currency-hub");
 
     app.Run();
 }
