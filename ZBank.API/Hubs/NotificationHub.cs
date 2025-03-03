@@ -34,7 +34,7 @@ public class NotificationHub : Hub<INotificationClient>
         if (userId != null && Guid.TryParse(userId, out var validUserId))
         {
             _connectionManager.AddConnection(UserId.Create(validUserId), Context.ConnectionId);
-            await Clients.Caller.ReceiveMessage($"Connected successfully. User ID: {userId}");
+            await Clients.Caller.ReceiveMessage($"Connected successfully. You are now receiving notifications. User ID: {userId}");
         }
     }
 

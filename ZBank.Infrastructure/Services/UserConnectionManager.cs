@@ -38,7 +38,7 @@ public class UserConnectionManager : IUserConnectionManager
     {
         lock (_userConnections)
         {
-            return _userConnections.ContainsKey(userId) ? _userConnections[userId] : null;
+            return _userConnections.TryGetValue(userId, out var connection) ? connection : null;
         }
     }
 }

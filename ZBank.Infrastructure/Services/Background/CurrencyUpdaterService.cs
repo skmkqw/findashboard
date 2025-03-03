@@ -16,6 +16,7 @@ public class CurrencyUpdaterService : BackgroundService
     private readonly TimeSpan _refreshInterval = TimeSpan.FromMinutes(1);
     
     private readonly ILogger<CurrencyUpdaterService> _logger;
+    
     private readonly IServiceScopeFactory _scopeFactory;
 
     public CurrencyUpdaterService(ILogger<CurrencyUpdaterService> logger, IServiceScopeFactory scopeFactory)
