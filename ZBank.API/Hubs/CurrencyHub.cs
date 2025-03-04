@@ -30,7 +30,7 @@ public class CurrencyHub : Hub<ICurrencyClient>
 
         if (userId != null && Guid.TryParse(userId, out var validUserId))
         {
-            await Clients.Caller.ReceiveMessage($"Connected successfully. You are now receiving currency updates. User ID: {validUserId}");
+            await Clients.Caller.ReceiveMessage($"Connected successfully. Join group to receive currency updates. User ID: {validUserId}");
             return;
         }
         
