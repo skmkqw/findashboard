@@ -25,6 +25,8 @@ public static class DependencyInjection
         
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
+        services.AddSingleton<IGroupManager, GroupManager>();
+
 
         services.AddHostedService<CurrencyUpdaterService>();
         services.AddHostedService<CurrencyUpdateSenderService>();
