@@ -1,7 +1,7 @@
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ZBank.API.Interfaces;
+using ZBank.Application.Common.Interfaces.Services.Notifications;
 using ZBank.Application.Profiles.Commands.CreateProfile;
 using ZBank.Contracts.Profiles.CreateProfile;
 

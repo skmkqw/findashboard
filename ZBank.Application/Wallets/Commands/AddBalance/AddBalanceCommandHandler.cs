@@ -55,7 +55,7 @@ public class AddBalanceCommandHandler : IRequestHandler<AddBalanceCommand, Error
             return Errors.User.IdNotFound(request.UserId);
         }
         
-        var currency = await _currencyRepository.GetCurrencyBySymbol(request.Symbol);
+        var currency = await _currencyRepository.GetCurrencyBySymbolAsync(request.Symbol);
         if (currency is null)
         {
             _logger.LogInformation("Currency with Symbol: {Symbol} not found", request.Symbol);

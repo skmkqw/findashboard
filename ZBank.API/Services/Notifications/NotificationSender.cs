@@ -1,8 +1,8 @@
 using MapsterMapper;
 using Microsoft.AspNetCore.SignalR;
 using ZBank.API.Hubs;
-using ZBank.API.Interfaces;
 using ZBank.Application.Common.Interfaces.Services;
+using ZBank.Application.Common.Interfaces.Services.Notifications;
 using ZBank.Contracts.Notifications.GetUserNotifications;
 using ZBank.Domain.NotificationAggregate;
 

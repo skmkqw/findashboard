@@ -123,7 +123,7 @@ public class AcceptInviteCommandHandler : IRequestHandler<AcceptInviteCommand, E
             return (Errors.User.IdNotFound(invite.NotificationSender.SenderId), new ErrorOr<User>());
         }
 
-        var receiver = await _userRepository.FindByIdAsync(invite.NotificationSender.SenderId);
+        var receiver = await _userRepository.FindByIdAsync(invite.NotificationReceiverId);
         if (receiver is null)
         {
             _logger.LogInformation("Notification receiver with ID: {Id} not found", invite.NotificationSender.SenderId.Value);
