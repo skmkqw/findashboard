@@ -4,5 +4,5 @@ namespace ZBank.Application.Common.Interfaces.Services.Currencies;
 
 public interface ICurrencyUpdateSender
 {
-    Task SendUpdateAsync(IEnumerable<Currency> currencies);
+    Task SendUpdateAsync(IEnumerable<Currency> currencies, string groupName);
 }
