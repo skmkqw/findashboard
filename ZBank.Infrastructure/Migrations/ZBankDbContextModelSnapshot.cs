@@ -693,6 +693,9 @@ namespace ZBank.Infrastructure.Migrations
                                 .IsRequired()
                                 .HasColumnType("text");
 
+                            b1.Property<decimal>("TotalInUsd")
+                                .HasColumnType("numeric");
+
                             b1.HasKey("WalletId", "Id");
 
                             b1.ToTable("WalletBalances", (string)null);
