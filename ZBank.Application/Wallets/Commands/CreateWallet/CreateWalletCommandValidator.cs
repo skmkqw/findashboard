@@ -8,7 +8,7 @@ public class CreateWalletCommandValidator : AbstractValidator<CreateWalletComman
     {
         RuleFor(x => x.Address)
             .NotEmpty().WithMessage("Address is required")
-            .Length(20, 200).WithMessage("Address must be between 20 and 200 characters long");
+            .Length(20, 100).WithMessage("Address must be between 20 and 100 characters long");
         
         RuleFor(x => x.Type)
             .NotEmpty().WithMessage("Type is required");
