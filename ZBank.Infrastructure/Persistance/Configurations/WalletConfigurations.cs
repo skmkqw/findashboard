@@ -58,6 +58,11 @@ public class WalletConfigurations : IEntityTypeConfiguration<Wallet>
                 .HasConversion(
                     id => id.Value,
                     value => CurrencyId.Create(value));
+            
+            //TotalInUsd
+            bb.Property(x => x.TotalInUsd)
+                .IsRequired()
+                .ValueGeneratedNever();
         });
         
         builder.Metadata.FindNavigation(nameof(Wallet.Balances))!
