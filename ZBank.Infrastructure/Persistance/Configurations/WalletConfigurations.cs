@@ -32,7 +32,7 @@ public class WalletConfigurations : IEntityTypeConfiguration<Wallet>
         //Name
         builder.Property(x => x.Address)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasMaxLength(100);
     }
 
     private void ConfigureBalancesTable(EntityTypeBuilder<Wallet> builder)
