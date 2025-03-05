@@ -12,10 +12,10 @@ public class Wallet : AggregateRoot<WalletId>
     public WalletType Type { get; private set; } = WalletType.EVM;
 
     public ProfileId ProfileId { get; }
-    
-    public decimal TotalInUsd => Balances.Sum(b => b.TotalInUsd);
-    
-    public IReadOnlyList<Balance> Balances => _balances.AsReadOnly();
+
+    public decimal TotalInUsd { get; private set; }
+
+public IReadOnlyList<Balance> Balances => _balances.AsReadOnly();
 
     private readonly List<Balance> _balances = new();
     
@@ -24,6 +24,7 @@ public class Wallet : AggregateRoot<WalletId>
         Address = address;
         Type = type;
         ProfileId = profileId;
+        TotalInUsd = 0;
     }
 
     public static Wallet Create(string address, WalletType type, ProfileId profileId)
@@ -36,6 +37,8 @@ public class Wallet : AggregateRoot<WalletId>
         Address = address;
         Type = type;
     }
+    
+    public void UpdateTotal(decimal totalInUsd) => TotalInUsd = totalInUsd;
     
     public void AddBalance(Balance balance) => _balances.Add(balance);
     
