@@ -13,6 +13,8 @@ public class Wallet : AggregateRoot<WalletId>
 
     public ProfileId ProfileId { get; }
     
+    public decimal TotalInUsd => Balances.Sum(b => b.TotalInUsd);
+    
     public IReadOnlyList<Balance> Balances => _balances.AsReadOnly();
 
     private readonly List<Balance> _balances = new();
