@@ -15,6 +15,11 @@ public class WalletRepository : IWalletRepository
         _dbContext = dbContext;
     }
 
+    public async Task<List<Wallet>> GetAllAsync()
+    {
+        return await _dbContext.Wallets.ToListAsync(); 
+    }
+
     public async Task<Wallet?> GetById(WalletId walletId)
     {
         return await _dbContext.Wallets.FindAsync(walletId);

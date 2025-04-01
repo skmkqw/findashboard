@@ -6,6 +6,8 @@ namespace ZBank.Application.Common.Interfaces.Persistance;
 
 public interface IWalletRepository
 {
+    Task<List<Wallet>> GetAllAsync();
+    
     Task<Wallet?> GetById(WalletId walletId);
     
     Task<WalletValidationDetails?> GetWalletValidationDetails(WalletId walletId);

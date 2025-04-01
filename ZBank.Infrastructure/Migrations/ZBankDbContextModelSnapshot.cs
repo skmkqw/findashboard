@@ -271,6 +271,9 @@ namespace ZBank.Infrastructure.Migrations
                     b.Property<Guid>("ProfileId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("TotalInUsd")
+                        .HasColumnType("numeric");
+
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
