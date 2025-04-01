@@ -1,6 +1,5 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +12,7 @@ using ZBank.Infrastructure.Authentication;
 using ZBank.Infrastructure.Persistance;
 using ZBank.Infrastructure.Persistance.Repositories;
 using ZBank.Infrastructure.Services;
-using ZBank.Infrastructure.Services.Background;
+using ZBank.Infrastructure.Services.Background.Currencies;
 
 namespace ZBank.Infrastructure;
 

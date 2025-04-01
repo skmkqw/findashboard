@@ -7,7 +7,7 @@ using ZBank.Application.Common.Interfaces.Services.Currencies;
 using ZBank.Domain.CurrencyAggregate;
 using ZBank.Domain.TeamAggregate.ValueObjects;
 
-namespace ZBank.Infrastructure.Services.Background;
+namespace ZBank.Infrastructure.Services.Background.Currencies;
 
 public class CurrencyUpdateSenderService : BackgroundService
 {

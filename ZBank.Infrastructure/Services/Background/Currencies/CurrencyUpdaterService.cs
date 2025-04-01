@@ -7,7 +7,7 @@ using RestSharp;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.CurrencyAggregate;
 
-namespace ZBank.Infrastructure.Services.Background;
+namespace ZBank.Infrastructure.Services.Background.Currencies;
 
 public class CurrencyUpdaterService : BackgroundService
 {
