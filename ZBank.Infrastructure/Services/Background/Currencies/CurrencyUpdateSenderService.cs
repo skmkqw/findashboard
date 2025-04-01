@@ -32,7 +32,8 @@ public class CurrencyUpdateSenderService : BackgroundService
         {
             try
             {
-                await NotifyClients();
+                var groupNames = GetGroupNames();
+                await NotifyClients(groupNames);
             }
             catch (Exception ex)
             {
@@ -59,12 +60,12 @@ public class CurrencyUpdateSenderService : BackgroundService
         return currencies;
     }
 
-    private async Task NotifyClients()
+    private async Task NotifyClients(IEnumerable<string> groupNames)
     {
         using var scope = _scopeFactory.CreateScope();
         var currencyUpdateSender = scope.ServiceProvider.GetRequiredService<ICurrencyUpdateSender>();
 
-        foreach (var groupName in GetGroupNames())
+        foreach (var groupName in groupNames)
         {
             var currencies = await GetGroupCurrencies(groupName);
 
