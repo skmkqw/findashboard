@@ -27,7 +27,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<INotificationSender, NotificationSender<NotificationHub>>();
-        services.AddScoped<ICurrencyUpdateSender, CurrencyUpdateSignalRSender<CurrencyHub>>();
+        services.AddScoped<ICurrencyUpdateSender, CurrencyUpdateSignalRSender<PriceHub>>();
         
         return services;
     }

@@ -7,7 +7,7 @@ using IGroupManager = ZBank.Application.Common.Interfaces.Services.IGroupManager
 
 namespace ZBank.API.Hubs;
 
-public interface ICurrencyClient
+public interface IPriceClient
 {
     Task ReceiveMessage(string message);
     
@@ -15,11 +15,11 @@ public interface ICurrencyClient
 }
 
 [Authorize]
-public class CurrencyHub : Hub<ICurrencyClient>
+public class PriceHub : Hub<IPriceClient>
 {
     private readonly IGroupManager _groupManager;
 
-    public CurrencyHub(IGroupManager groupManager)
+    public PriceHub(IGroupManager groupManager)
     {
         _groupManager = groupManager;
     }
