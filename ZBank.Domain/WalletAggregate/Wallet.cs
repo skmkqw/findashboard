@@ -15,7 +15,7 @@ public class Wallet : AggregateRoot<WalletId>
 
     public decimal TotalInUsd { get; private set; }
 
-public IReadOnlyList<Balance> Balances => _balances.AsReadOnly();
+    public IReadOnlyList<Balance> Balances => _balances.AsReadOnly();
 
     private readonly List<Balance> _balances = new();
     
@@ -38,7 +38,7 @@ public IReadOnlyList<Balance> Balances => _balances.AsReadOnly();
         Type = type;
     }
     
-    public void UpdateTotal(decimal totalInUsd) => TotalInUsd = totalInUsd;
+    public void UpdateTotal() => TotalInUsd = _balances.Sum(x => x.TotalInUsd);
     
     public void AddBalance(Balance balance) => _balances.Add(balance);
     
