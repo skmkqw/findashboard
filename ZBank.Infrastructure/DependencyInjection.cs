@@ -13,6 +13,7 @@ using ZBank.Infrastructure.Persistance;
 using ZBank.Infrastructure.Persistance.Repositories;
 using ZBank.Infrastructure.Services;
 using ZBank.Infrastructure.Services.Background.Currencies;
+using ZBank.Infrastructure.Services.Background.Wallets;
 
 namespace ZBank.Infrastructure;
 
@@ -29,6 +30,9 @@ public static class DependencyInjection
 
         services.AddHostedService<CurrencyUpdaterService>();
         services.AddHostedService<CurrencyUpdateSenderService>();
+        
+        services.AddHostedService<WalletUpdaterService>();
+        services.AddHostedService<WalletUpdateSenderService>();
         
         services.AddPersistence();
         return services;
