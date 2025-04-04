@@ -7,13 +7,13 @@ using ZBank.Domain.CurrencyAggregate;
 
 namespace ZBank.API.Services.Currencies;
 
-public class CurrencyUpdateSignalRSender<T> : ICurrencyUpdateSender where T : Hub<ICurrencyClient>
+public class CurrencyUpdateSignalRSender<T> : ICurrencyUpdateSender where T : Hub<IPriceClient>
 {
     private readonly IMapper _mapper;
     
-    private readonly IHubContext<T, ICurrencyClient> _currencyHubContext;
+    private readonly IHubContext<T, IPriceClient> _currencyHubContext;
 
-    public CurrencyUpdateSignalRSender(IHubContext<T, ICurrencyClient> hubContext, IMapper mapper)
+    public CurrencyUpdateSignalRSender(IHubContext<T, IPriceClient> hubContext, IMapper mapper)
     {
         _currencyHubContext = hubContext;
         _mapper = mapper;
