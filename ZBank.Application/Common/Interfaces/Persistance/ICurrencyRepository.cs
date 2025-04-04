@@ -6,6 +6,8 @@ namespace ZBank.Application.Common.Interfaces.Persistance;
 
 public interface ICurrencyRepository
 {
+    Task<List<Currency>> GetAllAsync();
+    
     Task<Currency?> GetCurrencyBySymbolAsync(CurrencyId symbol);
 
     Task<List<Currency>> GetTeamCurrenciesAsync(TeamId teamId);

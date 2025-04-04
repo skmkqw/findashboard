@@ -16,6 +16,11 @@ public class CurrencyRepository : ICurrencyRepository
         _dbContext = dbContext;
     }
 
+    public async Task<List<Currency>> GetAllAsync()
+    {
+        return await _dbContext.Currencies.ToListAsync();
+    }
+
     public async Task<Currency?> GetCurrencyBySymbolAsync(CurrencyId symbol)
     {
         return await _dbContext.Currencies.FindAsync(symbol);
