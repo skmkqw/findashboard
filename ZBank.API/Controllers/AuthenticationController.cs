@@ -21,7 +21,7 @@ public class AuthenticationController : ApiController
 
     private readonly CookieOptions _cookieOptions = new()
     {
-        HttpOnly = false,
+        HttpOnly = true,
         Secure = true,
         SameSite = SameSiteMode.None,
         Expires = DateTime.UtcNow.AddDays(1)
@@ -81,7 +81,7 @@ public class AuthenticationController : ApiController
     
         HttpContext.Response.Cookies.Delete("AuthToken", new CookieOptions
         {
-            HttpOnly = false,
+            HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
             Path = "/",

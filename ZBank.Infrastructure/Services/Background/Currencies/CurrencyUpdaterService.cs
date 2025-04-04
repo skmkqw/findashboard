@@ -7,13 +7,13 @@ using RestSharp;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Domain.CurrencyAggregate;
 
-namespace ZBank.Infrastructure.Services.Background;
+namespace ZBank.Infrastructure.Services.Background.Currencies;
 
 public class CurrencyUpdaterService : BackgroundService
 {
     private readonly string _url = "https://www.okx.com/api/v5/market/tickers?instType=SPOT";
     
-    private readonly TimeSpan _refreshInterval = TimeSpan.FromMinutes(1);
+    private readonly TimeSpan _refreshInterval = TimeSpan.FromSeconds(60);
     
     private readonly ILogger<CurrencyUpdaterService> _logger;
     

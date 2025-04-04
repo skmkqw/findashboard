@@ -2,8 +2,10 @@ using ZBank.API.Hubs;
 using ZBank.API.Mapping;
 using ZBank.API.Services.Currencies;
 using ZBank.API.Services.Notifications;
+using ZBank.API.Services.Wallets;
 using ZBank.Application.Common.Interfaces.Services.Currencies;
 using ZBank.Application.Common.Interfaces.Services.Notifications;
+using ZBank.Application.Common.Interfaces.Services.Wallets;
 
 namespace ZBank.API;
 
@@ -27,7 +29,8 @@ public static class DependencyInjection
         });
 
         services.AddScoped<INotificationSender, NotificationSender<NotificationHub>>();
-        services.AddScoped<ICurrencyUpdateSender, CurrencyUpdateSignalRSender<CurrencyHub>>();
+        services.AddScoped<ICurrencyUpdateSender, CurrencyUpdateSignalRSender<PriceHub>>();
+        services.AddScoped<IWalletUpdateSender, WalletUpdateSignalRSender<PriceHub>>();
         
         return services;
     }

@@ -1,28 +1,27 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ZBank.Application.Common;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Application.Common.Interfaces.Services.Currencies;
 using ZBank.Domain.CurrencyAggregate;
 using ZBank.Domain.TeamAggregate.ValueObjects;
 
-namespace ZBank.Infrastructure.Services.Background;
+namespace ZBank.Infrastructure.Services.Background.Currencies;
 
-public class CurrencyUpdateSenderService : BackgroundService
+public class CurrencyUpdateSenderService : PriceUpdateSenderService
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IGroupManager _groupManager;
     private readonly ILogger<CurrencyUpdateSenderService> _logger;
-    private readonly TimeSpan _updateInterval = TimeSpan.FromMinutes(1);
+    private readonly TimeSpan _updateInterval = TimeSpan.FromSeconds(65);
 
     public CurrencyUpdateSenderService(IServiceScopeFactory scopeFactory,
         ILogger<CurrencyUpdateSenderService> logger,
-        IGroupManager groupManager)
+        IGroupManager groupManager) : base(groupManager)
     {
         _scopeFactory = scopeFactory;
         _logger = logger;
-        _groupManager = groupManager;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,7 +31,8 @@ public class CurrencyUpdateSenderService : BackgroundService
         {
             try
             {
-                await NotifyClients();
+                var groupNames = GetGroupNames();
+                await NotifyClients(groupNames);
             }
             catch (Exception ex)
             {
@@ -40,9 +40,7 @@ public class CurrencyUpdateSenderService : BackgroundService
             }
         }
     }
-
-    private List<string> GetGroupNames() => _groupManager.GetAllGroups();
-
+    
     private async Task<List<Currency>> GetGroupCurrencies(string groupName)
     {
         using var scope = _scopeFactory.CreateScope();
@@ -52,19 +50,19 @@ public class CurrencyUpdateSenderService : BackgroundService
 
         var teamId = TeamId.Create(Guid.Parse(groupName));
         var currencies = await currencyRepository.GetTeamCurrenciesAsync(teamId);
-        
+
         if (currencies.Count == 0)
             _logger.LogWarning($"No currencies found for group {groupName}");
 
         return currencies;
     }
 
-    private async Task NotifyClients()
+    protected override async Task NotifyClients(IEnumerable<string> groupNames)
     {
         using var scope = _scopeFactory.CreateScope();
         var currencyUpdateSender = scope.ServiceProvider.GetRequiredService<ICurrencyUpdateSender>();
 
-        foreach (var groupName in GetGroupNames())
+        foreach (var groupName in groupNames)
         {
             var currencies = await GetGroupCurrencies(groupName);
 

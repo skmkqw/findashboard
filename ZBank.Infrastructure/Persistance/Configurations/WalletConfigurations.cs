@@ -33,6 +33,11 @@ public class WalletConfigurations : IEntityTypeConfiguration<Wallet>
         builder.Property(x => x.Address)
             .IsRequired()
             .HasMaxLength(100);
+        
+        //TotalInUsd
+        builder.Property(x => x.TotalInUsd)
+            .IsRequired()
+            .ValueGeneratedNever();
     }
 
     private void ConfigureBalancesTable(EntityTypeBuilder<Wallet> builder)
@@ -58,6 +63,11 @@ public class WalletConfigurations : IEntityTypeConfiguration<Wallet>
                 .HasConversion(
                     id => id.Value,
                     value => CurrencyId.Create(value));
+            
+            //TotalInUsd
+            bb.Property(x => x.TotalInUsd)
+                .IsRequired()
+                .ValueGeneratedNever();
         });
         
         builder.Metadata.FindNavigation(nameof(Wallet.Balances))!
