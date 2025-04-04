@@ -1,6 +1,7 @@
 using Mapster;
 using ZBank.Application.Wallets.Commands.AddBalance;
 using ZBank.Application.Wallets.Commands.CreateWallet;
+using ZBank.Contracts.Wallets;
 using ZBank.Contracts.Wallets.AddBalance;
 using ZBank.Contracts.Wallets.CreateWallet;
 using ZBank.Domain.CurrencyAggregate.ValueObjects;
@@ -34,5 +35,16 @@ public class WalletMappingConfigurations : IRegister
         config.NewConfig<Balance, AddBalanceResponse>()
             .Map(dest => dest.Id, src => src.Id.Value)
             .Map(dest => dest.CurrencySymbol, src => src.CurrencyId.Value);
+
+        config.NewConfig<Balance, GetBalanceResponse>()
+            .Map(dest => dest.Id, src => src.Id.Value)
+            .Map(dest => dest.CurrencySymbol, src => src.CurrencyId.Value);
+
+        config.NewConfig<Wallet, GetWalletUpdateResponse>()
+            .Map(dest => dest.Id, src => src.Id.Value)
+            .Map(dest => dest.Balances, src => src.Balances.Adapt<List<GetBalanceResponse>>());
+
+        config.NewConfig<List<Wallet>, GetWalletUpdatesResponse>()
+            .Map(dest => dest.WalletUpdates, src => src.Adapt<List<GetWalletUpdateResponse>>());
     }
 }
