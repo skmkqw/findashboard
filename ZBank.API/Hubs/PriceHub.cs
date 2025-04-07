@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
+using ZBank.API.Hubs.Common;
 using ZBank.Contracts.Currencies;
 using ZBank.Contracts.Wallets;
 using ZBank.Domain.UserAggregate.ValueObjects;
@@ -8,10 +9,8 @@ using IGroupManager = ZBank.Application.Common.Interfaces.Services.IGroupManager
 
 namespace ZBank.API.Hubs;
 
-public interface IPriceClient
+public interface IPriceClient : IHubClient
 {
-    Task ReceiveMessage(string message);
-
     Task ReceiveCurrencyUpdates(GetCurrencyUpdatesResponse currencyUpdates);
     
     Task ReceiveWalletUpdates(GetWalletUpdatesResponse walletUpdates);

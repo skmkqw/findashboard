@@ -1,16 +1,15 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using ZBank.API.Hubs.Common;
 using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Contracts.Notifications.GetUserNotifications;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.API.Hubs;
 
-public interface INotificationClient
+public interface INotificationClient : IHubClient
 {
-    Task ReceiveMessage(string message);
-    
     Task ReceiveInformationNotification(InformationNotificationResponse notification);
     
     Task ReceiveTeamInviteNotification(TeamInviteNotificationResponse notification);
