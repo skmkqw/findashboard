@@ -89,7 +89,7 @@ public class CreateSpaceCommandHandler : IRequestHandler<CreateSpaceCommand, Err
 
     private InformationNotification CreateSpaceCreatedNotification(User owner, PersonalSpace space)
     {
-        var spaceCreatedNotification = NotificationFactory.CreateSpaceCreatedNotification(owner, space);
+        var spaceCreatedNotification = NotificationFactory.CreateSpaceCreatedNotification(owner.Id, space);
         
         owner.AddNotificationId(spaceCreatedNotification.Id);
         

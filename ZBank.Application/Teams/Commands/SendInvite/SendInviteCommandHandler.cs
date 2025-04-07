@@ -144,7 +144,7 @@ public class SendInviteCommandHandler : IRequestHandler<SendInviteCommand, Error
 
     private InformationNotification CreateInviteCreatedNotification(User inviteSender, User inviteReceiver, Team team)
     {
-        var notification = NotificationFactory.CreateTemInviteSentNotification(inviteSender, inviteReceiver, team);
+        var notification = NotificationFactory.CreateTemInviteSentNotification(inviteSender.Id, inviteReceiver, team);
         
         _notificationRepository.AddNotification(notification);
         

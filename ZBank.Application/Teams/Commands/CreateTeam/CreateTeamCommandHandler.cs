@@ -73,7 +73,7 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
     
     private InformationNotification CreateTeamCreatedNotification(User teamCreator, Team team)
     {
-        var notification = NotificationFactory.CreateTeamCreatedNotification(teamCreator, team);
+        var notification = NotificationFactory.CreateTeamCreatedNotification(teamCreator.Id, team);
         
         _notificationRepository.AddNotification(notification);
         
