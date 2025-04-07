@@ -11,37 +11,32 @@ namespace ZBank.Domain.NotificationAggregate.Factories;
 
 public static class NotificationFactory
 {
-    public static InformationNotification CreateInformationNotification(string content, NotificationSender notificationSender, UserId receiverId)
-    {
-        return new InformationNotification(NotificationId.CreateUnique(), notificationSender, receiverId, content);
-    }
-    
-    public static InformationNotification CreateSpaceCreatedNotification(User spaceOwner, PersonalSpace space)
+    public static InformationNotification CreateSpaceCreatedNotification(UserId receiverId, PersonalSpace space)
     {
         return new InformationNotification(
             id: NotificationId.CreateUnique(),
-            notificationSender: NotificationSender.Create(spaceOwner.Id, string.Join(" ", spaceOwner.FirstName, spaceOwner.LastName)),
-            receiverId: spaceOwner.Id,
+            notificationSender: NotificationSender.System, 
+            receiverId: receiverId,
             content: $"Your personal space with name: {space.Name} is created successfully"
         );
     }
     
-    public static InformationNotification CreateTeamCreatedNotification(User teamCreator, Team team)
+    public static InformationNotification CreateTeamCreatedNotification(UserId teamCreatorId, Team team)
     {
         return new InformationNotification(
             id: NotificationId.CreateUnique(),
-            notificationSender: NotificationSender.Create(teamCreator.Id, string.Join(" ", teamCreator.FirstName, teamCreator.LastName)),
-            receiverId: teamCreator.Id,
+            notificationSender: NotificationSender.System,
+            receiverId: teamCreatorId,
             content: $"Team '{team.Name}' is created successfully"
         );
     }
     
-    public static InformationNotification CreateTemInviteSentNotification(User inviteSender, User inviteReceiver, Team team)
+    public static InformationNotification CreateTemInviteSentNotification(UserId inviteSenderId, User inviteReceiver, Team team)
     {
         return new InformationNotification(
             id: NotificationId.CreateUnique(),
-            notificationSender: NotificationSender.Create(inviteSender.Id, string.Join(" ", inviteSender.FirstName, inviteSender.LastName)),
-            receiverId: inviteSender.Id,
+            notificationSender: NotificationSender.System,
+            receiverId: inviteSenderId,
             content: $"{string.Join(" ", inviteReceiver.FirstName, inviteReceiver.LastName)} ({inviteReceiver.Email}) has been invited to {team.Name}"
         );
     }
