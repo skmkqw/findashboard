@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using ErrorOr;
+using Microsoft.Extensions.DependencyInjection;
 using ZBank.Application.Common.Interfaces.Persistance;
 using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Domain.Common.Errors;
@@ -10,16 +11,13 @@ namespace ZBank.Infrastructure.Services;
 
 public class GroupManager : IGroupManager
 {
-    private readonly IUserRepository _userRepository;
-    
-    private readonly ITeamRepository _teamRepository;
+    private readonly IServiceScopeFactory _scopeFactory;
     
     private readonly ConcurrentDictionary<string, ConcurrentDictionary<UserId, HashSet<string>>> _groups = new();
 
-    public GroupManager(ITeamRepository teamRepository, IUserRepository userRepository)
+    public GroupManager(IServiceScopeFactory scopeFactory)
     {
-        _teamRepository = teamRepository;
-        _userRepository = userRepository;
+        _scopeFactory = scopeFactory;
     }
     
     public async Task<ErrorOr<Success>> TryAddUserToGroupAsync(UserId userId, string connectionId, string groupId)
@@ -95,17 +93,21 @@ public class GroupManager : IGroupManager
     
     private async Task<ErrorOr<Success>> ValidateGroupAsync(UserId userId, string groupId)
     {
+        using var scope = _scopeFactory.CreateScope();
+        var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+        var teamRepository = scope.ServiceProvider.GetRequiredService<ITeamRepository>();
+
         if (Guid.TryParse(groupId, out var validGroupId))
         {
             var teamId = TeamId.Create(validGroupId);
             
-            var user = await _userRepository.FindByIdAsync(userId);
+            var user = await userRepository.FindByIdAsync(userId);
             if (user is null)
             {
                 return Errors.User.IdNotFound(userId);
             }
             
-            var teamValidationDetails = await _teamRepository.GetTeamValidationDetailsAsync(teamId, user);
+            var teamValidationDetails = await teamRepository.GetTeamValidationDetailsAsync(teamId, user);
             if (teamValidationDetails is null)
             {
                 return Error.NotFound("Group.NotFound", "Team or personal space with given id not found does not exist");
