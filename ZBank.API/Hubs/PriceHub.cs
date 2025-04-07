@@ -42,15 +42,26 @@ public class PriceHub : Hub<IPriceClient>
     
     public async Task JoinTeamGroup(string teamId)
     {
-        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userIdClaim = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (userId != null && Guid.TryParse(userId, out var validUserId))
+        if (userIdClaim is null || !Guid.TryParse(userIdClaim, out var validUserId))
         {
-            _groupManager.AddUserToGroup(UserId.Create(validUserId), Context.ConnectionId, teamId);
-            await Groups.AddToGroupAsync(Context.ConnectionId, $"team-{teamId}");
-            
-            await Clients.Caller.ReceiveMessage($"Joined team group successfully. Group name: team-{teamId}. User ID: {validUserId}");
+            await Clients.Caller.ReceiveMessage("Invalid user identity. Cannot join group.");
+            return;
         }
+
+        var userId = UserId.Create(validUserId);
+        
+        var joinGroupResult = await _groupManager.TryAddUserToGroupAsync(userId, Context.ConnectionId, teamId);
+        if (joinGroupResult.IsError)
+        {
+            await Clients.Caller.ReceiveMessage($"Access denied: {joinGroupResult.FirstError.Code}-{joinGroupResult.FirstError.Description}");
+            return;
+        }
+
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"team-{teamId}");
+    
+        await Clients.Caller.ReceiveMessage($"Joined team group successfully. Group name: team-{teamId}. User ID: {validUserId}");
     }
 
     public async Task LeaveTeamGroup(string teamId)
