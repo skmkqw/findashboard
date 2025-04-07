@@ -33,4 +33,8 @@ public class PriceHub : HubBase<IPriceClient>
         
         await Clients.Caller.ReceiveMessage("Connection failed. User identity cannot be determined");
     }
+    
+    public async Task JoinTeamGroup(string teamId) => await TryJoinGroupAsync(teamId);
+    
+    public async Task LeaveTeamGroup(string teamId) => await LeaveGroupAsync(teamId);
 }
