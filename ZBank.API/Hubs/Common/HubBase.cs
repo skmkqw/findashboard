@@ -7,11 +7,11 @@ namespace ZBank.API.Hubs.Common;
 
 public abstract class HubBase<TClient> : Hub<TClient> where TClient : class, IHubClient
 {
-    protected readonly IGroupManager _groupManager;
+    protected readonly IGroupManager GroupManager;
 
     protected HubBase(IGroupManager groupManager)
     {
-        _groupManager = groupManager;
+        GroupManager = groupManager;
     }
 
     protected UserId? GetUserId()
@@ -20,28 +20,7 @@ public abstract class HubBase<TClient> : Hub<TClient> where TClient : class, IHu
         return Guid.TryParse(userId, out var guid) ? UserId.Create(guid) : null;
     }
 
-    protected async Task<bool> TryJoinGroup(string groupId)
-    {
-        var userId = GetUserId();
-        if (userId is null)
-        {
-            await Clients.Caller.ReceiveMessage("Invalid user identity.");
-            return false;
-        }
-
-        var result = await _groupManager.TryAddUserToGroupAsync(userId, Context.ConnectionId, groupId);
-        if (result.IsError)
-        {
-            await Clients.Caller.ReceiveMessage($"Access denied: {result.FirstError.Description}");
-            return false;
-        }
-
-        await Groups.AddToGroupAsync(Context.ConnectionId, $"team-{groupId}");
-        await Clients.Caller.ReceiveMessage($"Joined team group: team-{groupId}");
-        return true;
-    }
-
-    protected async Task LeaveGroup(string groupId)
+    protected async Task TryJoinGroupAsync(string groupId)
     {
         var userId = GetUserId();
         if (userId is null)
@@ -50,8 +29,29 @@ public abstract class HubBase<TClient> : Hub<TClient> where TClient : class, IHu
             return;
         }
 
-        _groupManager.RemoveUserFromGroup(userId, Context.ConnectionId, groupId);
+        var result = await GroupManager.TryAddUserToGroupAsync(userId, Context.ConnectionId, groupId);
+        if (result.IsError)
+        {
+            await Clients.Caller.ReceiveMessage($"Access denied: {result.FirstError.Description}");
+            return;
+        }
+
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"team-{groupId}");
+        await Clients.Caller.ReceiveMessage($"Joined team group: team-{groupId}");
+    }
+
+    protected async Task LeaveGroupAsync(string groupId)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+        {
+            await Clients.Caller.ReceiveMessage("Invalid user identity.");
+            return;
+        }
+
+        GroupManager.RemoveUserFromGroup(userId, Context.ConnectionId, groupId);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"team-{groupId}");
-        await Clients.Caller.ReceiveMessage($"Left team group successfully. Group name: team-{groupId}. User ID: {userId}");
+        await Clients.Caller.ReceiveMessage(
+            $"Left team group successfully. Group name: team-{groupId}. User ID: {userId}");
     }
 }
