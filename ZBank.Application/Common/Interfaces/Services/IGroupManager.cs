@@ -1,10 +1,11 @@
+using ErrorOr;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Application.Common.Interfaces.Services;
 
 public interface IGroupManager
 {
-    void AddUserToGroup(UserId userId, string connectionId, string groupId);
+    Task<ErrorOr<Success>> TryAddUserToGroupAsync(UserId userId, string connectionId, string groupId);
 
     void RemoveUserFromGroup(UserId userId, string connectionId, string groupId);
 
