@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
 using ZBank.API.Hubs.Common;
-using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Contracts.Notifications.GetUserNotifications;
 using ZBank.Application.Common.Interfaces.Services;
 
@@ -31,16 +29,24 @@ public class NotificationHub : HubBase<INotificationClient>
             return;
         }
         
-        await Clients.Caller.ReceiveMessage($"Connected successfully. Join a group to receive notifications. User ID: {userId}");
+        await Clients.Caller.ReceiveMessage($"Connected successfully. Join a group to receive notifications. User ID: {userId.Value}");
     }
     
     public async Task JoinTeamGroup(string teamId) => await TryJoinGroupAsync(teamId);
     
     public async Task LeaveTeamGroup(string teamId) => await LeaveGroupAsync(teamId);
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _connectionManager.RemoveConnection(Context.ConnectionId);
-        return base.OnDisconnectedAsync(exception);
+        var userId = GetUserId();
+        if (userId is null)
+        {
+            await Clients.Caller.ReceiveMessage("Connection failed. User identity cannot be determined");
+            return;
+        }
+    
+        var groups = GroupManager.GetAllGroups();
+    
+        groups.ForEach(groupId => GroupManager.RemoveUserFromGroup(userId, Context.ConnectionId, groupId));
     }
 }
