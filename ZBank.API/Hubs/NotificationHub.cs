@@ -1,10 +1,9 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using ZBank.API.Hubs.Common;
 using ZBank.Application.Common.Interfaces.Services;
 using ZBank.Contracts.Notifications.GetUserNotifications;
-using ZBank.Domain.UserAggregate.ValueObjects;
+using ZBank.Application.Common.Interfaces.Services;
 
 namespace ZBank.API.Hubs;
 
@@ -17,15 +16,12 @@ public interface INotificationClient : IHubClient
 
 
 [Authorize]
-public class NotificationHub : Hub<INotificationClient>
+public class NotificationHub : HubBase<INotificationClient>
 {
-    private readonly IUserConnectionManager _connectionManager;
-
-    public NotificationHub(IUserConnectionManager connectionManager)
+    public NotificationHub(IGroupManager groupManager) : base(groupManager)
     {
-        _connectionManager = connectionManager;
     }
-
+    
     public override async Task OnConnectedAsync()
     {
         var userId = GetUserId();
@@ -37,6 +33,10 @@ public class NotificationHub : Hub<INotificationClient>
         
         await Clients.Caller.ReceiveMessage($"Connected successfully. Join a group to receive notifications. User ID: {userId}");
     }
+    
+    public async Task JoinTeamGroup(string teamId) => await TryJoinGroupAsync(teamId);
+    
+    public async Task LeaveTeamGroup(string teamId) => await LeaveGroupAsync(teamId);
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
