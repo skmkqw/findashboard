@@ -68,6 +68,8 @@ public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Error
         
         _teamRepository.AddTeam(team);
         
+        owner.AddTeamId(team.Id);
+        
         return team;
     }
     

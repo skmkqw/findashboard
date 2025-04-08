@@ -3,6 +3,8 @@ using ZBank.Application.Spaces.Commands.CreateSpace;
 using ZBank.Application.Spaces.Queries.GetSpace;
 using ZBank.Contracts.Spaces.CreateSpace;
 using ZBank.Contracts.Spaces.GetSpace;
+using ZBank.Contracts.Teams.GetTeams;
+using ZBank.Domain.Common.Errors;
 using ZBank.Domain.TeamAggregate;
 using ZBank.Domain.UserAggregate.ValueObjects;
 
@@ -30,5 +32,8 @@ public class SpaceMappingConfigurations : IRegister
             .Map(dest => dest.ProjectIds, src => src.ProjectIds.Select(u => u.Value).ToList())
             .Map(dest => dest.ActivityIds, src => src.ActivityIds.Select(u => u.Value).ToList())
             .Map(dest => dest, src => src);
+        
+        config.NewConfig<PersonalSpace, GetUserTeamResponse>()
+            .Map(dest => dest.Id, src => src.Id.Value);
     }
 }
