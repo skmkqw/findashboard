@@ -3,7 +3,10 @@ using ZBank.Application.Teams.Commands.AcceptInvite;
 using ZBank.Application.Teams.Commands.CreateTeam;
 using ZBank.Application.Teams.Commands.DeclineInvite;
 using ZBank.Application.Teams.Commands.SendInvite;
+using ZBank.Application.Users.Queries.GetUserTeams;
+using ZBank.Contracts.Spaces.GetSpace;
 using ZBank.Contracts.Teams.CreateTeam;
+using ZBank.Contracts.Teams.GetTeams;
 using ZBank.Contracts.Teams.SendInvite;
 using ZBank.Domain.NotificationAggregate.ValueObjects;
 using ZBank.Domain.TeamAggregate;
@@ -36,5 +39,15 @@ public class TeamMappingConfigurations : IRegister
         config.NewConfig<Team, CreateTeamResponse>()
             .Map(dest => dest.Id, src => src.Id.Value.ToString())
             .Map(dest => dest.MemberIds, src => src.UserIds.Select(u => u.Value.ToString()).ToList());
+
+        config.NewConfig<Guid, GetUserTeamsQuery>()
+            .Map(dest => dest.UserId, src => UserId.Create(src));
+        
+        config.NewConfig<Team, GetUserTeamResponse>()
+            .Map(dest => dest.Id, src => src.Id.Value);
+        
+        config.NewConfig<(List<Team> Teams, PersonalSpace? PersonalSpace), GetUserTeamsResponse>()
+            .Map(dest => dest.Teams, src => src.Teams.Adapt<List<GetUserTeamResponse>>().ToList())
+            .Map(dest => dest.PersonalSpace, src => src.PersonalSpace.Adapt<GetUserTeamResponse>());
     }
 }
