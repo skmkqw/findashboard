@@ -28,13 +28,14 @@ public class NotificationHub : Hub<INotificationClient>
 
     public override async Task OnConnectedAsync()
     {
-        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        if (userId != null && Guid.TryParse(userId, out var validUserId))
+        var userId = GetUserId();
+        if (userId is null)
         {
-            _connectionManager.AddConnection(UserId.Create(validUserId), Context.ConnectionId);
-            await Clients.Caller.ReceiveMessage($"Connected successfully. You are now receiving notifications. User ID: {userId}");
+            await Clients.Caller.ReceiveMessage("Connection failed. User identity cannot be determined");
+            return;
         }
+        
+        await Clients.Caller.ReceiveMessage($"Connected successfully. Join a group to receive notifications. User ID: {userId}");
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
