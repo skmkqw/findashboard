@@ -23,15 +23,14 @@ public class PriceHub : HubBase<IPriceClient>
     
     public override async Task OnConnectedAsync()
     {
-        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        if (userId != null && Guid.TryParse(userId, out var validUserId))
+        var userId = GetUserId();
+        if (userId is null)
         {
-            await Clients.Caller.ReceiveMessage($"Connected successfully. Join group to receive currency updates. User ID: {validUserId}");
+            await Clients.Caller.ReceiveMessage("Connection failed. User identity cannot be determined");
             return;
         }
         
-        await Clients.Caller.ReceiveMessage("Connection failed. User identity cannot be determined");
+        await Clients.Caller.ReceiveMessage($"Connected successfully. Join group to receive currency updates. User ID: {userId}");
     }
     
     public async Task JoinTeamGroup(string teamId) => await TryJoinGroupAsync(teamId);
