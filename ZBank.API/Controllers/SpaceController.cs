@@ -48,7 +48,7 @@ public class SpaceController : ApiController
         }
         
         _logger.LogInformation("Successfully fetched personal space with id: {Id}", getPersonalSpaceResult.Value.Id.Value);
-        return Ok(_mapper.Map<GetSpaceResponse>(getPersonalSpaceResult.Value));
+        return Ok(_mapper.Map<GetSpaceDetailsResponse>(getPersonalSpaceResult.Value));
     }
     
     [HttpPost]
