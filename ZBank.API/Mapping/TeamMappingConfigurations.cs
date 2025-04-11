@@ -43,11 +43,16 @@ public class TeamMappingConfigurations : IRegister
         config.NewConfig<Guid, GetUserTeamsQuery>()
             .Map(dest => dest.UserId, src => UserId.Create(src));
         
-        config.NewConfig<Team, GetUserTeamResponse>()
+        config.NewConfig<Team, GetTeamResponse>()
             .Map(dest => dest.Id, src => src.Id.Value);
         
-        config.NewConfig<(List<Team> Teams, PersonalSpace? PersonalSpace), GetUserTeamsResponse>()
-            .Map(dest => dest.Teams, src => src.Teams.Adapt<List<GetUserTeamResponse>>().ToList())
-            .Map(dest => dest.PersonalSpace, src => src.PersonalSpace.Adapt<GetUserTeamResponse>());
+        config.NewConfig<GetTeamResult, GetTeamResponse>()
+            .Map(dest => dest.Id, src => src.Team.Id.Value)
+            .Map(dest => dest.Members, src => src.Members.Adapt<List<GetTeamMemberResponse>>())
+            .Map(dest => dest, src => src.Team);
+        
+        config.NewConfig<(List<GetTeamResult> Teams, PersonalSpace? PersonalSpace), GetUserTeamsResponse>()
+            .Map(dest => dest.Teams, src => src.Teams.Adapt<List<GetTeamResponse>>().ToList())
+            .Map(dest => dest.PersonalSpace, src => src.PersonalSpace.Adapt<GetTeamResponse>());
     }
 }
