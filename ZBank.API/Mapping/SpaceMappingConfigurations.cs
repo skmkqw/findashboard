@@ -26,14 +26,14 @@ public class SpaceMappingConfigurations : IRegister
         config.NewConfig<Guid?, GetSpaceQuery>()
             .Map(dest => dest.OwnerId, src => UserId.Create(src!.Value));
         
-        config.NewConfig<PersonalSpace, GetSpaceResponse>()
+        config.NewConfig<PersonalSpace, GetSpaceDetailsResponse>()
             .Map(dest => dest.Id, src => src.Id.Value)
             .Map(dest => dest.OwnerId, src => src.OwnerId.Value)
             .Map(dest => dest.ProjectIds, src => src.ProjectIds.Select(u => u.Value).ToList())
             .Map(dest => dest.ActivityIds, src => src.ActivityIds.Select(u => u.Value).ToList())
             .Map(dest => dest, src => src);
         
-        config.NewConfig<PersonalSpace, GetUserTeamResponse>()
+        config.NewConfig<PersonalSpace, GetTeamResponse>()
             .Map(dest => dest.Id, src => src.Id.Value);
     }
 }
