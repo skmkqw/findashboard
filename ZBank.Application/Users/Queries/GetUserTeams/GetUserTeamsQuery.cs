@@ -5,4 +5,4 @@ using ZBank.Domain.UserAggregate.ValueObjects;
 
 namespace ZBank.Application.Users.Queries.GetUserTeams;
 
-public record GetUserTeamsQuery(UserId UserId) : IRequest<ErrorOr<(List<Team> Teams, PersonalSpace? PersonalSpace)>>;
+public record GetUserTeamsQuery(UserId UserId) : IRequest<ErrorOr<(List<GetTeamResult> Teams, PersonalSpace? PersonalSpace)>>;
